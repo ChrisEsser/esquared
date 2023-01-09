@@ -1,0 +1,4 @@
+/vendor
+/.idea
+.env
+/app/files

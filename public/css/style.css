@@ -1,0 +1,128 @@
+h1.page_header {
+    border-bottom: 1px solid #C0C0C0;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+h1.page_header small {
+    font-size: .7em;
+}
+
+.navbar-nav li.active a {
+    color: #ffff;
+}
+
+.e2-table {
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.e2-table caption {
+    font-size: 1.5em;
+    margin: .5em 0 .75em;
+}
+
+.e2-table tr {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: .35em;
+}
+
+.e2-table th,
+.e2-table td {
+    padding: .625em;
+    text-align: left;
+}
+.e2-table tr td:last-child {
+    white-space: nowrap;
+}
+
+.e2-table th {
+    font-size: .85em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.property_image {
+    width: 100%;
+    max-width: 200px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+tr.table-success,
+.table-success tr {
+    color: #000;
+    border-color: #bcd0c7;
+    background-color: #d1e7dd;
+}
+tr.table-info,
+.table-info tr {
+    color: #000;
+    border-color: #badce3;
+    background-color: #cff4fc;
+}
+
+.ui-datepicker {
+    z-index: 9999 !important;
+}
+
+@media screen and (max-width: 1200px) {
+    .property_image {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .e2-table {
+        border: 0;
+        table-layout: fixed;
+    }
+
+    .e2-table caption {
+        font-size: 1.3em;
+    }
+
+    .e2-table thead {
+        border: none;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+
+    .e2-table tr {
+        border-bottom: 3px solid #ddd;
+        display: block;
+        margin-bottom: .625em;
+    }
+
+    .e2-table td {
+        border-bottom: 1px solid #ddd;
+        display: block;
+        font-size: .9em;
+        text-align: right;
+    }
+
+    .e2-table td::before {
+        /*
+        * aria-label has no advantage, it won't be read inside a table
+        content: attr(aria-label);
+        */
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .e2-table td:last-child {
+        border-bottom: 0;
+    }
+}
