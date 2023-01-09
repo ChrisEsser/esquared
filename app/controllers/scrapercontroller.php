@@ -83,7 +83,7 @@ class ScraperController extends BaseController
             $url->depth = intval($_POST['depth'])-1;
             $url->search_string = base64_encode(serialize($_POST['search_string']));
             $url->state = $_POST['state'];
-            if (empty($url->last_scraped)) $url->last_scraped = gmdate('Y-m-d H:i:s', 0);
+            if (empty($url->last_scraped)) $url->last_scraped = gmdate('Y-m-d H:i:s');
             $url->save();
 
         } catch (Exception $e) {
