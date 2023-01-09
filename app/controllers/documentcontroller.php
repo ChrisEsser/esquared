@@ -94,6 +94,7 @@ class DocumentController extends BaseController
             $document->user_id = $this->loggedInUser;
             $document->description = '';
             $document->property_id = 0;
+            $document->type = 0;
             $document->save();
 
         } catch (Exception $e) {
