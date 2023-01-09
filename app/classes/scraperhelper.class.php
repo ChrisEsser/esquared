@@ -128,9 +128,9 @@ class ScraperHelper
                 $body .= '<p><a href="' . $linkHref . '">' . $url->name . '</a></p>';
                 $mailer->html = $body;
 
-//                if (!$mailer->send()) {
-//                    HTML::addAlert('error sending scraper notification email. ERROR MESSAGE: ' . $mailer->error, 'danger');
-//                }
+                if (!$mailer->send()) {
+                    HTML::addAlert('error sending scraper notification email. ERROR MESSAGE: ' . $mailer->error, 'danger');
+                }
 
             }
 
