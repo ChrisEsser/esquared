@@ -142,4 +142,10 @@ class HTTP
         return;
     }
 
+    public static function asyncRequest($url)
+    {
+        $client = new GuzzleHttp\Client();
+        $promise = $client->requestAsync('GET', $url);
+    }
+
 }
