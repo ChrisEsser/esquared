@@ -29,8 +29,7 @@ try {
 
     $result = mysqli_query($db, 'select * from scraper_urls');
 
-
-    while ($row = mysqli_fetch_assoc($result)) {
+    while ($row = mysqli_fetch_row($result)) {
 
         $filters = unserialize(base64_decode($row['search_string']));
 

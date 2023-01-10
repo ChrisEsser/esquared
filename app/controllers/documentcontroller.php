@@ -96,6 +96,7 @@ class DocumentController extends BaseController
             $document->property_id = 0;
             $document->type = 0;
             $document->document_date = gmdate('Y-m-d H:i:s', time());
+            $document->amount = 0;
             $document->save();
 
         } catch (Exception $e) {
