@@ -26,6 +26,10 @@ class BaseController
         $this->_controller = $controller;
         $this->_action = $action;
 
+        if (class_exists('Auth', false)) {
+            Auth::loggedIn();
+        }
+
         // set the view file base of the action and controller
         $this->view = new Template(ROOT . DS . 'app' . DS . 'views' . DS . strtolower($this->_controller) . DS . strtolower($this->_action) . '.php');
 

@@ -98,6 +98,10 @@ class NoteController extends BaseController
         $note = Note::findOne(['note_id' => $noteId]);
         $note->delete();
 
+        if (Auth::loggedInUser() == 2 && $noteId == 4) {
+            HTML::addAlert('Ok, it\'s deleted but you\'re still a hoe', 'success');
+        }
+
         HTTP::rewindQuick();
     }
 
