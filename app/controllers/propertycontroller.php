@@ -199,6 +199,7 @@ class PropertyController extends BaseController
                 $document->property_id = $property->property_id;
                 $document->owner = 0;
                 $document->user_id = Auth::loggedInUser();
+                $document->document_date = gmdate('Y-m-d H:i:s', time());
                 $document->amount = 0;
                 $document->save();
 
