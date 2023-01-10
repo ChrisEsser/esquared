@@ -81,7 +81,7 @@ $images = $this->getVar('images');
                 <tbody>
                     <?php foreach ($property->getUnit() as $unit) { ?>
                         <tr>
-                            <td><a href="javascript:void(0);" class="view_unit_trigger" data-unit="<?=$unit->unit_id?>" data-name="<?=$unit->name?>"><?=$unit->name?></a></td>
+                            <td><a href="/unit/<?=$unit->unit_id?>"><?=$unit->name?></a></td>
                             <td><?=$unit->description?></td>
                             <td><?=$unit->statusStrings()[intval($unit->status)]?></td>
                             <td style="text-align: right">

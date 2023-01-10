@@ -14,9 +14,6 @@ class UnitController extends BaseController
 
     public function unit($params)
     {
-        HTTP::removePageFromHistory();
-        $this->render_header = false;
-
         $unitId = ($params['unitId']) ?? 0;
 
         $unit = ($unitId)

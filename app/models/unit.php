@@ -6,6 +6,7 @@
  * MAGIC METHODS
  * @method \Property getProperty()
  * @method \User[] getRenter()
+ * @method \PaymentHistory[] getPaymentHistory()
  */
 class Unit extends BaseModel
 {
@@ -43,6 +44,7 @@ class Unit extends BaseModel
     {
         self::addRelationOneToOne('property_id', 'Property', 'property_id');
         self::addRelationOneToMany('unit_id', 'User', 'unit_id', 'Renter');
+        self::addRelationOneToMany('unit_id', 'PaymentHistory', 'unit_id');
     }
 
     public function statusStrings()
