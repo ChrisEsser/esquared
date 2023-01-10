@@ -172,7 +172,7 @@ $images = $this->getVar('images');
                             <td><?=date('m/d/Y g:ia', strtotime($note->created))?></td>
                             <td><?=$userName?></td>
                             <td><?=$note->note?></td>
-                            <td><?=$note->typeStrings()[$note->note_id]?></td>
+                            <td><?=$note->typeStrings()[$note->type]?></td>
                             <td style="text-align: right">
                                 <button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="note" data-note="<?=$note->note_id?>" type="button">Edit</button>
                                 <button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-message="Are you sure you want to delete this note?" data-url="/delete-note/<?=$note->note_id?>" type="button">Delete</button>
