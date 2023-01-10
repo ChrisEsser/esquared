@@ -199,6 +199,7 @@ class PropertyController extends BaseController
                 $document->property_id = $property->property_id;
                 $document->owner = 0;
                 $document->user_id = Auth::loggedInUser();
+                $document->amount = 0;
                 $document->save();
 
             } else throw new Exception('No file key' . print_r($_POST, true));
