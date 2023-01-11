@@ -150,11 +150,9 @@ class RenterController extends BaseController
         if (empty($_POST['stripeToken'])) $missing[] = 'stripeToken';
 
         if (!empty($missing)) {
-            HTML::addAlert('Required fields were missing');
+            HTML::addAlert('Required fields were missing', 'danger');
             HTTP::rewindQuick();
         }
-
-        $stripe = new \Stripe\StripeClient($_ENV['STRIPE_SECRET']);
 
         // rent amount
         $rent = $this->user->getUnit()->rent;
@@ -164,12 +162,16 @@ class RenterController extends BaseController
         $fee = $total - $rent;
 
         try {
-            $response = $stripe->charges->create([
+
+            \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET']);
+
+            $charge = \Stripe\Charge::create([
                 'amount'      => $total,
                 'currency'    => 'usd',
                 'source'      => $_POST['stripeToken'],
                 'description' => 'E Squared Holdings | Rent Payment',
             ]);
+
         } catch (Exception $e) {
              HTML::addAlert('An error occurred processing payment. ' . $e->getMessage());
              HTTP::rewindQuick();
@@ -190,7 +192,7 @@ class RenterController extends BaseController
         $payment->description = 'Rent Payment - ' . date('m/d/y');
         $payment->payment_date = gmdate('Y-m-d H:i:s', time());
 
-        $payment->transaction_id = $response->id;
+        $payment->transaction_id = $charge->id;
         $payment->confirmation_number = $confirmationNumber;
         $payment->save();
 
@@ -209,15 +211,17 @@ class RenterController extends BaseController
 
         $stripe = new \Stripe\StripeClient($_ENV['STRIPE_SECRET']);
 
+        $rent = $this->user->getUnit()->rent;
+        $rent = number_format($rent, 2) * 100;
+
+        $fee = round(min($rent * 0.008, 500));
+        $total = $rent + $fee;
+
         try {
 
-            $rent = $this->user->getUnit()->rent;
-            $rent = number_format($rent, 2) * 100;
+            \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET']);
 
-            $fee = round(min($rent * 0.008, 500));
-            $total = $rent + $fee;
-
-            $response = $stripe->charges->create([
+            $charge = \Stripe\Charge::create([
                 'amount' => $total,
                 'currency' => 'usd',
                 'customer' => $this->paymentDetails['stripe_customer_id'],
@@ -243,7 +247,7 @@ class RenterController extends BaseController
         $payment->description = 'Rent Payment - ' . date('m/d/y');
         $payment->payment_date = gmdate('Y-m-d H:i:s', time());
 
-        $payment->transaction_id = $response->id;
+        $payment->transaction_id = $charge->id;
         $payment->confirmation_number = $confirmationNumber;
         $payment->save();
 
