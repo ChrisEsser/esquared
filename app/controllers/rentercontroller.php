@@ -1,5 +1,8 @@
 <?php
 
+use Stripe\Customer;
+use Stripe\Stripe;
+
 class RenterController extends BaseController
 {
     /** @var \User */
