@@ -99,6 +99,8 @@ class BaseModel extends PicORM\Model
             $args[0]['deleted'] = 0;
         }
 
+        Debug::dump($args);
+
         return parent::__call($method, $args);
     }
 

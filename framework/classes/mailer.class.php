@@ -58,12 +58,21 @@ class Mailer {
                 $this->mailer->setFrom($_ENV['MAIL_FROM'], 'E Squared Holdings, LLC');
             }
 
-            if (is_array($this->to)) {
-                foreach ($this->to as $address) {
-                    $this->mailer->addAddress($address);
+            if (!$_ENV['DEVELOPMENT_ENVIRONMENT']) {
+
+                if (is_array($this->to)) {
+                    foreach ($this->to as $address) {
+                        $this->mailer->addAddress($address);
+                    }
+                } else if (is_string($this->to)) {
+                    $this->mailer->addAddress($this->to);
                 }
-            } else if (is_string($this->to)) {
-                $this->mailer->addAddress($this->to);
+
+            } else {
+
+                // if its dev enviro just send the email to me for testing
+                $this->mailer->addAddress('chris@esquaredholdings.com');
+
             }
 
             if (!empty($this->cc)) {
@@ -94,7 +103,7 @@ class Mailer {
                  $this->mailer->AltBody = $this->text;
             }
 
-            return $this->mailer->send();
+            return (!$this->mailer->send()) ? false : true;
 
         } catch (Exception $e) {
             $this->error = $e->getMessage();

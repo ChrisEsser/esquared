@@ -24,7 +24,11 @@ return [
     ['GET', '/rent-history', 'RenterController#rentHistory'],
     ['GET', '/pay-rent', 'RenterController#payRent'],
     ['POST', '/pay-rent/process/card', 'RenterController#payRentProcessCard'],
+    ['POST', '/pay-rent/process/ach', 'RenterController#payRentProcessAch'],
     ['GET', '/confirmation/[*:confirmationNumber]', 'RenterController#payRentConfirmation'],
+    ['GET', '/manage-payment', 'RenterController#managePayment'],
+    ['POST', '/ach-setup/process', 'RenterController#achSetupProcess'],
+    ['POST', '/ach-setup/verify', 'RenterController#achSetupProcess'],
 
     ['GET', '/dashboard', 'DashboardController#dashboard'],
 

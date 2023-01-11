@@ -304,8 +304,8 @@ class PropertyController extends BaseController
             if (!$payment->unit_id) $payment->unit_id = intval($_POST['unit_id']);
             $payment->method = $_POST['method'];
             $payment->type = $_POST['type'];
-            $payment->payment_date = date('Y-m-d H:i:s', strtotime($_POST['payment_date']));
-            $payment->amount = number_format($_POST['amount'], 2);
+            $payment->payment_date = gmdate('Y-m-d H:i:s', strtotime($_POST['payment_date']));
+            $payment->amount = number_format($_POST['amount'], 2, '.', '');
             $payment->user_id = Auth::loggedInUser();
             $payment->fee = 0;
             $payment->description = $_POST['type'] . ' Payment - ' . date('Y-m-d H:i:s', strtotime($_POST['payment_date']));

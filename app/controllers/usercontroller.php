@@ -52,6 +52,8 @@ class UserController extends BaseController
                 ? User::findOne(['user_id' => $userId])
                 : new User();
 
+            $newUser = empty($user->user_id);
+
             if (empty($_POST['first_name'])) $missing[] = 'first_name';
             if (empty($_POST['last_name'])) $missing[] = 'last_name';
             if (empty($_POST['email'])) $missing[] = 'email';
@@ -62,15 +64,45 @@ class UserController extends BaseController
                 throw new Exception('The passwords do not match');
             }
 
+            $admin = intval($_POST['admin'] ?? 0);
+
             $user->first_name = $_POST['first_name'];
             $user->last_name = $_POST['last_name'];
             $user->email = $_POST['email'];
-            $user->admin = (isset($_POST['admin']) && $_POST['admin'] == 1);
+            $user->admin = $admin;
             $user->unit_id = intval($_POST['unit_id']);
             if (!empty($_POST['password'])) {
                 $user->password = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
             $user->save();
+
+            // if this a new user, lets fire off a password rest email as kind of an invite into the system
+            if ($newUser) {
+
+                $tokenString = bin2hex(random_bytes(16));
+
+                $token = new ResetToken();
+                $token->user_id = $user->user_id;
+                $token->token = $tokenString;
+                $token->created = date('Y-m-d H:i:s', time());
+                $token->save();
+
+                $mailer = new Mailer();
+                $mailer->subject = 'E Squared Holdings | Website Invitation';
+                $mailer->to = $user->email;
+
+                $linkHref = $_ENV['BASE_PATH'] . '/login/password-recovery?token=' .$tokenString;
+
+                $body = '<p>Hello ' . $user->first_name . ', </p>';
+                $body .= '<p>Use the following link to set your password: </p>';
+                $body .= '<p><a href="' . $linkHref . '">Click here to reset your password</a></p>';
+                $mailer->html = $body;
+
+                if (!$mailer->send()) {
+                    throw new Exception('The account was created but there was an error sending invitation email.');
+                }
+
+            }
 
         } catch (Exception $e) {
             $return = [

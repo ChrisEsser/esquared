@@ -4,6 +4,7 @@ class RenterController extends BaseController
 {
     /** @var \User */
     private $user;
+    private $paymentDetails;
 
     public function beforeAction()
     {
@@ -17,8 +18,14 @@ class RenterController extends BaseController
         }
 
         $this->user = $user;
+        $paymentDetails = (!empty($user->payment_details))
+            ? unserialize(base64_decode($user->payment_details))
+            : [];
+
+        $this->paymentDetails = $paymentDetails;
 
         $this->view->setVar('user', $user);
+        $this->view->setVar('paymentDetails', $paymentDetails);
     }
 
     public function account()
@@ -103,6 +110,7 @@ class RenterController extends BaseController
             HTTP::redirect('/');
         }
 
+        $this->view->setVar('unit', $unit);
     }
 
     public function payRent()
@@ -113,16 +121,23 @@ class RenterController extends BaseController
         $rent = $this->user->getUnit()->rent;
         $rent = number_format($rent, 2) * 100;
 
-        $cardTotal = ceil(($rent + 30) / (1 - 0.029));
+        $achFee = round(min($rent * 0.008, 500));
+        $achTotal = $achFee + $rent;
+
+        $cardTotal = round($rent / (1 - 0.029));
         $cardFee = $cardTotal - $rent;
 
         $rent =  $this->user->getUnit()->rent;
-        $cardTotal = round($cardTotal/100, 2);
-        $cardFee = round($cardFee/100, 2);
+        $achTotal = $achTotal/100;
+        $cardTotal = $cardTotal/100;
+        $cardFee = $cardFee/100;
+        $achFee = $achFee/100;
 
         $this->view->setVar('rent', $rent);
         $this->view->setVar('cardTotal', $cardTotal);
+        $this->view->setVar('achTotal', $achTotal);
         $this->view->setVar('cardFee', $cardFee);
+        $this->view->setVar('achFee', $achFee);
     }
 
     public function payRentProcessCard()
@@ -145,7 +160,7 @@ class RenterController extends BaseController
         $rent = $this->user->getUnit()->rent;
         $rent = number_format($rent, 2) * 100;
 
-        $total = ceil(($rent + 30) / (1 - 0.029));
+        $total = round($rent / (1 - 0.029));
         $fee = $total - $rent;
 
         try {
@@ -169,11 +184,64 @@ class RenterController extends BaseController
         $payment->user_id = $this->user->user_id;
         $payment->unit_id = $this->user->getUnit()->unit_id;
         $payment->amount = $this->user->getUnit()->rent;
-        $payment->fee = round($fee / 100, 2);
+        $payment->fee = $fee / 100;
         $payment->method = 'Credit Card';
         $payment->type = 'Rent';
         $payment->description = 'Rent Payment - ' . date('m/d/y');
-        $payment->payment_date = date('Y-m-d H:i:s', time());
+        $payment->payment_date = gmdate('Y-m-d H:i:s', time());
+
+        $payment->transaction_id = $response->id;
+        $payment->confirmation_number = $confirmationNumber;
+        $payment->save();
+
+        HTTP::redirect('/confirmation/' . $confirmationNumber);
+
+    }
+
+    public function payRentProcessAch()
+    {
+        $this->render = false;
+
+        if ($this->paymentDetails['stripe_ach_verified'] != 2) {
+            HTML::addAlert('Invalid Bank Details');
+            HTTP::rewindQuick();
+        }
+
+        $stripe = new \Stripe\StripeClient($_ENV['STRIPE_SECRET']);
+
+        try {
+
+            $rent = $this->user->getUnit()->rent;
+            $rent = number_format($rent, 2) * 100;
+
+            $fee = round(min($rent * 0.008, 500));
+            $total = $rent + $fee;
+
+            $response = $stripe->charges->create([
+                'amount' => $total,
+                'currency' => 'usd',
+                'customer' => $this->paymentDetails['stripe_customer_id'],
+                'description' => 'E Squared Holdings | Rent Payment',
+            ]);
+
+        } catch (Exception $e) {
+            HTML::addAlert($e->getMessage());
+            HTTP::rewindQuick();
+        }
+
+        // generate a unique confirmation number
+        $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $confirmationNumber = date('Ymd-', time()) . substr(str_shuffle($chars), 0, 5);
+
+        $payment = new PaymentHistory();
+        $payment->user_id = $this->user->user_id;
+        $payment->unit_id = $this->user->getUnit()->unit_id;
+        $payment->amount = $this->user->getUnit()->rent;
+        $payment->fee = $fee / 100;
+        $payment->method = 'ACH Transfer';
+        $payment->type = 'Rent';
+        $payment->description = 'Rent Payment - ' . date('m/d/y');
+        $payment->payment_date = gmdate('Y-m-d H:i:s', time());
 
         $payment->transaction_id = $response->id;
         $payment->confirmation_number = $confirmationNumber;
@@ -191,6 +259,90 @@ class RenterController extends BaseController
         if (!$payment) throw new Exception404();
 
         $this->view->setVar('payment', $payment);
+    }
+
+    public function managePayment()
+    {
+        $this->render_header = false;
+
+    }
+
+    public function achSetupProcess()
+    {
+        $this->render = false;
+
+        $return = [
+            'result' => 'success',
+            'message' => '',
+        ];
+
+        try {
+
+            if (empty($_POST['ach_type'])) throw new Exception('Invalid Request: no type');
+
+            \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET']);
+
+            if ($_POST['ach_type'] == 'setup') {
+
+                $missing = [];
+                if (empty($_POST['account_name'])) $missing[] = 'account_name';
+                if (empty($_POST['account_type'])) $missing[] = 'account_type';
+                if (empty($_POST['account_number'])) $missing[] = 'account_number';
+                if (empty($_POST['routing_number'])) $missing[] = 'routing_number';
+
+                if (!empty($missing)) throw new Exception('Required fields were missing');
+
+                if (empty($_POST['token'])) throw new Exception('Account token missing');
+
+                $customer = \Stripe\Customer::create([
+                    'description' => $_POST['account_name'],
+                    'source' => $_POST['token'],
+                ]);
+
+                $paymentDetails = [
+                    'stripe_customer_id' => $customer->id,
+                    'stripe_default_source' => $customer->default_source,
+                    'stripe_ach_verified' => 1,
+                ];
+
+                $this->user->payment_details = base64_encode(serialize($paymentDetails));
+                $this->user->save();
+
+            } else if ($_POST['ach_type'] == 'verify') {
+
+                $deposit0 = round($_POST['deposit_0'] * 100);
+                $deposit1 = round($_POST['deposit_1'] * 100);
+
+                $account = \Stripe\Customer::retrieveSource(
+                    $this->paymentDetails['stripe_customer_id'],
+                    $this->paymentDetails['stripe_default_source']
+                );
+
+                $response = $account->verify([
+                    'amounts' => [$deposit0, $deposit1]
+                ]);
+
+                if ($response['status'] != 'verified') {
+                    throw new Exception('Unable to verify. Please check that the amounts are correct.');
+                }
+
+                $newPaymentDetails = $this->paymentDetails;
+                $newPaymentDetails['stripe_ach_verified'] = 2;
+
+                $this->user->payment_details = base64_encode(serialize($newPaymentDetails));
+                $this->user->save();
+
+            } else throw new Exception('Invalid Request: invalid type');
+
+        } catch (Exception $e) {
+            $return = [
+                'result' => 'error',
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        echo json_encode($return);
+
     }
 
 

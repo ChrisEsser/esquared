@@ -17,6 +17,7 @@ class User extends BaseModel
     public $last_name;
     public $admin;
     public $unit_id;
+    public $payment_details;
     public $created;
     public $updated;
     public $deleted;
@@ -34,6 +35,7 @@ class User extends BaseModel
         'last_name',
         'admin',
         'unit_id',
+        'payment_details',
         'created',
         'updated',
         'deleted',

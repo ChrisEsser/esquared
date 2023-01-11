@@ -2,7 +2,10 @@
 
 $rent = $this->getVar('rent');
 $cardTotal = $this->getVar('cardTotal');
+$achTotal = $this->getVar('achTotal');
 $cardFee = $this->getVar('cardFee');
+$achFee = $this->getVar('achFee');
+$paymentDetails = $this->getVar('paymentDetails');
 
 ?>
 
@@ -15,35 +18,46 @@ $cardFee = $this->getVar('cardFee');
         <th>Transaction Fee:</th>
         <td>$<?=number_format($cardFee, 2)?></td>
     </tr>
+    <tr class="ach_extra_payment_row" style="display: none">
+        <th>Transaction Fee:</th>
+        <td>$<?=number_format($achFee, 2)?></td>
+    </tr>
     <tr class="card_extra_payment_row" style="display: none">
         <th>Total:</th>
         <td>$<?=number_format($cardTotal, 2)?></td>
+    </tr>
+    <tr class="ach_extra_payment_row" style="display: none">
+        <th>Total:</th>
+        <td>$<?=number_format($achTotal, 2)?></td>
     </tr>
 </table>
 
 <hr/>
 
+<div class="row">
 
-<div class="mb-3">
-    <label for="type_toggle" class="form-label">Choose Payment Method</label>
-    <select class="form-control" id="type_toggle">
-        <?php if (false) { ?>
-            <option value="1">Electronic Fund Transfer (ACH)</option>
-        <?php } ?>
-        <option value="0">Credit Card</option>
-        <option value="2">Apple Pay</option>
-    </select>
+    <div class="mb-3 col-md-6 col-9">
+        <label for="type_toggle" class="form-label">Choose Payment Method</label>
+        <select class="form-control" id="type_toggle">
+            <?php if (!empty($paymentDetails) && $paymentDetails['stripe_ach_verified'] == 2) { ?>
+                <option value="1">Electronic Fund Transfer (ACH)</option>
+            <?php } ?>
+            <option value="0">Credit Card</option>
+<!--            <option value="2">Apple Pay</option>-->
+        </select>
+    </div>
+
+    <div class="mb-3 col-md-6 col-3">
+
+
+
+    </div>
+
 </div>
 
-<hr class="mt-4" />
+<hr />
 
 <div class="alert alert-danger" id="error_message" style="display: none"></div>
-
-<?php if (false) { ?>
-    <div id="ach_container" class="pay_container" style="display: none">
-        <strong>Account#:</strong> 183849234089swdljk
-    </div>
-<?php } ?>
 
 <div id="credit_card_container" class="pay_container" style="display: none">
 
@@ -51,29 +65,33 @@ $cardFee = $this->getVar('cardFee');
 
     <form id="cardForm" method="POST" action="/pay-rent/process/card">
 
-        <div class="mb-3">
-            <label for="cardName" class="control-label">Name on Card</label>
-            <input type="text" id="cardName" name="card_name" class="form-control" />
-        </div>
+        <div class="row">
 
-        <div class="mb-3">
-            <label for="cardName" class="control-label">Zip Code</label>
-            <input type="text" id="cardZip" name="card_zip" class="form-control" />
-        </div>
+            <div class="mb-3 col-md-6">
+                <label for="cardName" class="control-label">Name on Card</label>
+                <input type="text" id="cardName" name="card_name" class="form-control" />
+            </div>
 
-        <div class="mb-3">
-            <label for="cardNumber" class="control-label">Card Number</label>
-            <div id="cardNumber" class="form-control"></div>
+            <div class="mb-3 col-md-6">
+                <label for="cardName" class="control-label">Zip Code</label>
+                <input type="text" id="cardZip" name="card_zip" class="form-control" />
+            </div>
+
         </div>
 
         <div class="row">
 
             <div class="mb-3 col-6">
+                <label for="cardNumber" class="control-label">Card Number</label>
+                <div id="cardNumber" class="form-control"></div>
+            </div>
+
+            <div class="mb-3 col-3">
                 <label for="cardExpiry" class="control-label">Card Expiration</label>
                 <div id="cardExpiry" class="form-control"></div>
             </div>
 
-            <div class="mb-3 col-6">
+            <div class="mb-3 col-3">
                 <label for="cardCvc" class="control-label">Card CVC</label>
                 <div id="cardCvc" class="form-control"></div>
             </div>
@@ -85,6 +103,14 @@ $cardFee = $this->getVar('cardFee');
 </div>
 
 <div id="apple_container" class="pay_container" style="display: none"></div>
+
+<div id="ach_container" class="pay_container" style="display: none">
+
+    <p><small><i>By submitting this form, you authorize E Squared Holdings, LLC to electronically debit my account and, if necessary, electronically credit my account to correct erroneous debits.</i></small></p>
+
+    <form id="achForm" method="POST" action="/pay-rent/process/ach"></form>
+
+</div>
 
 
 <script>
@@ -103,6 +129,7 @@ $cardFee = $this->getVar('cardFee');
     function showPayContainer() {
         $('.pay_container').hide();
         $('.card_extra_payment_row').hide();
+        $('.ach_extra_payment_row').hide();
         let type = $('#type_toggle').val();
         if (type === '0') {
             mountCard();
@@ -110,6 +137,7 @@ $cardFee = $this->getVar('cardFee');
             $('.card_extra_payment_row').show();
         } else if (type === '1') {
             $('#ach_container').show();
+            $('.ach_extra_payment_row').show();
         } else if (type === '2') {
             $('#apple_container').show();
         }
@@ -174,6 +202,10 @@ $cardFee = $this->getVar('cardFee');
                     $('#cardForm').append('<input type="hidden" name="stripeToken" value="' + result.token.id + '" />').submit();
                 }
             });
+
+        } else if (type === '1') {
+
+            $('#achForm').submit();
 
         }
 

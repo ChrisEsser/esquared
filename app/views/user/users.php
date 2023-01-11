@@ -31,7 +31,7 @@
                     <td><?=$user->last_name?></td>
                     <td><?=$user->email?></td>
                     <td><?=($user->admin) ? 'Yes' : 'No'?></td>
-                    <td><?=($user->getUnit()) ? '<a href="/property/' . $user->getUnit()->property_id . '" target="_blank">' . $user->getUnit()->name . '</a>' : ''?></td>
+                    <td><?=($user->getUnit()) ? '<a href="/property/' . $user->getUnit()->property_id . '" target="_blank">' . $user->getUnit()->getProperty()->name . ' | ' . $user->getUnit()->name . '</a>' : ''?></td>
                     <td style="text-align: right">
                         <button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-user="<?=$user->user_id?>" type="button">Edit</button>
                         <button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-property="<?=$user->user_id?>" data-message="Are you sure you want to delete this user?" data-url="/delete-user/<?=$user->user_id?>" type="button">Delete</button>

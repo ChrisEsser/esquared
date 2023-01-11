@@ -31,9 +31,7 @@ class Debug
 
     public static function dump_shutdown()
     {
-
-        if (substr($_SERVER['REMOTE_ADDR'], 0, 8) == '192.168.' || $_SERVER['REMOTE_ADDR'] == '127.0.0.1') {
-
+        if ($_ENV['DEVELOPMENT_ENVIRONMENT']) {
 
             if (isset($_SESSION['framework']['dump'])) {
 
