@@ -163,9 +163,9 @@ class RenterController extends BaseController
 
         try {
 
-            \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET']);
+            $stripe = new \Stripe\StripeClient($_ENV['STRIPE_SECRET']);
 
-            $charge = \Stripe\Charge::create([
+            $stripe->charges->create([
                 'amount'      => $total,
                 'currency'    => 'usd',
                 'source'      => $_POST['stripeToken'],
@@ -219,9 +219,9 @@ class RenterController extends BaseController
 
         try {
 
-            \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET']);
+            $stripe = new \Stripe\StripeClient($_ENV['STRIPE_SECRET']);
 
-            $charge = \Stripe\Charge::create([
+            $stripe->charges->create([
                 'amount' => $total,
                 'currency' => 'usd',
                 'customer' => $this->paymentDetails['stripe_customer_id'],
