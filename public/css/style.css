@@ -6,8 +6,21 @@
     top: 0;
 }
 
+#sidebar_trigger {
+    color: #fff;
+    background-color: rgb(40, 40, 40);
+    border-radius: 0 7px 7px 0;
+    padding: 7px 15px;
+    text-decoration: none;
+    font-size: 1.2em;
+    position: absolute;
+    top: 15px;
+    right: -40px;
+}
+
 #body_container {
     margin-left: 250px;
+    min-width: 320px;
 }
 
 .menu_heading {

@@ -21,7 +21,7 @@ $action = $this->getVar('action');
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
     <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.css"/>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"/>
-    <link rel="stylesheet" href="/css/style.css?ver=33"/>
+    <link rel="stylesheet" href="/css/style.css?ver=99"/>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -96,15 +96,15 @@ $action = $this->getVar('action');
                     </ul>
                 </div>
 
+                <a href="#" id="sidebar_trigger"><i class="fa fa-bars"></i></a>
+
             </div>
 
         </div>
 
         <div class="col" id="body_container">
 
-            <div class="top_bar py-3" style="display: flex; align-items: center; justify-content: space-between">
-
-                <a href="#" class="border rounded-3 py-1 px-2 text-decoration-none" id="sidebar_trigger" style="color: #fff; background-color: #414552"><i class="bi bi-list"></i></a>
+            <div class="top_bar py-3" style="display: flex; align-items: center; justify-content: end">
 
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-dark px-3 text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -176,15 +176,38 @@ $action = $this->getVar('action');
 </div>
 
 <script>
+
+    function detectWidthAndHandleSidebar() {
+        var windowWidth = window.innerWidth;
+        if (windowWidth < 991) {
+            $('#sidebar').css({left: '-250px'});
+            $('#body_container').css({marginLeft: '0'});
+        } else {
+            $('#sidebar').css({left: '0'});
+            $('#body_container').css({marginLeft: '250px'});
+        }
+    }
+
+    detectWidthAndHandleSidebar();
+
     $(document).ready(function() {
+
+        $(window).resize(() => {
+            detectWidthAndHandleSidebar();
+        });
 
         $('#sidebar_trigger').click(function() {
 
             var lefValue = $('#sidebar').css('left');
+            var windowWidth = window.innerWidth;
 
             if (lefValue == '-250px') {
                 $('#sidebar').animate({left: '0'}, 300);
-                $('#body_container').animate({marginLeft: '250px'});
+                if (windowWidth < 991) {
+                    $('#body_container').css({marginLeft: '0'});
+                } else {
+                    $('#body_container').animate({marginLeft: '250px'});
+                }
             } else {
                 $('#sidebar').animate({left: '-250px'}, 300);
                 $('#body_container').animate({marginLeft: '0'});
@@ -193,6 +216,7 @@ $action = $this->getVar('action');
         });
 
     });
+
 </script>
 
 </body>
