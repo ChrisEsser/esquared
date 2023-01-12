@@ -21,7 +21,7 @@ $action = $this->getVar('action');
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
     <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.css"/>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"/>
-    <link rel="stylesheet" href="/css/style.css?ver=98"/>
+    <link rel="stylesheet" href="/css/style.css?ver=96"/>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
