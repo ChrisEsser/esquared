@@ -15,6 +15,12 @@ class Auth
     public static function switchUser($userId)
     {
         $_SESSION['framework']['user']['currentUser']['user_id'] = $userId;
+
+        if ($userId == $_SESSION['framework']['user']['previousUser']['user_id']) {
+            unset($_SESSION['framework']['user']['previousUser']);
+        } else {
+            $_SESSION['framework']['user']['previousUser']['user_id'] = Auth::loggedInUser();
+        }
     }
 
     /**
@@ -138,7 +144,7 @@ class Auth
 
         try {
 
-            $userId = isset($_SESSION['framework']['user']['currentUser']['user_id']) ? $_SESSION['framework']['user']['currentUser']['user_id'] : 0;
+            $userId = $_SESSION['framework']['user']['currentUser']['user_id'] ?? 0;
 
             if (!$userId) {
                 $cdeToken = $_COOKIE['cdeToken'];

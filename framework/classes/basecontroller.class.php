@@ -26,7 +26,7 @@ class BaseController
         $this->_controller = $controller;
         $this->_action = $action;
 
-        if (class_exists('Auth', false)) {
+        if (class_exists('Auth')) {
             Auth::loggedIn();
         }
 

@@ -24,7 +24,7 @@ spl_autoload_register(function($className) {
         }
     }
 
-    if (!$gotit) throw new Exception('Class not found: ' . $tmpClassName);
+    if (!$gotit) return false;
 
 });
 
