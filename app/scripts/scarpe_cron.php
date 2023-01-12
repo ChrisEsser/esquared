@@ -78,6 +78,11 @@ try {
             }
 
             $plainSTring = getPdfString($href);
+
+            if (!$plainSTring) {
+                continue;
+            }
+
             $dollarAmount = pullDollarAmountFromString($plainSTring);
             $address = pullAddressFromString($plainSTring);
             $addressParts = parseAddressPartsFromGoogle($address);
@@ -226,9 +231,10 @@ function getPdfString($url)
 {
     $tmpPdfPath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmppdf' . time() . '.pdf';
 
-    if (!$result = file_put_contents($tmpPdfPath, file_get_contents($url))) {
-        return false;
-    }
+    $contents = file_get_contents($url);
+    if (!$contents) return false;
+    $result = file_put_contents($tmpPdfPath, $contents);
+    if (!$result) return false;
 
     $tmpImgFilePath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmptxt' . time();
 
