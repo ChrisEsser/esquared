@@ -14,7 +14,7 @@
     text-decoration: none;
     font-size: 1.2em;
     position: absolute;
-    top: 15px;
+    top: 7px;
     right: -40px;
 }
 
@@ -91,6 +91,7 @@ h1.page_header {
     border-bottom: 1px solid #C0C0C0;
     padding-bottom: 5px;
     margin-bottom: 15px;
+    margin-top: 10px;
 }
 
 h1.page_header small {
