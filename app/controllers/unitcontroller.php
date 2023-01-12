@@ -11,6 +11,22 @@ class UnitController extends BaseController
         }
     }
 
+    public function units($params)
+    {
+        $propertyId = ($params['propertyId']) ?? 0;
+
+        $property = ($propertyId)
+            ? Property::findOne(['property_id' => $propertyId])
+            : new Property();
+
+        $units = ($propertyId)
+            ? Unit::find(['property_id' => $propertyId])
+            : Unit::find();
+
+        $this->view->setVar('property', $property);
+        $this->view->setVar('units', $units);
+    }
+
 
     public function unit($params)
     {
@@ -108,7 +124,7 @@ class UnitController extends BaseController
             $layout->display();
         }
         else if ($this->render) {
-            $layout = new PlainLayout();
+            $layout = new AdminLayout();
             $layout->action = $this->_action;
             $layout->addTemplate($this->view);
             $layout->display();

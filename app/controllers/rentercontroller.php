@@ -168,7 +168,7 @@ class RenterController extends BaseController
 
             $stripe = new \Stripe\StripeClient($_ENV['STRIPE_SECRET']);
 
-            $stripe->charges->create([
+            $charge = $stripe->charges->create([
                 'amount'      => $total,
                 'currency'    => 'usd',
                 'source'      => $_POST['stripeToken'],
@@ -199,8 +199,25 @@ class RenterController extends BaseController
         $payment->confirmation_number = $confirmationNumber;
         $payment->save();
 
-        HTTP::redirect('/confirmation/' . $confirmationNumber);
+        // send email notification
+        $mailer = new Mailer();
+        $mailer->to = $this->user->email;
+        $mailer->from = 'info@esquaredholdings.com';
+        $mailer->subject = 'E Squared Holdings | Payment Confirmation';
 
+        $html = '<h2>Payment Confirmation</h2>';
+        $html .= '<p>Thank you! Your payment was successful</p>';
+        $html .= '<p><strong>$' . number_format($total/100, 2) . '</strong> -- E Squared Holdings, LLC | Rent PAyment</p>';
+        $mailer->html = $html;
+        $mailer->send();
+
+        // send email notification
+        if (!$this->sendPaymentConfirmationEmail($total)) {
+            HTML::addAlert('The payment succeeded but an error occurred sending the confirmation email', 'danger');
+        }
+        $this->sendPaymentAdminNotificationEmail($total, 'Credit Card');
+
+        HTTP::redirect('/confirmation/' . $confirmationNumber);
     }
 
     public function payRentProcessAch()
@@ -224,7 +241,7 @@ class RenterController extends BaseController
 
             $stripe = new \Stripe\StripeClient($_ENV['STRIPE_SECRET']);
 
-            $stripe->charges->create([
+            $charge = $stripe->charges->create([
                 'amount' => $total,
                 'currency' => 'usd',
                 'customer' => $this->paymentDetails['stripe_customer_id'],
@@ -254,8 +271,13 @@ class RenterController extends BaseController
         $payment->confirmation_number = $confirmationNumber;
         $payment->save();
 
-        HTTP::redirect('/confirmation/' . $confirmationNumber);
+        // send email notification
+        if (!$this->sendPaymentConfirmationEmail($total)) {
+            HTML::addAlert('The payment succeeded but an error occurred sending the confirmation email', 'danger');
+        }
+        $this->sendPaymentAdminNotificationEmail($total, 'ACH');
 
+        HTTP::redirect('/confirmation/' . $confirmationNumber);
     }
 
     public function payRentConfirmation($params)
@@ -352,7 +374,6 @@ class RenterController extends BaseController
 
     }
 
-
     public function afterAction()
     {
         if (!$this->render_header) {
@@ -368,6 +389,40 @@ class RenterController extends BaseController
             $layout->addTemplate($this->view);
             $layout->display();
         }
+    }
+
+    private function sendPaymentConfirmationEmail($total)
+    {
+        $hStyle = 'color: #414552; font-family: -apple-system,\'SF Pro Display\',\'Segoe UI\',Roboto,\'Helvetica Neue\',Ubuntu,sans-serif;font-size: 28px;line-height: 36px;font-weight: 700!important;';
+        $pStyle = 'color: #414552!important;font-family: -apple-system,\'SF Pro Display\',\'SF Pro Text\',\'Helvetica\',sans-serif;font-weight: 400;font-size: 16px;line-height: 24px;';
+
+        $mailer = new Mailer();
+        $mailer->to = $this->user->email;
+        $mailer->from = 'info@esquaredholdings.com';
+        $mailer->subject = 'E Squared Holdings | Payment Confirmation';
+
+        $html = '<h2 style="' . $hStyle . '">Payment Confirmation</h2>';
+        $html .= '<p style="' . $pStyle . '">Thank you! Your payment was successful</p>';
+        $html .= '<p style="' . $pStyle . '"><strong>$' . number_format($total/100, 2) . '</strong> -- E Squared Holdings, LLC | Rent Payment</p>';
+        $mailer->html = $html;
+        return $mailer->send();
+    }
+
+    private function sendPaymentAdminNotificationEmail($total, $type)
+    {
+        $hStyle = 'color: #414552; font-family: -apple-system,\'SF Pro Display\',\'Segoe UI\',Roboto,\'Helvetica Neue\',Ubuntu,sans-serif;font-size: 28px;line-height: 36px;font-weight: 700!important;';
+        $pStyle = 'color: #414552!important;font-family: -apple-system,\'SF Pro Display\',\'SF Pro Text\',\'Helvetica\',sans-serif;font-weight: 400;font-size: 16px;line-height: 24px;';
+
+        $mailer = new Mailer();
+        $mailer->to = ['cody@esquaredholdings.com', 'chris@esquaredholdings.com'];
+        $mailer->from = 'info@esquaredholdings.com';
+        $mailer->subject = 'E Squared Holdings | Payment Notification';
+
+        $html = '<h2 style="' . $hStyle . '">Payment Notification</h2>';
+        $html .= '<p style="' . $pStyle . '">A payment was received from ' . $this->user->first_name . ' ' . $this->user->last_name . ' via ' . $type . '</p>';
+        $html .= '<p style="' . $pStyle . '"><strong>$' . number_format($total/100, 2) . '</strong> - ' . $this->user->getUnit()->getProperty()->name . ' | ' . $this->user->getUnit()->name . '</p>';
+        $mailer->html = $html;
+        return $mailer->send();
     }
 
 }

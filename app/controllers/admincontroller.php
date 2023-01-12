@@ -125,7 +125,7 @@ class AdminController extends BaseController
             $layout->display();
         }
         else if ($this->render) {
-            $layout = new PlainLayout();
+            $layout = new AdminLayout();
             $layout->action = $this->_action;
             $layout->addTemplate($this->view);
             $layout->display();

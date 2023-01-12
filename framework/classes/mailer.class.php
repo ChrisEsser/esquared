@@ -19,7 +19,7 @@ class Mailer {
 
     public function __construct()
     {
-        $this->mailer = new PHPMailer(true);
+        $this->mailer = new PHPMailer();
         $this->setSMTP();
     }
 
@@ -33,8 +33,7 @@ class Mailer {
             $this->mailer->Username = $_ENV['MAIL_USER'];
             $this->mailer->Password = $_ENV['MAIL_PASSWORD'];
 
-
-            $this->mailer->SMTPDebug = 1;
+            $this->mailer->SMTPDebug = 0;
             $this->mailer->Debugoutput = 'html';
             $this->mailer->SMTPSecure = 'tls';
             $this->mailer->SMTPAuth = true;

@@ -46,6 +46,8 @@ return [
 	['POST', '/property/delete-payment/[:paymentId]', 'PropertyController#editPayment'],
 	['POST', '/property/save-payment', 'PropertyController#savePayment'],
 
+    ['GET', '/units', 'UnitController#units'],
+    ['GET', '/units/[i:propertyId]', 'UnitController#units'],
     ['GET', '/unit/[i:unitId]', 'UnitController#unit'],
     ['GET', '/edit-unit/[i:unitId]', 'UnitController#edit'],
     ['GET', '/create-unit/[i:propertyId]', 'UnitController#edit'],

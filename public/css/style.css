@@ -1,3 +1,79 @@
+#sidebar {
+    background-color: rgb(40, 40, 40);
+    width: 250px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+}
+
+#body_container {
+    margin-left: 250px;
+}
+
+.menu_heading {
+    margin-top: 20px;
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    font-weight: 600;
+    display: inherit;
+    flex-flow: row nowrap;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+    width: 100%;
+    text-transform: uppercase;
+    -webkit-box-align: center;
+    align-items: center;
+    margin-left: 20px;
+}
+
+#sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#sidebar ul.list_container > li {
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    border-right: 1px solid rgba(0,0,0,.125);
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    border-left: 1px solid rgba(0,0,0,.125);
+}
+
+#sidebar ul.list_container > li:first-child {
+    border-top: 1px solid rgba(0,0,0,.125);
+}
+
+#sidebar ul.list_container > li > a {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    font-weight: 400;
+    width: 100%;
+    text-decoration: none !important;
+    color: rgb(212, 215, 220);
+}
+
+#sidebar ul.list_container > li > a > div {
+    padding: 0 12px;
+}
+#sidebar ul.list_container > li > a > div > i {
+    font-size: 1.4em;
+}
+#sidebar ul.list_container > li > a > span {
+    padding: 10px 0;
+}
+
+li.active > a {
+    border-left: 4px solid #0d6efd;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+
+
+
 h1.page_header {
     border-bottom: 1px solid #C0C0C0;
     padding-bottom: 5px;
