@@ -33,11 +33,20 @@ register_shutdown_function(function() {
     Debug::dump_shutdown();
 });
 
+// include composer autoloader
+require ROOT . DS . 'vendor' . DS . 'autoload.php';
 
-if (substr($_SERVER['REMOTE_ADDR'], 0, 8) == '192.168.' || $_SERVER['REMOTE_ADDR'] == '127.0.0.1') {
+// load the environment variables from the main .env file
+$dotenv = Dotenv\Dotenv::createImmutable(ROOT);
+$dotenv->load();
+
+require_once(ROOT . DS . 'config' . DS . 'config.php');
+require_once(ROOT . DS . 'config' . DS . 'routing.php');
+
+if ($_ENV['DEVELOPMENT_ENVIRONMENT'] == 'true') {
 
     error_reporting(E_ALL);
-	ini_set('log_errors', 1);
+    ini_set('log_errors', 1);
 
     set_error_handler(function($errNo, $errStr, $errFile, $errLine) {
         switch ($errNo) {
@@ -53,16 +62,6 @@ if (substr($_SERVER['REMOTE_ADDR'], 0, 8) == '192.168.' || $_SERVER['REMOTE_ADDR
         }
     });
 }
-
-// include composer autoloader
-require ROOT . DS . 'vendor' . DS . 'autoload.php';
-
-// load the environment variables from the main .env file
-$dotenv = Dotenv\Dotenv::createImmutable(ROOT);
-$dotenv->load();
-
-require_once(ROOT . DS . 'config' . DS . 'config.php');
-require_once(ROOT . DS . 'config' . DS . 'routing.php');
 
 // this contains the main hook call
 require_once(ROOT . DS . 'framework' . DS . 'helpers' . DS . 'hook.php');

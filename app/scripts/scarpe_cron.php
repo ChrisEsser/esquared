@@ -6,18 +6,44 @@
  * as such needs to be a procedural php script
  */
 
+session_start();
+
 ini_set('max_execution_time', 0);
 set_time_limit(0);
 
 define('ROOT', dirname(dirname(dirname(__FILE__))));
 define('DS', DIRECTORY_SEPARATOR);
 
+spl_autoload_register(function($className) {
+
+    $tmpClassName = $className;
+    $className = strtolower($className);
+
+    $classPaths = [
+        'framePath' => ROOT . DS . 'framework' . DS . 'classes' . DS . $className . '.class.php',
+        'appClassesPath' => ROOT . DS . 'app' . DS . 'classes' . DS . $className . '.class.php',
+        'appInterfacePath' => ROOT . DS . 'app' . DS . 'interfaces' . DS . $className . '.interface.php',
+        'controllersPath' => ROOT . DS . 'app' . DS . 'controllers' . DS . $className . '.php',
+        'componentsPath' => ROOT . DS . 'app' . DS . 'components' . DS . $className . '.php',
+        'modelsPath' => ROOT . DS . 'app' . DS . 'models' . DS . $className . '.php',
+        'layoutPath' => ROOT . DS . 'app' . DS . 'layouts' . DS . $className . '.class.php',
+    ];
+
+    $gotit = false;
+    foreach ($classPaths as $name => $classPath) {
+        if (file_exists($classPath)) {
+            require $classPath;
+            $gotit = true;
+            break;
+        }
+    }
+
+    if (!$gotit) throw new Exception('Class not found: ' . $tmpClassName);
+
+});
+
 require ROOT . DS . 'vendor' . DS . 'autoload.php';
 
-use thiagoalessio\TesseractOCR\TesseractOCR;
-
-
-// load environment variables from the .env file
 $dotenv = Dotenv\Dotenv::createImmutable(ROOT);
 $dotenv->load();
 
@@ -25,19 +51,16 @@ try {
 
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $db = mysqli_connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD'], $_ENV['DB_NAME']);
+    /** @var ScraperUrl[] $urls */
+    $urls = ScraperUrl::find();
 
-    $result = mysqli_query($db, 'select * from scraper_urls');
+    libxml_use_internal_errors(true);
 
-    while ($row = mysqli_fetch_row($result)) {
+    foreach ($urls as $urlRow) {
 
-        $filters = unserialize(base64_decode($row['search_string']));
-
-        libxml_use_internal_errors(true);
-
+        $filters = unserialize(base64_decode($urlRow->search_string));
         $client = new GuzzleHttp\Client();
-
-        $leads = recursiveCrawl($row['url'], 0, $row['depth'], $filters, $client);
+        $leads = recursiveCrawl($urlRow->url, 0, $urlRow->depth, $filters, $client);
 
         $leadHrefs = [];
 
@@ -45,22 +68,13 @@ try {
 
             $leadHrefs[] = $href;
 
-            $sql = 'select * from scraper_leads where url_id = ? and url = ?'; // SQL with parameters
-            $stmt = $db->prepare($sql);
-            $stmt->bind_param('is', $row['url_id'], $href);
-            $stmt->execute();
-            $result = $stmt->get_result(); // get the mysqli result
-            $lead = $result->fetch_assoc(); // fetch data
+            /** @var ScraperLead $lead */
+            $lead = ScraperLead::findOne(['url_id' => $urlRow->url_id, 'url' => $href]);
 
-            if (!empty($lead)) {
-
-                $sql = 'update scraper_leads set last_seen = ? where lead_id = ?';
-                $stmt = $db->prepare($sql);
-                $date = gmdate('Y-m-d H:i:s', time());
-                $stmt->bind_param('si', $date, $lead['lead_id']);
-                $stmt->execute();
+            if ($lead) {
+                $lead->last_seen = gmdate('Y-m-d H:i:s', time());
+                $lead->save();
                 continue;
-
             }
 
             $plainSTring = getPdfString($href);
@@ -68,47 +82,58 @@ try {
             $address = pullAddressFromString($plainSTring);
             $addressParts = parseAddressPartsFromGoogle($address);
 
-
-            $sql = 'insert into scraper_leads (url_id, url, last_seen, active, flagged, judgment_amount, lat, lon, 
-                                               street, city, state, zip)
-                    values (?, ?, ?, 1, 0, ?, ?, ?, ?, ?, ?, ?)';
-            $stmt = $db->prepare($sql);
-            $date = gmdate('Y-m-d H:i:s', time());
-            $dollarAmount = floatval($dollarAmount);
-            $street = $addressParts['streetNumber'] . ' ' . $addressParts['streetName'];
-            $stmt->bind_param(
-                'ssssssssss',
-                $row['url_id'],
-                $href,
-                $date,
-                $dollarAmount,
-                $addressParts['lat'],
-                $addressParts['lon'],
-                $street,
-                $addressParts['city'],
-                $addressParts['state'],
-                $addressParts['zip']
-            );
-            $stmt->execute();
+            /** @var ScraperLead $lead */
+            $lead = new ScraperLead();
+            $lead->url_id = $urlRow->url_id;
+            $lead->url = $href;
+            $lead->last_seen = gmdate('Y-m-d H:i:s', time());
+            $lead->active = 1;
+            $lead->flagged = 0;
+            $lead->judgment_amount = floatval($dollarAmount);
+            $lead->lat = $addressParts['lat'];
+            $lead->lon = $addressParts['lon'];
+            $lead->street = $addressParts['streetNumber'] . ' ' . $addressParts['streetName'];
+            $lead->city = $addressParts['city'];
+            $lead->state = $addressParts['state'];
+            $lead->zip = $addressParts['zip'];
+            $lead->save();
+            $newLeads[] = $lead;
 
         }
 
-        $sql = 'delete from scraper_leads where url_id = ? and url not in (\'' . implode('\', \'', $leadHrefs) . '\')';
-        $stmt = $db->prepare($sql);
-//        $notInList = implode('\', \'', $leadHrefs);
-        $stmt->bind_param('i', $row['url_id']);
-        $stmt->execute();
+        // delete any outdated leads for this url
+        ScraperLead::find([
+            'url' => [
+                'operator' => 'NOT IN',
+                'value' => [
+                    '(\'' . implode('\', \'', $leadHrefs) . '\')'
+                ]
+            ],
+            'url_id' => $urlRow->url_id
+        ])->delete();
 
-        $sql = 'update scraper_urls set last_scraped = ?, leads_count = ? where url_id = ?';
-        $stmt = $db->prepare($sql);
-        $date = $date = gmdate('Y-m-d H:i:s', time());
-        $count = count($leads);
-        $stmt->bind_param('sii', $date, $count, $row['url_id']);
-        $stmt->execute();
+        // update the main url record
+        $urlRow->last_scraped = gmdate('Y-m-d H:i:s', time());
+        $urlRow->leads_count = count($leads);
+        $urlRow->save();
+
+        // send notification emails
+        if (!empty($newLeads)) {
+
+            $mailer = new Mailer();
+            $mailer->subject = 'E Squared Holdings | Scraper Notification';
+            $mailer->to = ['chris@esquaredholdings.com', 'cody@esquaredholdings.com'];
+
+            $linkHref = $_ENV['BASE_PATH'] . '/scraper/' . $urlRow->url_id . '/leads';
+
+            $body = '<p>New leads were detected for the following scraper url: </p>';
+            $body .= '<p><a href="' . $linkHref . '">' . $urlRow->name . '</a></p>';
+            $mailer->html = $body;
+            $mailer->send();
+
+        }
 
     }
-
-    echo 'done';
 
 } catch (Exception $e) {
 
@@ -116,7 +141,7 @@ try {
 
 }
 
-mysqli_close($db);
+echo 'done';
 
 /**
  * Recursively Crawl the url using settings set up in the app
