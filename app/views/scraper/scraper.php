@@ -7,11 +7,12 @@ $urls = $this->getVar('urls');
 
 <h1 class="page_header">Manage Scraper</h1>
 
-<a href="/scraper/leads">View All Leads</a> <!--| <a href="/scraper/all">Scrape All Urls</a>-->
-
-
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
     <button role="button" class="btn btn-primary me-md-2 edit_trigger" type="button">Add Url</button>
+</div>
+
+<div class="mb-3">
+    <a href="/scraper/leads">View All Leads</a> <!--| <a href="/scraper/all">Scrape All Urls</a>-->
 </div>
 
 <?php if (count($urls)) { ?>

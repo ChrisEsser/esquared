@@ -9,15 +9,15 @@ $viewing = $this->getVar('viewing');
 
 <h1 class="page_header">Manage Documents<?=(!empty($viewing)) ? '<small> - ' . $viewing . '</small>' : ''?></h1>
 
-
-<a href="/documents?mydocs">My Documents</a> | <a href="/documents">All Documents</a>
-
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
     <button role="button" class="btn btn-primary me-md-2 edit_trigger" type="button">Add Document</button>
 </div>
 
-<?php if (count($documents)) { ?>
+<div class="mb-3">
+    <a href="/documents?mydocs">My Documents</a> | <a href="/documents">All Documents</a>
+</div>
 
+<?php if (count($documents)) { ?>
 
     <table class="e2-table">
         <thead>

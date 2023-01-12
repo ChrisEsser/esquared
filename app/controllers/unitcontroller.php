@@ -23,8 +23,11 @@ class UnitController extends BaseController
             ? Unit::find(['property_id' => $propertyId])
             : Unit::find();
 
+        $properties = $property->find();
+
         $this->view->setVar('property', $property);
         $this->view->setVar('units', $units);
+        $this->view->setVar('properties', $properties);
     }
 
 

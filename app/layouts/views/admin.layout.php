@@ -87,8 +87,8 @@ $action = $this->getVar('action');
                                 <span>Scraper Urls</span>
                             </a>
                         </li>
-                        <li class="<?=($action == 'settings') ? 'active' : ''?>">
-                            <a href="/settings" tabindex="0">
+                        <li class="<?=($action == 'admin') ? 'active' : ''?>">
+                            <a href="/admin" tabindex="0">
                                 <div><i class="fa fa-cog"></i></div>
                                 <span>Settings</span>
                             </a>
