@@ -126,8 +126,9 @@ function hook()
 
     } catch (Exception $e) {
 
-        if ($_ENV['DEVELOPMENT_ENVIRONMENT']) {
+        if ($_ENV['DEVELOPMENT_ENVIRONMENT'] == 'true') {
             var_dump($e->getMessage() . ' File: ' . $e->getFile() . ' Line: ' . $e->getLine());
+            exit;
         } else {
             header('HTTP/1.1 500 Internal Server Error');
             exit;

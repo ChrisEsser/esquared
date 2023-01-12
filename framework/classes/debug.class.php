@@ -31,7 +31,7 @@ class Debug
 
     public static function dump_shutdown()
     {
-        if ($_ENV['DEVELOPMENT_ENVIRONMENT']) {
+        if ($_ENV['DEVELOPMENT_ENVIRONMENT'] == 'ture') {
 
             if (isset($_SESSION['framework']['dump'])) {
 

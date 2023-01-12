@@ -58,7 +58,7 @@ class Mailer {
                 $this->mailer->setFrom($_ENV['MAIL_FROM'], 'E Squared Holdings, LLC');
             }
 
-            if (!$_ENV['DEVELOPMENT_ENVIRONMENT']) {
+            if ($_ENV['DEVELOPMENT_ENVIRONMENT'] == 'false') {
 
                 if (is_array($this->to)) {
                     foreach ($this->to as $address) {

@@ -7,7 +7,7 @@ class QuickBooks
 {
     public function getDataService()
     {
-        $baseUrl = ($_ENV['DEVELOPMENT_ENVIRONMENT']) ? 'development' : 'production';
+        $baseUrl = ($_ENV['DEVELOPMENT_ENVIRONMENT'] == 'true') ? 'development' : 'production';
 
         return DataService::Configure([
             'auth_mode' => 'oauth2',
