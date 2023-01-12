@@ -130,20 +130,20 @@ try {
         $urlRow->save();
 
         // send notification emails
-        if (false || !empty($newLeads)) {
-
-            $mailer = new Mailer();
-            $mailer->subject = 'E Squared Holdings | Scraper Notification';
-            $mailer->to = ['chris@esquaredholdings.com', 'cody@esquaredholdings.com'];
-
-            $linkHref = $_ENV['BASE_PATH'] . '/scraper/' . $urlRow->url_id . '/leads';
-
-            $body = '<p>New leads were detected for the following scraper url: </p>';
-            $body .= '<p><a href="' . $linkHref . '">' . $urlRow->name . '</a></p>';
-            $mailer->html = $body;
-            $mailer->send();
-
-        }
+//        if (false || !empty($newLeads)) {
+//
+//            $mailer = new Mailer();
+//            $mailer->subject = 'E Squared Holdings | Scraper Notification';
+//            $mailer->to = ['chris@esquaredholdings.com', 'cody@esquaredholdings.com'];
+//
+//            $linkHref = $_ENV['BASE_PATH'] . '/scraper/' . $urlRow->url_id . '/leads';
+//
+//            $body = '<p>New leads were detected for the following scraper url: </p>';
+//            $body .= '<p><a href="' . $linkHref . '">' . $urlRow->name . '</a></p>';
+//            $mailer->html = $body;
+//            $mailer->send();
+//
+//        }
 
     }
 
