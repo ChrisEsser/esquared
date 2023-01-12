@@ -77,15 +77,15 @@ try {
                 continue;
             }
 
-            $plainSTring = getPdfString($href);
+//            $plainSTring = getPdfString($href);
 
-            if (!$plainSTring) {
-                continue;
-            }
+//            if (!$plainSTring) {
+//                continue;
+//            }
 
-            $dollarAmount = pullDollarAmountFromString($plainSTring);
-            $address = pullAddressFromString($plainSTring);
-            $addressParts = parseAddressPartsFromGoogle($address);
+//            $dollarAmount = pullDollarAmountFromString($plainSTring);
+//            $address = pullAddressFromString($plainSTring);
+//            $addressParts = parseAddressPartsFromGoogle($address);
 
             /** @var ScraperLead $lead */
             $lead = new ScraperLead();
@@ -94,13 +94,20 @@ try {
             $lead->last_seen = gmdate('Y-m-d H:i:s', time());
             $lead->active = 1;
             $lead->flagged = 0;
-            $lead->judgment_amount = floatval($dollarAmount);
-            $lead->lat = $addressParts['lat'];
-            $lead->lon = $addressParts['lon'];
-            $lead->street = $addressParts['streetNumber'] . ' ' . $addressParts['streetName'];
-            $lead->city = $addressParts['city'];
-            $lead->state = $addressParts['state'];
-            $lead->zip = $addressParts['zip'];
+//            $lead->judgment_amount = floatval($dollarAmount);
+            $lead->judgment_amount = 0.0;
+//            $lead->lat = $addressParts['lat'];
+            $lead->lat = '';
+//            $lead->lon = $addressParts['lon'];
+            $lead->lon = '';
+//            $lead->street = $addressParts['streetNumber'] . ' ' . $addressParts['streetName'];
+            $lead->street = '';
+//            $lead->city = $addressParts['city'];
+            $lead->city = '';
+//            $lead->state = $addressParts['state'];
+            $lead->state = '';
+//            $lead->zip = $addressParts['zip'];
+            $lead->zip = '';
             $lead->save();
             $newLeads[] = $lead;
 
@@ -123,7 +130,7 @@ try {
         $urlRow->save();
 
         // send notification emails
-        if (!empty($newLeads)) {
+        if (false || !empty($newLeads)) {
 
             $mailer = new Mailer();
             $mailer->subject = 'E Squared Holdings | Scraper Notification';
