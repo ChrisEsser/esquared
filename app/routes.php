@@ -7,6 +7,8 @@ return [
     ['GET', '/', 'IndexController#index'],
     ['GET', '', 'IndexController#index'],
 
+    ['GET', '/test', 'PropertyController#test'],
+
     ['GET', '/login', 'LoginController#login'],
     ['POST', '/process-login', 'LoginController#process'],
     ['GET', '/process-login', 'LoginController#loginRedirectFix'],
@@ -102,6 +104,15 @@ return [
     ['GET', '/lead/[i:leadId]', 'ScraperController#lead'],
 
     ['GET', '/ocd-test', 'ScraperController#ocdTest'],
+
+
+
+    ['POST', '/app-data/properties', 'AjaxDataController#properties'],
+    ['POST', '/app-data/units', 'AjaxDataController#units'],
+    ['POST', '/app-data/documents', 'AjaxDataController#documents'],
+    ['POST', '/app-data/users', 'AjaxDataController#users'],
+    ['POST', '/app-data/scraper/urls', 'AjaxDataController#scraperUrls'],
+    ['POST', '/app-data/scraper/leads', 'AjaxDataController#scraperLeads'],
 
 
 ];

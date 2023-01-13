@@ -1,6 +1,6 @@
 FilePond.registerPlugin(FilePondPluginImageResize);
 
-function createPond(selector) {
+function createPond(selector, loadedCallback) {
     return $(selector).filepond({
         server: {
             fetch: null, restore: null, revert: null,
@@ -19,6 +19,7 @@ function createPond(selector) {
                     if (request.status >= 200 && request.status < 300) {
 
                         var jsonResponse = JSON.parse(request.responseText);
+
                         if (typeof jsonResponse.error !== 'undefined' || typeof jsonResponse.key === 'undefined') {
                             var message = (typeof jsonResponse.error !== 'undefined') ? jsonResponse.error : 'An error occurred uploading the file';
                             alert(message);
@@ -26,6 +27,11 @@ function createPond(selector) {
                         }
 
                         load(jsonResponse.key);
+
+                        if (typeof loadedCallback == "function") {
+                            loadedCallback(jsonResponse);
+                        }
+
                         // $('#image_container span').text('');
                         // $('#image_container').css({'background-image' : 'url("http://app.testing/proxy/image/tmp?file=' + jsonResponse.key + '")'});
 

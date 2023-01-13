@@ -42,6 +42,13 @@ class FileController extends BaseController
                 $dbFile->original_name = filter_var($_FILES['filepond']['name'], FILTER_SANITIZE_STRING);
                 $dbFile->save();
 
+                // determine if the uploaded file is an image and send that back to the front end
+                $finfo = finfo_open(FILEINFO_MIME);  // return mime type ala mimetype extension
+                $info = finfo_file($finfo, $file);
+                finfo_close($finfo);
+                $return['isImage'] = (strpos($info, 'image') !== false);
+                $return['fileInfo'] = $info;
+
                 $return['key'] = $uid;
 
             }

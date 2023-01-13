@@ -29,8 +29,6 @@ $document = $this->getVar('document');
         $('#button_save').click(function() {
             $.post('/save-document', $('#documentForm').serialize()).done(function(result) {
 
-                console.log(result);
-
                 result = JSON.parse(result);
                 if (typeof result.result == 'undefined') {
                     alert('An unknown error occurred');

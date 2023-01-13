@@ -28,9 +28,16 @@ $docObj = new Document();
         <input type="number" min="0" step=".01" class="form-control" id="amount" name="amount" aria-describedby="amountHelp" />
     </div>
 
-
     <div class="mb-3">
         <div id="document" name="filepond"></div>
+    </div>
+
+    <div class="mb-3" id="convert_row" style="display: none">
+        <label for="amount" class="form-label">Convert to PDF</label>
+        <select class="form-control" id="convert" name="convert" aria-describedby="convertHelp">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+        </select>
     </div>
 
 </form>
@@ -44,7 +51,20 @@ $docObj = new Document();
 
         toggleAmountRow();
 
-        let docPond = createPond('#document');
+        let docPond = createPond('#document', function(data) {
+            if (typeof data.isImage == 'boolean' && data.isImage) {
+                $('#convert_row').show();
+
+                var message = 'It looks like you\'re uploading an image file. The system can automatically convert this file to a PDF. Would you like to do that?';
+                message += ' This doesn\'t always work so check the uploaded file after upload';
+
+                if (confirm(message)) $('#convert').val('1');
+                else $('#convert').val('0');
+
+            } else {
+                $('#convert_row').hide();
+            }
+        });
 
         $('#button_save').click(function() {
             $.post('/property/<?=$property->property_id?>/save-document', $('#documentForm').serialize()).done(function(result) {

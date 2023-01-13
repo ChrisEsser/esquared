@@ -11,22 +11,9 @@ class UnitController extends BaseController
         }
     }
 
-    public function units($params)
+    public function units()
     {
-        $propertyId = ($params['propertyId']) ?? 0;
-
-        $property = ($propertyId)
-            ? Property::findOne(['property_id' => $propertyId])
-            : new Property();
-
-        $units = ($propertyId)
-            ? Unit::find(['property_id' => $propertyId])
-            : Unit::find();
-
-        $properties = $property->find();
-
-        $this->view->setVar('property', $property);
-        $this->view->setVar('units', $units);
+        $properties = Property::find();
         $this->view->setVar('properties', $properties);
     }
 

@@ -41,8 +41,7 @@ class PropertyController extends BaseController
 
     public function properties()
     {
-        $properties = Property::find();
-        $this->view->setVar('properties', $properties);
+
     }
 
     public function edit($params)
@@ -188,11 +187,31 @@ class PropertyController extends BaseController
                     $tmpFile = $tmpPath . DS . $dbFile->uid . '.' . $ext;
                     $newFile = $propertyFilePath . DS . $dbFile->original_name;
                     rename($tmpFile, $newFile);
+                } else throw new Exception('No file to move');
+
+                $originalName = $dbFile->original_name;
+
+                // ok now that we moved the doc, lets see if we need to convert from image to pdf
+                if (isset($_POST['convert']) && $_POST['convert'] == 1) {
+                    $pathInfo = pathinfo($newFile);
+                    $dir = $pathInfo['dirname'];
+                    $filename = $pathInfo['filename'];
+                    $pdfFile = $dir . DS . $filename . '.pdf';
+
+                    try {
+                        $command = 'convert "' . $newFile . '" -quality 100 ' . $pdfFile;
+                        if (exec($command)) {
+                            unlink($newFile);
+                        }
+                        $originalName = str_replace('.' . $ext, '.pdf', $originalName);
+                    } catch (Exception $e) {
+                        var_dump($e->getMessage());
+                    }
                 }
 
-                // save the document now record now
+                // save the document record to the db
                 $document = new Document();
-                $document->name = $dbFile->original_name;
+                $document->name = $originalName;
                 $document->description = $_POST['description'];
                 $document->type = $_POST['type'];
                 $document->amount = $_POST['amount'];
@@ -323,10 +342,20 @@ class PropertyController extends BaseController
         echo json_encode($return);
     }
 
-     public function deletePayment($params)
-     {
+    public function deletePayment($params)
+    {
         $this->render = false;
-     }
+    }
+
+    public function test()
+    {
+        $this->render = false;
+
+
+
+
+
+    }
 
     public function afterAction()
     {

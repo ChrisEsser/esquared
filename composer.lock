@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "84d321d35f681bb90c4d8fe5c7160f71",
+    "content-hash": "4ad35529ea13e38e294476103c2fc053",
     "packages": [
         {
             "name": "dcblogdev/pdo-wrapper",
@@ -1481,7 +1481,8 @@
     "platform": {
         "ext-openssl": "*",
         "ext-pdo": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-fileinfo": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.3.0"

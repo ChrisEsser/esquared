@@ -17,24 +17,7 @@ class DocumentController extends BaseController
 
     public function documents()
     {
-        $where['property_id'] = '0';
-        $viewing = '';
-        if (isset($_GET['mydocs'])) {
-            $where['owner_id'] = $this->loggedInUser;
-            /** @var User $user */
-            $user = User::findOne(['user_id' => $this->loggedInUser]);
-            $viewing = $user->first_name . ' ' . $user->last_name;
-        } else if (isset($_GET['userdocs'])) {
-            $where['owner_id'] = intval($_GET['userdocs']);
-            /** @var User $user */
-            $user = User::findOne(['user_id' => $_GET['userdocs']]);
-            $viewing = $user->first_name . ' ' . $user->last_name;
-        }
 
-        $documents = Document::find($where);
-        $this->view->setVar('documents', $documents);
-        $this->view->setVar('documents', $documents);
-        $this->view->setVar('viewing', $viewing);
     }
 
     public function edit($params)

@@ -12,8 +12,7 @@ class UserController extends BaseController
 
     public function users($params)
     {
-        $users = User::find();
-        $this->view->setVar('users', $users);
+
     }
 
     public function edit($params)
