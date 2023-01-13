@@ -134,7 +134,6 @@ class AjaxDataController extends BaseController
             }
         }
 
-        /** @var User[] $collection */
         $collection = User::find($where);
         $collection->activePagination($this->pageLength);
         $collection->paginate($this->page);

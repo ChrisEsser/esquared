@@ -28,7 +28,12 @@
         var table = new tableData('#propertyTable', {
             url: '/app-data/properties',
             columns: [
-                {col: 'name'},
+                {
+                    col: 'name',
+                    template: function (data) {
+                        return '<a href="/property/' + data.property_id + '">' + data.name + '</a>';
+                    }
+                },
                 {col: 'description'},
                 {
                     col: '',

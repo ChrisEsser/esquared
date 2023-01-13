@@ -114,6 +114,4 @@ return [
     ['POST', '/app-data/scraper/urls', 'AjaxDataController#scraperUrls'],
     ['POST', '/app-data/scraper/leads', 'AjaxDataController#scraperLeads'],
 
-
 ];
-
