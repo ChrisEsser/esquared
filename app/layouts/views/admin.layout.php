@@ -21,7 +21,7 @@ $action = $this->getVar('action');
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
     <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.css"/>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"/>
-    <link rel="stylesheet" href="/css/style.css?ver=96"/>
+    <link rel="stylesheet" href="/css/style.css?ver=64"/>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -30,7 +30,7 @@ $action = $this->getVar('action');
     <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
     <script src="/js/confirm.js"></script>
     <script src="/js/filepondHelper.js"></script>
-    <script src="/js/tableData.js"></script>
+    <script src="/js/tableData.js?ver=44"></script>
     <?= HTML::displayHead() ?>
 </head>
 
@@ -183,9 +183,11 @@ $action = $this->getVar('action');
         if (windowWidth < 991) {
             $('#sidebar').css({left: '-250px'});
             $('#body_container').css({marginLeft: '0'});
+            // $('.tableData_general_container thead tr:last-child').hide();
         } else {
             $('#sidebar').css({left: '0'});
             $('#body_container').css({marginLeft: '250px'});
+            $('.tableData_general_container thead tr:last-child').show();
         }
     }
 

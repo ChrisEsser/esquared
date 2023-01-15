@@ -35,9 +35,10 @@
             columns: [
                 {col: 'name'},
                 {col: 'user'},
-                {col: 'created'},
+                {col: 'created', format: 'datetime'},
                 {
                     col: '',
+                    search: false,
                     cellStyle: 'text-align:right;',
                     template: function (data) {
                         let html = '<button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-document="' + data.document_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-document/' + data.document_id + '" type="button">Delete</button>';

@@ -28,8 +28,13 @@ class AjaxDataController extends BaseController
     {
         $where = [];
         foreach ($this->filters as $key => $value) {
-            if ($key == 'search' && !empty($value)) {
+            if ($key == 'name' && !empty($value)) {
                 $where['name'] = [
+                    'operator' => 'LIKE',
+                    'value' => '%' . $value . '%'
+                ];
+            } else if ($key == 'description' && !empty($value)) {
+                $where['description'] = [
                     'operator' => 'LIKE',
                     'value' => '%' . $value . '%'
                 ];
@@ -59,16 +64,43 @@ class AjaxDataController extends BaseController
     {
         $where = [];
         foreach ($this->filters as $key => $value) {
-            if ($key == 'search' && !empty($value)) {
-                $where['name'] = [
+
+            if (in_array($key, ['name', 'description', 'rent']) && !empty($value)) {
+                $where[$key] = [
                     'operator' => 'LIKE',
                     'value' => '%' . $value . '%'
                 ];
+            } else if ($key == 'status') {
+                $in[] = 0;
+                $unit = new Unit();
+                foreach ($unit->statusStrings() as $code => $status) {
+                    if (stripos($status, $value) !== false) $in[] = $code;
+                }
+                $where[$key] = [
+                    'operator' => 'IN',
+                    'value' => [
+                        '(' . implode(',', $in) . ')'
+                    ]
+                ];
             } else if ($key == 'property' && !empty($value)) {
-                $where['property_id'] = intval($value);
+                $in[] = 0;
+                /** @var Property[] $properties */
+                $properties = Property::find();
+                foreach ($properties as $property) {
+                    if (stripos($property->name, $value) !== false) {
+                        $in[] =  $property->property_id;
+                    }
+                }
+                $where['property_id'] = [
+                    'operator' => 'IN',
+                    'value' => [
+                        '(' . implode(',', $in) . ')'
+                    ]
+                ];
             }
         }
 
+        /** @var Unit[] $collection */
         $collection = Unit::find($where);
         $collection->activePagination($this->pageLength);
         $collection->paginate($this->page);
@@ -77,6 +109,8 @@ class AjaxDataController extends BaseController
 
         $data = [];
         foreach ($collection as $row) {
+            $row->property = $row->getProperty()->name;
+            $row->property_id = $row->getProperty()->property_id;
             $data[] =  $row;
         }
 
@@ -92,10 +126,26 @@ class AjaxDataController extends BaseController
     {
         $where = [];
         foreach ($this->filters as $key => $value) {
-            if ($key == 'search' && !empty($value)) {
-                $where['name'] = [
+            if (in_array($key, ['name', 'created']) && !empty($value)) {
+                $where[$key] = [
                     'operator' => 'LIKE',
                     'value' => '%' . $value . '%'
+                ];
+            } else if ($key == 'user' && !empty($value)) {
+                $in[] = 0;
+                /** @var User[] $users */
+                $users = User::find(['admin' => 1]);
+                foreach ($users as $user) {
+                    $name = trim($user->first_name) . ' ' . trim($user->last_name);
+                    if (stripos($name, $value) !== false) {
+                        $in[] = $user->user_id;
+                    }
+                }
+                $where['user_id'] = [
+                    'operator' => 'IN',
+                    'value' => [
+                        '(' . implode(',', $in) . ')'
+                    ]
                 ];
             }
         }
@@ -126,12 +176,36 @@ class AjaxDataController extends BaseController
     {
         $where = [];
         foreach ($this->filters as $key => $value) {
-            if ($key == 'search' && !empty($value)) {
-                $where['last_name'] = [
+            if (in_array($key, ['first_name', 'last_name', 'email']) && !empty($value)) {
+                $where[$key] = [
                     'operator' => 'LIKE',
                     'value' => '%' . $value . '%'
                 ];
+            } else if ($key == 'admin' && $value != '') {
+                $admin = 0;
+                if (stripos('yes', $value) !== false || $value == '1') {
+                    $admin = 1;
+                }
+                $where[$key] = $admin;
+            } else if ($key == 'unit' && !empty($value)) {
+                // get all the units... this might be a little slow since we have to look at property too for this one
+                // it might be ok since this is paginated results anyways
+                $in[] = 0;
+                /** @var Unit[] $units */
+                $units = Unit::find();
+                foreach ($units as $unit) {
+                    if (stripos($unit->name, $value) !== false || stripos($unit->getProperty()->name, $value) !== false) {
+                        $in[] = $unit->unit_id;
+                    }
+                }
+                $where['unit_id'] = [
+                    'operator' => 'IN',
+                    'value' => [
+                        '(' . implode(',', $in) . ')'
+                    ]
+                ];
             }
+
         }
 
         $collection = User::find($where);
@@ -163,8 +237,8 @@ class AjaxDataController extends BaseController
     {
         $where = [];
         foreach ($this->filters as $key => $value) {
-            if ($key == 'search' && !empty($value)) {
-                $where['name'] = [
+            if (in_array($key, ['name', 'state', 'last_scraped']) && !empty($value)) {
+                $where[$key] = [
                     'operator' => 'LIKE',
                     'value' => '%' . $value . '%'
                 ];
@@ -204,7 +278,7 @@ class AjaxDataController extends BaseController
             }
         }
 
-        $collection = ScraperLead::find($where);
+        $collection = ScraperLead::find($where, ['active' => 'DESC']);
         $collection->activePagination($this->pageLength);
         $collection->paginate($this->page);
         $total = $collection->queryFoundModels();

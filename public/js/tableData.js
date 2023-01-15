@@ -8,9 +8,7 @@ class tableData
         var $this = this;
 
         if (typeof this.config.filter == 'undefined') {
-            this.config.filter = {
-                search: '',
-            }
+            this.config.filter = {};
         }
 
         this.getBaseHtml(function(html) {
@@ -38,15 +36,22 @@ class tableData
                 $this.loadData(results);
             });
         });
+
         var timeout;
-        $(document).on('keyup', '#' + this.id + '_search', function() {
-            $this.config.filter.search = $(this).val();
+        $(document).on('keyup', '.tableData_search_input', function() {
+            const val = $(this).val();
+            const col = $(this).data('column');
             clearTimeout(timeout);
             timeout = setTimeout(function() {
+                $this.config.filter[col] = val;
                 $this.getData(1, function (results) {
                     $this.loadData(results);
                 });
             }, 200);
+        });
+
+        $(document).on('click', '.mobile_filter_trigger', function() {
+            $('#' + $this.id + '_tableData_container thead tr:last-child').toggle();
         });
     }
 
@@ -95,13 +100,29 @@ class tableData
             let $tbody = $('#' + this.id  + '_tableActual tbody');
             let html = '';
 
+            let hasOneSearchColumn = false;
+            for(let j = 0; j < this.config.columns.length; j++) {
+                // if the search functionality for this column is turned off we want to hide the search input
+                if ((typeof this.config.columns[j].search != 'undefined' && this.config.columns[j].search === false)
+                    || typeof this.config.columns[j].col != 'string') {
+                    $('#' + this.id + '_headerSearch_' + j).remove();
+                } else {
+                    hasOneSearchColumn = true;
+                    $('#' + this.id + '_headerSearch_' + j).attr('data-column', this.config.columns[j].col);
+                }
+            }
+
+            if (!hasOneSearchColumn) {
+                $('#' + this.id + '_tableActual thead tr:last-child').hide();
+            }
+
             for (let i = 0; i < results.data.length; i++) {
                 html += '<tr>';
                 for(let j = 0; j < this.config.columns.length; j++) {
 
                     let style = '';
                     if (typeof this.config.columns[j].cellStyle == 'string') {
-                        style = ' style="' + this.config.columns[j].cellStyle + '" ';
+                        style = ' style="' + this.config.columns[j].cellStyle + ';" ';
                     }
                     html += '<td' + ((style != '') ? style : '') + '>';
                     let value = (typeof results.data[i][this.config.columns[j].col] != 'undefined') ?
@@ -196,22 +217,29 @@ class tableData
 
     showNoResults()
     {
-        var colCount = 0;
-        $('#' + this.id + '_tableActual thead th').each(function () {
-            if ($(this).attr('colspan')) {
-                colCount += +$(this).attr('colspan');
-            } else {
-                colCount++;
-            }
-        });
-        $('#'+ this.id + '_tableActual tbody').html('<tr style="border: none; background-color: #fff"><td colspan="' + colCount + '" style="border: none; background-color: #fff"><div class="alert alert-primary">No Results</div></td></tr>');
+        const cols = this.getColumnCount('#' + this.id + '_tableActual');
+        $('#'+ this.id + '_tableActual tbody').html('<tr style="border: none; background-color: #fff"><td colspan="' + cols + '" style="border: none; background-color: #fff"><div class="alert alert-primary">No Results</div></td></tr>');
     }
 
     getBaseHtml(callback)
     {
-        var origClone = this.element.clone().html();
+        var origClone = this.element.clone();
 
-        var newHtml = '<div>';
+        // add a new row in the thead with text search boxes for each column.
+        // by default they all have it unless the setting no search is set for this column in the config
+        const cols = this.getColumnCount('#' + this.id);
+
+        let html = '<tr style="padding: 0">';
+        for(let i = 0; i < cols; i++){
+            html += '<td style="padding: 8px 8px"><input class="tableData_search_input" type="text" id="' + this.id + '_headerSearch_' + i + '" /></td>';
+        }
+        html += '</tr>';
+
+        origClone.find('thead').append(html);
+
+
+
+        var newHtml = '<div class="tableData_general_container">';
         newHtml += '<div class="mb-2" style="display: flex; align-items: center; justify-content: space-between">';
         newHtml += '<div class="row g-3 align-items-center">';
         newHtml += '<div class="col-auto"><label for="' + this.id + '_perPage" class="col-form-label" style="font-weight: 500">Show</label></div>';
@@ -224,10 +252,13 @@ class tableData
         newHtml += '</select>';
         newHtml += '</div>';
         newHtml += '</div>'; // end inline container
-        newHtml += '<input class="form-control" id="' + this.id + '_search" type="search" placeholder="Search" aria-label="Search" style="max-width: 150px" />';
+        // newHtml += '<input class="form-control" id="' + this.id + '_search" type="search" placeholder="Search" aria-label="Search" style="max-width: 150px" />';
         newHtml += '</div>'; // end flex row
         // newHtml += '<div class="showing_counts mb-2">Total: <strong>0</strong></div>';
-        newHtml += '<table class="e2-table" id="' + this.id + '_tableActual">' + origClone + '</table>';
+        newHtml += '<div class="mobile_filter_trigger">';
+        newHtml += '<i class="fa fa-filter"></i>';
+        newHtml += '</div>';
+        newHtml += '<table class="e2-table" id="' + this.id + '_tableActual">' + origClone.html() + '</table>';
         newHtml += '<div class="my-2" style="display: flex; align-items: start; justify-content: space-between">';
         newHtml += '<div class="showing_counts">Total: <strong>0</strong></div>';
         newHtml += '<nav id="' + this.id + '_paginate">';
@@ -251,6 +282,19 @@ class tableData
         if (typeof callback == 'function') {
             callback(newHtml);
         }
+    }
+
+    getColumnCount(tableSelector)
+    {
+        var colCount = 0;
+        $(tableSelector + ' thead tr:first-child th').each(function () {
+            if ($(this).attr('colspan')) {
+                colCount += +$(this).attr('colspan');
+            } else {
+                colCount++;
+            }
+        });
+        return colCount;
     }
 
 }

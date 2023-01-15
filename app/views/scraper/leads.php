@@ -12,11 +12,10 @@ $viewAll = $this->getVar('viewAll');
     <thead>
         <tr>
             <th>Active</th>
-            <th>Flag</th>
+<!--            <th>Flag</th>-->
             <th>lead URL</th>
             <th>Address</th>
-            <th>Amount</th>
-            <th>First Scrapped</th>
+            <th>Judgment</th>
             <th>Last Scrapped</th>
             <?=($viewAll) ? '<th>Scraper</th>' : ''?>
             <th></th>
@@ -38,35 +37,48 @@ $viewAll = $this->getVar('viewAll');
             columns: [
                 {
                     col: 'active',
+                    search: false,
                     template: function (data) {
                         const checked = (data.active) ? ' checked' : '';
                         return '<input type="checkbox" value="1" class="lead_active_toggle" data-lead="' + data.lead_id + '"' + checked + ' />';
                     }
                 },
-                {
-                    col: 'flagged',
-                    template: function (data) {
-                        const checked = (data.flagged) ? ' checked' : '';
-                        return '<input type="checkbox" value="1" class="lead_flag_toggle" data-lead="' + data.lead_id + '"' + checked + ' />';
-                    }
-                },
+                // {
+                //     col: 'flagged',
+                //     search: false,
+                //     template: function (data) {
+                //         const checked = (data.flagged) ? ' checked' : '';
+                //         return '<input type="checkbox" value="1" class="lead_flag_toggle" data-lead="' + data.lead_id + '"' + checked + ' />';
+                //     }
+                // },
                 {
                     col: 'url',
+                    search: false,
                     template: function (data) {
-                        const short = (data.url.length >= 30) ? data.url.substring(0, 30) + '...' : data.url;
-                        return '<a href="' + data.url + '" target="_blank">' + short + '</a>';
+                        // const short = (data.url.length >= 30) ? data.url.substring(0, 30) + '...' : data.url;
+                        return '<a href="' + data.url + '" target="_blank">Pdf URL</a>';
                     }
                 },
-                {col: 'street'},
+                {
+                    col: 'address',
+                    template: function (data) {
+
+                        let html = '';
+                        if (data.lom != '') html += '<a href="javascript:void(0);" class="trigger_street_view" data-lead="' + data.lead_id + '">';
+                        html += data.street + '<br />' + data.city + ', ' + data.state + ' ' + data.zip;
+                        if (data.lom != '') html += '</a>';
+
+                        return html;
+                    }
+                },
                 {
                     col: 'amount',
                     format: 'usd'
                 },
-                {col: 'created'},
-                {col: 'last_seen'},
+                {col: 'last_seen', format: 'date'},
                 <?php if ($viewAll) { ?>
                 {
-                    col: '',
+                    col: 'scraper',
                     template: function (data) {
                         return '<a href="/scraper/' + data.scraper_id + '">' + data.url_name + '</a>';
                     }
@@ -75,6 +87,7 @@ $viewAll = $this->getVar('viewAll');
                 {
                     col: '',
                     cellStyle: 'text-align:right;',
+                    search: false,
                     template: function(data) {
                         let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-lead="' + data.lead_id + '" type="button">Edit</button>';
                         html += '<button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-lead="' + data.lead_id + '" data-message="Are you sure you want to delete this lead?" data-url="/delete-lead/' + data.lead_id + '" type="button">Delete</button>';
@@ -84,7 +97,7 @@ $viewAll = $this->getVar('viewAll');
             ]
         });
 
-        $('.trigger_street_view').click(function() {
+        $(document).on('click', '.trigger_street_view', function() {
             let lead = $(this).data('lead');
             $.get('/lead-street-view/' + lead).done(function(result) {
                 $('#viewModalLabel').text('Street View');
@@ -93,7 +106,7 @@ $viewAll = $this->getVar('viewAll');
             });
         });
 
-        $('.lead_active_toggle').click(function() {
+        $(document).on('click', '.lead_active_toggle', function() {
 
             let lead = $(this).data('lead');
             let active = ($(this).is(':checked')) ? 1 : 0;
@@ -105,7 +118,7 @@ $viewAll = $this->getVar('viewAll');
                     return;
                 }
                 if (result.result == 'success') {
-                    location.reload();
+                    // location.reload();
                 } else if (result.result == 'error') {
                     let message = (typeof result.message != 'undefined')
                         ? result.message
@@ -116,7 +129,7 @@ $viewAll = $this->getVar('viewAll');
             });
         });
 
-        $('.lead_flag_toggle').click(function() {
+        $(document).on('click', '.lead_flag_toggle', function() {
 
             let lead = $(this).data('lead');
             let flagged = ($(this).is(':checked')) ? 1 : 0;
@@ -129,7 +142,7 @@ $viewAll = $this->getVar('viewAll');
                     return;
                 }
                 if (result.result == 'success') {
-                    location.reload();
+                    // location.reload();
                 } else if (result.result == 'error') {
                     let message = (typeof result.message != 'undefined')
                         ? result.message

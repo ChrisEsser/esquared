@@ -13,8 +13,7 @@ class UnitController extends BaseController
 
     public function units()
     {
-        $properties = Property::find();
-        $this->view->setVar('properties', $properties);
+
     }
 
 
