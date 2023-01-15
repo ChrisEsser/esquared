@@ -64,6 +64,7 @@ try {
         $leads = recursiveCrawl($urlRow->url, 0, $urlRow->depth, $filters, $client);
 
         $leadHrefs = [];
+        $newLeads = [];
 
         foreach ($leads as $href) {
 
