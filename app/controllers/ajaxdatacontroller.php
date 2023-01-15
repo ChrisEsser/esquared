@@ -162,6 +162,14 @@ class AjaxDataController extends BaseController
     public function scraperUrls()
     {
         $where = [];
+        foreach ($this->filters as $key => $value) {
+            if ($key == 'search' && !empty($value)) {
+                $where['name'] = [
+                    'operator' => 'LIKE',
+                    'value' => '%' . $value . '%'
+                ];
+            }
+        }
 
         $collection = ScraperUrl::find($where);
         $collection->activePagination($this->pageLength);
@@ -185,6 +193,16 @@ class AjaxDataController extends BaseController
     public function scraperLeads()
     {
         $where = [];
+        foreach ($this->filters as $key => $value) {
+            if ($key == 'search' && !empty($value)) {
+                $where['name'] = [
+                    'operator' => 'LIKE',
+                    'value' => '%' . $value . '%'
+                ];
+            } else if ($key == 'url' && !empty($value)) {
+                $where['url_id'] = intval($value);
+            }
+        }
 
         $collection = ScraperLead::find($where);
         $collection->activePagination($this->pageLength);

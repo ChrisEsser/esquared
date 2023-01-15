@@ -1,7 +1,5 @@
 <?php
 
-/** @var \ScraperUrl[] $urls */
-$urls = $this->getVar('urls');
 
 ?>
 
@@ -15,48 +13,51 @@ $urls = $this->getVar('urls');
     <a href="/scraper/leads">View All Leads</a> <!--| <a href="/scraper/all">Scrape All Urls</a>-->
 </div>
 
-<?php if (count($urls)) { ?>
-
-    <div class="table-responsive">
-    <table class="e2-table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>state</th>
-                <th>Leads</th>
-                <th>Last Scraped</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($urls as $url) { ?>
-
-                <tr>
-                    <td><a href="<?=$url->url?>" target="_blank"><?=$url->name?></a></td>
-                    <td><?=$url->state?></td>
-                    <td><?=($url->leads_count) ? '<a href="/scraper/' . $url->url_id . '/leads">' : ''?><?=$url->leads_count?><?=($url->leads_count) ? '</a>' : ''?></td>
-                    <td><?=date('m/d/y g:ia', strtotime($url->last_scraped))?></td>
-                    <td style="text-align: right">
-                        <button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-url="<?=$url->url_id?>" type="button">Edit</button>
-                        <a href="/scraper/<?=$url->url_id?>" class="btn btn-secondary btn-sm me-md-1" type="button">Scrape</a>
-                        <button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-message="Are you sure you want to delete <strong><?=$url->name?></strong>?" data-url="/delete-scraper/<?=$url->url_id?>" type="button">Delete</button>
-                    </td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-    </div>
-
-<?php } else { ?>
-
-    <div class="alert alert-primary" role="alert">No Scraper URLs</div>
-
-<?php } ?>
-
+<table class="e2-table" id="scraperTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>state</th>
+            <th>Leads</th>
+            <th>Last Scraped</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
 
 <script>
 
     $(document).ready(function() {
+
+        var table = new tableData('#scraperTable', {
+            url: '/app-data/scraper/urls',
+            columns: [
+                {
+                    col: 'name',
+                    template: function (data) {
+                        return '<a href="/">' + data.name + '</a>';
+                    }
+                },
+                {col: 'state'},
+                {
+                    col: 'leads_count',
+                    template: function (data) {
+                        return (data.leads_count == 0) ? 'leads (0)' : '<a href="/scraper/' + data.url_id + '/leads">leads (' + data.leads_count + ')</a>';
+                    }
+                },
+                {col: 'last_scraped'},
+                {
+                    col: '',
+                    cellStyle: 'text-align:right;',
+                    template: function(data) {
+                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-property="' + data.property_id + '" type="button">Edit</button>';
+                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-property="' + data.property_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-property/' + data.property_id + '" type="button">Delete</button>';
+                        return html;
+                    }
+                },
+            ]
+        });
 
         $(document).on('click', '.edit_trigger', function () {
 

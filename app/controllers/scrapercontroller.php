@@ -1,4 +1,4 @@
-<?php
+n<?php
 
 use thiagoalessio\TesseractOCR\TesseractOCR;
 
@@ -13,9 +13,7 @@ class ScraperController extends BaseController
 
     public function scraper($params)
     {
-        /** @var \ScraperUrl[] $urls */
-        $urls = ScraperUrl::find([], ['name' => 'ASC']);
-        $this->view->setVar('urls', $urls);
+
     }
 
     public function scrape($params)
@@ -135,13 +133,7 @@ class ScraperController extends BaseController
             $viewAll = true;
         }
 
-        $order = ['flagged' => 'DESC', 'active' => 'DESC', 'created' => 'DESC'];
-        $leads = ($url->url_id)
-            ? ScraperLead::find(['url_id' => $urlId], $order)
-            : ScraperLead::find([], $order);
-
         $this->view->setVar('url', $url);
-        $this->view->setVar('leads', $leads);
         $this->view->setVar('viewAll', $viewAll);
     }
 
