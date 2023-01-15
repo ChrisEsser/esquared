@@ -28,7 +28,7 @@ $action = $this->getVar('action');
     <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
     <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
     <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
-    <script src="/js/confirm.js"></script>
+    <script src="/js/confirm.js?ver=1"></script>
     <script src="/js/filepondHelper.js"></script>
     <script src="/js/tableData.js?ver=44"></script>
     <?= HTML::displayHead() ?>

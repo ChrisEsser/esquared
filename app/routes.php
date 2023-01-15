@@ -103,7 +103,10 @@ return [
     ['GET', '/lead-street-view/[i:leadId]', 'ScraperController#leadStreetView'],
     ['GET', '/lead/[i:leadId]', 'ScraperController#lead'],
 
-    ['GET', '/ocd-test', 'ScraperController#ocdTest'],
+
+
+
+    ['GET', '/scrapetest', 'ScraperController#scrapeTest'],
 
 
 

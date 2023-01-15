@@ -50,7 +50,7 @@
                     cellStyle: 'text-align:right;',
                     template: function(data) {
                         let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-user="' + data.user_id + '" type="button">Edit</button>';
-                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-user="' + data.user_id + '" data-message="Are you sure you want to delete <strong>' + data.first_name + '</strong>?" data-url="/delete-user/' + data.user_id + '" type="button">Delete</button>';
+                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-user="' + data.user_id + '" data-message="Are you sure you want to delete <strong>' + data.first_name + '</strong>?" data-url="/delete-user/' + data.user_id + '" type="button">Delete</button>';
                         return html;
                     }
                 },

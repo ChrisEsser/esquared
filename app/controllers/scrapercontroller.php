@@ -1,4 +1,4 @@
-n<?php
+<?php
 
 use thiagoalessio\TesseractOCR\TesseractOCR;
 
@@ -6,7 +6,7 @@ class ScraperController extends BaseController
 {
     public function beforeAction($params)
     {
-        if (!Auth::isAdmin() && $this->_action != 'scrapeBackground') {
+        if (!Auth::isAdmin()) {
             HTTP::redirect('/login');
         }
     }
@@ -16,39 +16,19 @@ class ScraperController extends BaseController
 
     }
 
-    public function scrape($params)
+    public function editScraper($params)
     {
-        $this->render = false;
+        HTTP::removePageFromHistory();
+        $this->render_header = false;
 
-        $urlId = $params['urlId'] ?? 0;
+        $urlId = ($params['urlId']) ?? 0;
 
-        if ($urlId) {
+        /** @var \ScraperUrl $lead */
+        $url = ($urlId)
+            ? ScraperUrl::findOne(['url_id' => $urlId])
+            : new ScraperUrl();
 
-            /** @var \ScraperUrl $url */
-            $url = ScraperUrl::findOne(['url_id' => $urlId]);
-
-            if (!$url->url_id) HTTP::redirect('/scraper');
-
-            ScraperHelper::runScrape($url);
-
-        } else {
-
-            ScraperHelper::runScrapeAll();
-
-        }
-
-        HTTP::redirect('/scraper');
-    }
-
-    public function scrapeBackground()
-    {
-        $this->render = false;
-
-        if (isset($_GET['key']) && $_GET['key'] == 'hdyetbx84648732mcjd') {
-            ScraperHelper::runScrapeAll();
-        }
-
-        echo 'done';
+        $this->view->setVar('url', $url);
     }
 
     public function saveScraper()
@@ -92,21 +72,6 @@ class ScraperController extends BaseController
         }
 
         echo json_encode($return);
-    }
-
-    public function editScraper($params)
-    {
-        HTTP::removePageFromHistory();
-        $this->render_header = false;
-
-        $urlId = ($params['urlId']) ?? 0;
-
-        /** @var \ScraperUrl $lead */
-        $url = ($urlId)
-            ? ScraperUrl::findOne(['url_id' => $urlId])
-            : new ScraperUrl();
-
-        $this->view->setVar('url', $url);
     }
 
     public function deleteScraper($params)
@@ -306,17 +271,6 @@ class ScraperController extends BaseController
         if (!$lead->lead_id) throw new Exception404();
 
         $this->view->setVar('lead', $lead);
-    }
-
-    public function ocdTest()
-    {
-        $this->render = false;
-//
-//        $image = ROOT . DS . 'public' . DS . 'images' . 'Callout.png';
-//
-//        echo (new TesseractOCR($image))
-//            ->run();
-
     }
 
     public function afterAction()

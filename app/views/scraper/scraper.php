@@ -53,8 +53,8 @@
                     cellStyle: 'text-align:right;',
                     search: false,
                     template: function(data) {
-                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-property="' + data.property_id + '" type="button">Edit</button>';
-                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-property="' + data.property_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-property/' + data.property_id + '" type="button">Delete</button>';
+                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-url="' + data.url_id + '" type="button">Edit</button>';
+                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-url="' + data.url_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-scraper/' + data.url_id + '" type="button">Delete</button>';
                         return html;
                     }
                 },
