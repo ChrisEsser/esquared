@@ -142,30 +142,28 @@ try {
 
     }
 
-//    if (!empty($newLeadUrls)) {
-//
-//        $mailer = new Mailer();
-//        $mailer->subject = 'E Squared Holdings | Scraper Notification';
-//        $mailer->to = ['chris@esquaredholdings.com', 'cody@esquaredholdings.com'];
-//
-//        $linkBase = $_ENV['BASE_PATH'] . '/scraper/';
-//
-//        $body = '<p>New leads were detected for the following scraper url(s): </p>';
-//
-//        $body .= '<p>';
-//        $sep = '';
-//        foreach ($newLeadUrls as $urlId => $urlName) {
-//            $body .= $sep . '<a href="' . $linkBase . $urlId . '/leads">' . $urlName . '</a>';
-//            $sep = '<br />';
-//        }
-//        $body .= '</p>';
-//
-//        $mailer->html = $body;
-//        $mailer->send();
-//
-//    }
+    if (!empty($newLeadUrls)) {
 
+        $mailer = new Mailer();
+        $mailer->subject = 'E Squared Holdings | Scraper Notification';
+        $mailer->to = ['chris@esquaredholdings.com', 'cody@esquaredholdings.com'];
 
+        $linkBase = $_ENV['BASE_PATH'] . '/scraper/';
+
+        $body = '<p>New leads were detected for the following scraper url(s): </p>';
+
+        $body .= '<p>';
+        $sep = '';
+        foreach ($newLeadUrls as $urlId => $urlName) {
+            $body .= $sep . '<a href="' . $linkBase . $urlId . '/leads">' . $urlName . '</a>';
+            $sep = '<br />';
+        }
+        $body .= '</p>';
+
+        $mailer->html = $body;
+        $mailer->send();
+
+    }
 
 } catch (Exception $e) {
 

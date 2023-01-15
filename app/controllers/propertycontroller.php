@@ -25,17 +25,13 @@ class PropertyController extends BaseController
             HTTP::rewind();
         }
 
-        $images = $documents = [];
+        $images = [];
         foreach (glob(ROOT . DS . 'app' . DS . 'files' . DS . 'properties' . DS . $propertyId . DS . 'images' . DS . '*.*') as $file) {
             $images[] = basename($file);
-        }
-        foreach (glob(ROOT . DS . 'app' . DS . 'files' . DS . 'properties' . DS . $propertyId . DS . 'documents' . DS . '*.*') as $file) {
-            $documents[] = basename($file);
         }
 
         $this->view->setVar('property', $property);
         $this->view->setVar('images', $images);
-        $this->view->setVar('documents', $documents);
     }
 
 

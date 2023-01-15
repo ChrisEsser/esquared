@@ -47,7 +47,7 @@
                         return (data.leads_count == 0) ? 'leads (0)' : '<a href="/scraper/' + data.url_id + '/leads">leads (' + data.leads_count + ')</a>';
                     }
                 },
-                {col: 'last_scraped'},
+                {col: 'last_scraped', format: 'datetime'},
                 {
                     col: '',
                     cellStyle: 'text-align:right;',

@@ -71,11 +71,8 @@ $viewAll = $this->getVar('viewAll');
                         return html;
                     }
                 },
-                {
-                    col: 'judgment_amount',
-                    format: 'usd'
-                },
-                {col: 'last_seen', format: 'date'},
+                {col: 'judgment_amount', format: 'usd'},
+                {col: 'last_seen', format: 'datetime'},
                 <?php if ($viewAll) { ?>
                 {
                     col: 'scraper',

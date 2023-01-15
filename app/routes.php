@@ -113,6 +113,7 @@ return [
     ['POST', '/app-data/properties', 'AjaxDataController#properties'],
     ['POST', '/app-data/units', 'AjaxDataController#units'],
     ['POST', '/app-data/documents', 'AjaxDataController#documents'],
+    ['POST', '/app-data/notes', 'AjaxDataController#notes'],
     ['POST', '/app-data/users', 'AjaxDataController#users'],
     ['POST', '/app-data/scraper/urls', 'AjaxDataController#scraperUrls'],
     ['POST', '/app-data/scraper/leads', 'AjaxDataController#scraperLeads'],

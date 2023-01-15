@@ -97,6 +97,8 @@ class AjaxDataController extends BaseController
                         '(' . implode(',', $in) . ')'
                     ]
                 ];
+            } else if ($key == 'property_id') {
+                $where['property_id'] = $value;
             }
         }
 
@@ -147,6 +149,8 @@ class AjaxDataController extends BaseController
                         '(' . implode(',', $in) . ')'
                     ]
                 ];
+            } else if ($key == 'property_id') {
+                $where['property_id'] = $value;
             }
         }
 
@@ -161,6 +165,36 @@ class AjaxDataController extends BaseController
         foreach ($collection as $row) {
             $row->user = $row->getUser()->first_name . ' ' . $row->getUser()->last_name;
             $row->owner = $row->getOwner()->first_name . ' ' . $row->getOwner()->last_name;
+            $data[] = $row;
+        }
+
+        echo json_encode([
+            'total' => $total,
+            'pages' => $totalPAges,
+            'page' => $this->page,
+            'data' => $data
+        ]);
+    }
+
+    public function notes()
+    {
+        $where = [];
+        foreach ($this->filters as $key => $value) {
+            if ($key == 'property_id') {
+                $where['property_id'] = $value;
+            }
+        }
+
+        /** @var Note[] $collection */
+        $collection = Document::find($where);
+        $collection->activePagination($this->pageLength);
+        $collection->paginate($this->page);
+        $total = $collection->queryFoundModels();
+        $totalPAges = $collection->getTotalPages();
+
+        $data = [];
+        foreach ($collection as $row) {
+            $row->user = $row->getUser()->first_name . ' ' . $row->getUser()->last_name;
             $data[] = $row;
         }
 

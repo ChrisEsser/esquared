@@ -30,7 +30,12 @@
         var table = new tableData('#unitTable', {
             url: '/app-data/units',
             columns: [
-                {col: 'name'},
+                {
+                    col: 'name',
+                    template: function (data) {
+                        return '<a href="/unit/' + data.unit_id + '">' + data.name + '</a>';
+                    }
+                },
                 {col: 'description'},
                 {
                     col: 'status',

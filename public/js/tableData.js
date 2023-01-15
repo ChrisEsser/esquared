@@ -128,6 +128,7 @@ class tableData
                     let value = (typeof results.data[i][this.config.columns[j].col] != 'undefined') ?
                         results.data[i][this.config.columns[j].col]
                         : '';
+
                     if (typeof this.config.columns[j].format == 'string') {
                         value = this.dataFormat(this.config.columns[j].format, value);
                     }
@@ -183,8 +184,21 @@ class tableData
 
     dataFormat(format, value)
     {
-        if (format == 'usd') {
+        if (format === 'usd') {
             value = new Intl.NumberFormat('en-US', { style: 'currency', 'currency':'USD' }).format(value);
+        } else if (format === 'date' || format === 'datetime') {
+            // value += 'Z';
+            const d = new Date(value);
+            const month = d.getMonth()+1;
+            value = + month + '/' + d.getDate() + '/' + d.getFullYear();
+            if (format === 'datetime') {
+                const time = d.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true,
+                });
+                value += ' ' + time;
+            }
         }
         return value;
     }
@@ -240,7 +254,7 @@ class tableData
 
 
         var newHtml = '<div class="tableData_general_container">';
-        newHtml += '<div class="mb-2" style="display: flex; align-items: center; justify-content: space-between">';
+        newHtml += '<div class="my-2" style="display: flex; align-items: center; justify-content: space-between">';
         newHtml += '<div class="row g-3 align-items-center">';
         newHtml += '<div class="col-auto"><label for="' + this.id + '_perPage" class="col-form-label" style="font-weight: 500">Show</label></div>';
         newHtml += '<div class="col-auto">';

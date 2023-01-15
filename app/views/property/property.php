@@ -67,126 +67,51 @@ $images = $this->getVar('images');
 
     <div class="tab-pane fade show active" id="units" role="tabpanel" aria-labelledby="units-tab">
 
-        <?php if (count($property->getUnit())) { ?>
-
-            <table class="e2-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($property->getUnit() as $unit) { ?>
-                        <tr>
-                            <td><a href="/unit/<?=$unit->unit_id?>"><?=$unit->name?></a></td>
-                            <td><?=$unit->description?></td>
-                            <td><?=$unit->statusStrings()[intval($unit->status)]?></td>
-                            <td style="text-align: right">
-                                <button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="unit" data-unit="<?=$unit->unit_id?>" type="button">Edit</button>
-                                <button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-message="Are you sure you want to delete <strong><?=$unit->name?></strong>?" data-url="/delete-unit/<?=$unit->unit_id?>" type="button">Delete</button>
-                            </td>
-                        </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
-
-        <?php } else { ?>
-
-            <div class="alert alert-primary" role="alert">No units</div>
-
-        <?php } ?>
+        <table class="e2-table" id="unitTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Rent</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
 
     </div>
 
     <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
 
-        <?php if (count($property->getDocument())) { ?>
-
-            <table class="e2-table">
-                <thead>
-                    <tr>
-                        <th>Document</th>
-                        <th>Note</th>
-                        <th>Type</th>
-                        <th>Uploaded By</th>
-                        <th>Upload Date</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($property->getDocument() as $document) { ?>
-                        <?php
-                        $user = $document->getUser();
-                        $userName = $user->first_name . ' ' . $user->last_name;
-                        ?>
-                        <tr>
-                            <td><a href="/file/proxy?file=properties/<?=$property->property_id?>/documents/<?=$document->name?>"><?=$document->name?></a></td>
-                            <td><?=$document->description?></td>
-                            <td><?=$document->typeStrings()[$document->type]?></td>
-                            <td><?=$userName?></td>
-                            <td><?=date('m/d/y g:ia', strtotime($document->created))?></td>
-                            <td style="text-align: right">
-                                <button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-message="Are you sure you want to delete <strong><?=$document->name?></strong>?" data-url="/delete-document/<?=$document->document_id?>" type="button">Delete</button>
-                            </td>
-                        </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
-
-        <?php } else { ?>
-
-            <div class="alert alert-primary" role="alert">No documents for this property</div>
-
-        <?php } ?>
+        <table class="e2-table" id="documentTable">
+            <thead>
+                <tr>
+                    <th>Document</th>
+                    <th>Uploaded By</th>
+                    <th>Upload Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
 
     </div>
 
     <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
 
-        <?php if (count($property->getNote())) { ?>
-
-            <table class="e2-table">
-                <thead>
-                    <tr>
-                        <th>Created Date</th>
-                        <th>Created By</th>
-                        <th>Note</th>
-                        <th>Type</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($property->getNote() as $note) { ?>
-                        <?php
-                        $user = $note->getUser();
-                        $userName = $user->first_name . ' ' . $user->last_name;
-
-                        $class = '';
-                        if ($note->status == 1) $class = 'table-info';
-                        else if ($note->status == 2) $class = 'table-success';
-                        ?>
-                        <tr class="<?=$class?>">
-                            <td><?=date('m/d/Y g:ia', strtotime($note->created))?></td>
-                            <td><?=$userName?></td>
-                            <td><?=$note->note?></td>
-                            <td><?=$note->typeStrings()[$note->type]?><?=($note->type == 1) ? ' (' . $note->statusStrings()[$note->status] . ')' : ''?></td>
-                            <td style="text-align: right">
-                                <button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="note" data-note="<?=$note->note_id?>" type="button">Edit</button>
-                                <button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-message="Are you sure you want to delete this note?" data-url="/delete-note/<?=$note->note_id?>" type="button">Delete</button>
-                            </td>
-                        </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
-
-        <?php } else { ?>
-
-            <div class="alert alert-primary" role="alert">No notes for this property</div>
-
-        <?php } ?>
+        <table class="e2-table" id="noteTable">
+            <thead>
+                <tr>
+                    <th>Created Date</th>
+                    <th>Created By</th>
+                    <th>Note</th>
+                    <th>Type</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
 
     </div>
 
@@ -201,6 +126,84 @@ $images = $this->getVar('images');
 
         $('.tabClick').click(function () {
             sessionStorage.setItem('lastTab', $(this).attr('id'));
+        });
+
+        var unitTable = new tableData('#unitTable', {
+            url: '/app-data/units',
+            filter: {property_id: '<?=$property->property_id?>'},
+            columns: [
+                {
+                    col: 'name',
+                    template: function (data) {
+                        return '<a href="/unit/' + data.unit_id + '">' + data.name + '</a>';
+                    }
+                },
+                {col: 'description'},
+                {
+                    col: 'status',
+                    template: function (data) {
+                        const statusCodes = ['Unknown', 'Occupied', 'Available', 'In Rehab'];
+                        return statusCodes[data.status];
+                    }
+                },
+                {col: 'rent', format: 'usd'},
+                {
+                    col: '',
+                    cellStyle: 'text-align:right;',
+                    search: false,
+                    template: function (data) {
+                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="unit" data-unit="' + data.unit_id + '" type="button">Edit</button>';
+                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-unit="' + data.unit_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-unit/' + data.unit_id + '" type="button">Delete</button>';
+                        return html;
+                    }
+                },
+            ]
+        });
+
+        var docTable = new tableData('#documentTable', {
+            url: '/app-data/documents',
+            filter: {property_id: '<?=$property->property_id?>'},
+            columns: [
+                {col: 'name'},
+                {col: 'user'},
+                {col: 'created', format: 'datetime'},
+                {
+                    col: '',
+                    search: false,
+                    cellStyle: 'text-align:right;',
+                    template: function (data) {
+                        let html = '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-document="' + data.document_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-document/' + data.document_id + '" type="button">Delete</button>';
+                        return html;
+                    }
+                },
+            ]
+        });
+
+        var noteTable = new tableData('#noteTable', {
+            url: '/app-data/notes',
+            filter: {property_id: '<?=$property->property_id?>'},
+            columns: [
+                {col: 'created', format: 'datetime'},
+                {col: 'user'},
+                {col: 'note'},
+                {
+                    col: 'type',
+                    template: function (data) {
+                        const typeCodes = ['Standard Note', 'To Do'];
+                        return typeCodes[data.type];
+                    }
+                },
+                {
+                    col: '',
+                    search: false,
+                    cellStyle: 'text-align:right;',
+                    template: function (data) {
+                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="note" data-note="' + data.note_id + '" type="button">Edit</button>';
+                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-note="' + data.note_id + '" data-message="Are you sure you want to delete this note??" data-url="/delete-note/' + data.note_id + '" type="button">Delete</button>';
+                        return html;
+                    }
+                },
+            ]
         });
 
         $(document).on('click', '.edit_trigger', function () {
@@ -229,19 +232,6 @@ $images = $this->getVar('images');
                 $('#editModalLabel').text('Edit ' + type.charAt(0).toUpperCase() + type.slice(1));
                 $('#editModal .modal-body').html(result);
                 $('#editModal').modal('show');
-            });
-
-        });
-
-        $(document).on('click', '.view_unit_trigger', function () {
-
-            let url = '/unit/' +  $(this).data('unit');
-            let unitName = $(this).data('name');
-
-            $.get(url).done(function(result) {
-                 $('#viewModalLabel').text(unitName);
-                 $('#viewModal .modal-body').html(result);
-                 $('#viewModal').modal('show');
             });
 
         });
