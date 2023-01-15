@@ -72,7 +72,7 @@ $viewAll = $this->getVar('viewAll');
                     }
                 },
                 {
-                    col: 'amount',
+                    col: 'judgment_amount',
                     format: 'usd'
                 },
                 {col: 'last_seen', format: 'date'},

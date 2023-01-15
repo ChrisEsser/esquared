@@ -108,19 +108,12 @@ try {
             $lead->active = 1;
             $lead->flagged = 0;
             $lead->judgment_amount = floatval($dollarAmount);
-            $lead->judgment_amount = 0.0;
             $lead->lat = $addressParts['lat'];
-            $lead->lat = '';
             $lead->lon = $addressParts['lon'];
-            $lead->lon = '';
             $lead->street = $addressParts['streetNumber'] . ' ' . $addressParts['streetName'];
-            $lead->street = '';
             $lead->city = $addressParts['city'];
-            $lead->city = '';
             $lead->state = $addressParts['state'];
-            $lead->state = '';
             $lead->zip = $addressParts['zip'];
-            $lead->zip = '';
             $lead->save();
             $newLeads[] = $lead;
 
@@ -265,10 +258,10 @@ function getPdfString($url)
 {
     $tmpPdfPath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmppdf' . time() . '.pdf';
 
-    $contents = file_get_contents($url);
-    if (!$contents) return false;
-    $result = file_put_contents($tmpPdfPath, $contents);
-    if (!$result) return false;
+    $contents = @file_get_contents($url);
+    if ($contents === false || empty($contents)) return false;
+    $result = @file_put_contents($tmpPdfPath, $contents);
+    if ($result === false) return false;
 
     $tmpImgFilePath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmptxt' . time();
 
