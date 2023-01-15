@@ -56,6 +56,7 @@ try {
 
     libxml_use_internal_errors(true);
 
+    $newLeadUrls = [];
     foreach ($urls as $urlRow) {
 
         $filters = unserialize(base64_decode($urlRow->search_string));
@@ -131,21 +132,35 @@ try {
 
         // send notification emails
         if (!empty($newLeads)) {
-
-            $mailer = new Mailer();
-            $mailer->subject = 'E Squared Holdings | Scraper Notification';
-            $mailer->to = ['chris@esquaredholdings.com', 'cody@esquaredholdings.com'];
-
-            $linkHref = $_ENV['BASE_PATH'] . '/scraper/' . $urlRow->url_id . '/leads';
-
-            $body = '<p>New leads were detected for the following scraper url: </p>';
-            $body .= '<p><a href="' . $linkHref . '">' . $urlRow->name . '</a></p>';
-            $mailer->html = $body;
-            $mailer->send();
-
+            $newLeadUrls[$urlRow->url_id] = $urlRow->name;
         }
 
     }
+
+    if (!empty($newLeadUrls)) {
+
+        $mailer = new Mailer();
+        $mailer->subject = 'E Squared Holdings | Scraper Notification';
+        $mailer->to = ['chris@esquaredholdings.com', 'cody@esquaredholdings.com'];
+
+        $linkBase = $_ENV['BASE_PATH'] . '/scraper/';
+
+        $body = '<p>New leads were detected for the following scraper url(s): </p>';
+
+        $body .= '<p>';
+        $sep = '';
+        foreach ($newLeadUrls as $urlId => $urlName) {
+            $body .= $sep . '<a href="' . $linkBase . $urlId . '/leads">' . $urlName . '</a>';
+            $sep = '<br />';
+        }
+        $body .= '</p>';
+
+        $mailer->html = $body;
+        $mailer->send();
+
+    }
+
+
 
 } catch (Exception $e) {
 

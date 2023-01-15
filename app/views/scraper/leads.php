@@ -1,8 +1,8 @@
 <?php
 
-    /** @var \ScraperUrl $scraperUrl */
-    $url = $this->getVar('url');
-    $viewAll = $this->getVar('viewAll');
+/** @var \ScraperUrl $scraperUrl */
+$url = $this->getVar('url');
+$viewAll = $this->getVar('viewAll');
 
 ?>
 
@@ -22,36 +22,7 @@
             <th></th>
         </tr>
     </thead>
-    <tbody>
-        <?php foreach ([] as $lead) { ?>
-            <tr class="<?=($lead->flagged) ? 'table-success' : ''?>">
-                <td><input type="checkbox" value="1" class="lead_active_toggle" data-lead="<?=$lead->lead_id?>"<?=($lead->active) ? ' checked' : ''?> /></td>
-                <td><input type="checkbox" value="1" class="lead_flag_toggle" data-lead="<?=$lead->lead_id?>"<?=($lead->flagged) ? ' checked' : ''?> /></td>
-                <td><a href="<?=$lead->url?>" target="_blank"><?=(strlen($lead->url) > 30) ? substr($lead->url, 0, 30) . '...' : $lead->url?></a></td>
-                <td>
-                    <?php if ($lead->street) { ?>
-                        <?php if ($lead->lat && $lead->lon) { ?>
-                            <a href="javascript:void(0);" class="trigger_street_view" data-lead="<?=$lead->lead_id?>">
-                        <?php } ?>
-                            <?=$lead->street?><br />
-                            <?=$lead->city?>, <?=$lead->state?> <?=$lead->zip?><br />
-                        <?php if ($lead->lat && $lead->lon) { ?>
-                            </a>
-                        <?php } ?>
-                    <?php } ?>
-                </td>
-                <td>$<?=number_format($lead->judgment_amount, 2)?></td>
-                <td><?=date('m/d/y', strtotime($lead->created))?></td>
-                <td><?=date('m/d/y', strtotime($lead->last_seen))?></td>
-                <?=($viewAll) ? '<td><a href="/scraper/' .  $lead->getScraperUrl()->url_id . '/leads">' . $lead->getScraperUrl()->name . '</a></td>' : ''?>
-                <td style="text-align: right">
-                    <button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-lead="<?=$lead->lead_id?>" type="button">Edit</button>
-                    <a href="/lead/<?=$lead->lead_id?>" class="btn btn-secondary btn-sm me-md-1" data-lead="<?=$lead->lead_id?>">View</a>
-                    <button role="button" class="btn btn-danger btn-sm me-md-1" data-trigger="confirm" data-message="Are you sure you want to delete this lead?" data-url="/delete-lead/<?=$lead->lead_id?>" type="button">Delete</button>
-                </td>
-            </tr>
-        <?php } ?>
-    </tbody>
+    <tbody></tbody>
 </table>
 
 <script>
