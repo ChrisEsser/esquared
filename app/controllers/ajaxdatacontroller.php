@@ -22,11 +22,12 @@ class AjaxDataController extends BaseController
         $this->filters = $_POST['filters'] ?? $this->filters;
         $this->filters = json_decode($this->filters);
         $this->order = $_POST['order'] ?? $this->order;
+//        $this->order = json_decode($this->order);
     }
 
     public function properties()
     {
-        $where = [];
+        $where = $order = [];
         foreach ($this->filters as $key => $value) {
             if ($key == 'name' && !empty($value)) {
                 $where['name'] = [
@@ -41,7 +42,13 @@ class AjaxDataController extends BaseController
             }
         }
 
-        $collection = Property::find($where);
+        $test = [];
+        foreach ($this->order as $col => $order) {
+//            $order[$col] = $order;
+            $test[$col] = $order;
+        }
+
+        $collection = Property::find($where, $order);
         $collection->activePagination($this->pageLength);
         $collection->paginate($this->page);
         $total = $collection->queryFoundModels();
@@ -56,7 +63,8 @@ class AjaxDataController extends BaseController
             'total' => $total,
             'pages' => $totalPAges,
             'page' => $this->page,
-            'data' => $data
+            'data' => $data,
+            'test' => $test,
         ]);
     }
 
@@ -302,16 +310,29 @@ class AjaxDataController extends BaseController
     {
         $where = [];
         foreach ($this->filters as $key => $value) {
-            if ($key == 'search' && !empty($value)) {
-                $where['name'] = [
-                    'operator' => 'LIKE',
-                    'value' => '%' . $value . '%'
+            if ($key == 'url_name' && !empty($value)) {
+                /** @var ScraperUrl[] $urls */
+                $urls = ScraperUrl::find();
+                $in[] = 0;
+                foreach ($urls as $url) {
+                    if (stripos($url->name, $value) !== false) {
+                        $in[] = $url->url_id;
+                    }
+                }
+                $where['url_id'] = [
+                    'operator' => 'IN',
+                    'value' => [
+                        '(' . implode(',', $in) . ')'
+                    ]
                 ];
+            } else if ($key == 'address' && !empty($value)) {
+
             } else if ($key == 'url' && !empty($value)) {
                 $where['url_id'] = intval($value);
             }
         }
 
+        /** @var ScraperLead[] $collection */
         $collection = ScraperLead::find($where, ['active' => 'DESC']);
         $collection->activePagination($this->pageLength);
         $collection->paginate($this->page);
@@ -320,6 +341,7 @@ class AjaxDataController extends BaseController
 
         $data = [];
         foreach ($collection as $row) {
+            $row->url_name = $row->getScraperUrl()->name;
             $data[] =  $row;
         }
 

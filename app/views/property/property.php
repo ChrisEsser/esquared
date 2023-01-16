@@ -132,25 +132,20 @@ $images = $this->getVar('images');
             url: '/app-data/units',
             filter: {property_id: '<?=$property->property_id?>'},
             columns: [
-                {
-                    col: 'name',
+                {col: 'name',
                     template: function (data) {
                         return '<a href="/unit/' + data.unit_id + '">' + data.name + '</a>';
                     }
                 },
                 {col: 'description'},
-                {
-                    col: 'status',
+                {col: 'status',
                     template: function (data) {
                         const statusCodes = ['Unknown', 'Occupied', 'Available', 'In Rehab'];
                         return statusCodes[data.status];
                     }
                 },
                 {col: 'rent', format: 'usd'},
-                {
-                    col: '',
-                    cellStyle: 'text-align:right;',
-                    search: false,
+                {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function (data) {
                         let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="unit" data-unit="' + data.unit_id + '" type="button">Edit</button>';
                         html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-unit="' + data.unit_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-unit/' + data.unit_id + '" type="button">Delete</button>';
@@ -167,10 +162,7 @@ $images = $this->getVar('images');
                 {col: 'name'},
                 {col: 'user'},
                 {col: 'created', format: 'datetime'},
-                {
-                    col: '',
-                    search: false,
-                    cellStyle: 'text-align:right;',
+                {col: '', search: false, cellStyle: 'text-align:right;', sort: false,
                     template: function (data) {
                         let html = '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-document="' + data.document_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-document/' + data.document_id + '" type="button">Delete</button>';
                         return html;
@@ -186,17 +178,13 @@ $images = $this->getVar('images');
                 {col: 'created', format: 'datetime'},
                 {col: 'user'},
                 {col: 'note'},
-                {
-                    col: 'type',
+                {col: 'type',
                     template: function (data) {
                         const typeCodes = ['Standard Note', 'To Do'];
                         return typeCodes[data.type];
                     }
                 },
-                {
-                    col: '',
-                    search: false,
-                    cellStyle: 'text-align:right;',
+                {col: '', search: false, cellStyle: 'text-align:right;', sort: false,
                     template: function (data) {
                         let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="note" data-note="' + data.note_id + '" type="button">Edit</button>';
                         html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-note="' + data.note_id + '" data-message="Are you sure you want to delete this note??" data-url="/delete-note/' + data.note_id + '" type="button">Delete</button>';

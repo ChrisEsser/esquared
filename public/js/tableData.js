@@ -10,6 +10,9 @@ class tableData
         if (typeof this.config.filter == 'undefined') {
             this.config.filter = {};
         }
+        if (typeof this.config.sort == 'undefined') {
+            this.config.sort = {};
+        }
 
         this.getBaseHtml(function(html) {
             // need to remove the original table and put the new html in it's place
@@ -32,6 +35,23 @@ class tableData
             $this.paginationNavigateTrigger($(this).data('page'));
         });
         $(document).on('change', '#' + this.id + '_perPage', function() {
+            $this.getData(1, function (results) {
+                $this.loadData(results);
+            });
+        });
+        $(document).on('click', '.' + this.id + '_tableData_sort_trigger', function() {
+
+            const order = $(this).attr('data-order');
+            const col = $(this).data('col');
+            if (order == 'DESC') {
+                $(this).attr('data-order', 'ASC');
+            }
+            else {
+                $(this).attr('data-order', 'DESC');
+            }
+
+
+            $this.config.sort = {col: order};
             $this.getData(1, function (results) {
                 $this.loadData(results);
             });
@@ -69,13 +89,16 @@ class tableData
         var query = new URLSearchParams({
             page: page,
             len: $('#' + this.id + '_perPage').val(),
-            filters: JSON.stringify(filters)
+            filters: JSON.stringify(filters),
+            sort: JSON.stringify(this.config.sort),
         });
         query = query.toString();
+
         $.post(this.config.url, query).done(function (results) {
             if (typeof callback == 'function') callback(results);
             else alert('Invalid callback');
         }).fail(function(result) {
+            console.log(result);
             alert('Invalid data request');
         });
     }
@@ -89,6 +112,8 @@ class tableData
             alert('Invalid response data:');
             return;
         }
+
+        console.log(results);
 
         if (results.total == 0) {
             this.showNoResults();
@@ -187,7 +212,7 @@ class tableData
         if (format === 'usd') {
             value = new Intl.NumberFormat('en-US', { style: 'currency', 'currency':'USD' }).format(value);
         } else if (format === 'date' || format === 'datetime') {
-            // value += 'Z';
+            value += 'Z';
             const d = new Date(value);
             const month = d.getMonth()+1;
             value = + month + '/' + d.getDate() + '/' + d.getFullYear();
@@ -248,10 +273,21 @@ class tableData
             html += '<td style="padding: 8px 8px"><input class="tableData_search_input" type="text" id="' + this.id + '_headerSearch_' + i + '" /></td>';
         }
         html += '</tr>';
-
         origClone.find('thead').append(html);
 
-
+        var i = 0;
+        var $this = this;
+        origClone.find('thead tr:first-child th').each(function() {
+            if ($this.config.sort !== false && (typeof $this.config.columns[i].sort == 'undefined' || typeof $this.config.columns[i].sort === true || typeof $this.config.columns[i].sort == 'string')) {
+                const order = (typeof $this.config.columns[i].order == 'undefined' || $this.config.columns[i].order === 'ASC') ? 'ASC' : '';
+                let html = '<div class="' + $this.id + '_tableData_sort_trigger" data-col="' + $this.config.columns[i].col + '" data-order="' + order + '" style="display: flex; align-items: center; justify-content: start; flex-wrap: nowrap; cursor: pointer;" id="' + $this.id + '_headerSort_' + i + '">';
+                html += '<div>' + $(this).html() + '</div>';
+                html += '<div><id class="fa fa-chevron-down fa-sm ms-1"></id></div>';
+                html += '</div>';
+                $(this).html(html);
+                i++;
+            }
+        });
 
         var newHtml = '<div class="tableData_general_container">';
         newHtml += '<div class="my-2" style="display: flex; align-items: center; justify-content: space-between">';

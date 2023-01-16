@@ -30,31 +30,25 @@
         var table = new tableData('#unitTable', {
             url: '/app-data/units',
             columns: [
-                {
-                    col: 'name',
+                {col: 'name',
                     template: function (data) {
                         return '<a href="/unit/' + data.unit_id + '">' + data.name + '</a>';
                     }
                 },
                 {col: 'description'},
-                {
-                    col: 'status',
+                {col: 'status',
                     template: function (data) {
                         const statusCodes = ['Unknown', 'Occupied', 'Available', 'In Rehab'];
                         return statusCodes[data.status];
                     }
                 },
                 {col: 'rent', format: 'usd'},
-                {
-                    col: 'property',
+                {col: 'property',
                     template: function (data) {
                         return '<a href="/property/' + data.property_id + '">' + data.property + '</a>';
                     }
                 },
-                {
-                    col: '',
-                    cellStyle: 'text-align:right;',
-                    search: false,
+                {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function (data) {
                         let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-unit="' + data.unit_id + '" type="button">Edit</button>';
                         html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-unit="' + data.unit_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-unit/' + data.unit_id + '" type="button">Delete</button>';

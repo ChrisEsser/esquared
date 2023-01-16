@@ -33,25 +33,23 @@
         var table = new tableData('#scraperTable', {
             url: '/app-data/scraper/urls',
             columns: [
-                {
-                    col: 'name',
+                {col: 'name',
                     template: function (data) {
                         return '<a href="/">' + data.name + '</a>';
                     }
                 },
                 {col: 'state'},
-                {
-                    col: 'leads_count',
+                {col: 'leads_count',
                     search: false,
                     template: function (data) {
                         return (data.leads_count == 0) ? 'leads (0)' : '<a href="/scraper/' + data.url_id + '/leads">leads (' + data.leads_count + ')</a>';
                     }
                 },
                 {col: 'last_scraped', format: 'datetime'},
-                {
-                    col: '',
+                {col: '',
                     cellStyle: 'text-align:right;',
                     search: false,
+                    sort: false,
                     template: function(data) {
                         let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-url="' + data.url_id + '" type="button">Edit</button>';
                         html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-url="/delete-scraper/' + data.url_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-scraper/' + data.url_id + '" type="button">Delete</button>';

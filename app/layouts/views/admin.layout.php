@@ -21,7 +21,7 @@ $action = $this->getVar('action');
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
     <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.css"/>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"/>
-    <link rel="stylesheet" href="/css/style.css?ver=64"/>
+    <link rel="stylesheet" href="/css/style.css?ver=67"/>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -30,7 +30,7 @@ $action = $this->getVar('action');
     <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
     <script src="/js/confirm.js?ver=1"></script>
     <script src="/js/filepondHelper.js"></script>
-    <script src="/js/tableData.js?ver=44"></script>
+    <script src="/js/tableData.js?ver=45"></script>
     <?= HTML::displayHead() ?>
 </head>
 
@@ -105,7 +105,7 @@ $action = $this->getVar('action');
 
         <div class="col" id="body_container">
 
-            <div class="top_bar py-3" style="display: flex; align-items: center; justify-content: end">
+            <div class="top_bar py-2" style="display: flex; align-items: center; justify-content: end">
 
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-dark px-3 text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">

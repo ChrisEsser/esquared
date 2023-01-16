@@ -10,13 +10,13 @@
 #sidebar_trigger {
     color: #fff;
     background-color: rgb(40, 40, 40);
-    border-radius: 0 7px 7px 0;
-    padding: 7px 15px;
+    border-radius: 0 3px 3px 0;
+    padding: 5px 10px;
     text-decoration: none;
-    font-size: 1.2em;
+    font-size: 1em;
     position: absolute;
-    top: 7px;
-    right: -40px;
+    top: 5px;
+    right: -30px;
 }
 
 #body_container {
@@ -93,7 +93,7 @@ h1.page_header {
     padding-bottom: 5px;
     margin-bottom: 15px;
     margin-top: 10px;
-    font-size: 2em;
+    font-size: 1.7em;
 }
 
 h1.page_header small {

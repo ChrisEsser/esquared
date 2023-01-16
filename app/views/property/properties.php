@@ -25,18 +25,15 @@
 
         var table = new tableData('#propertyTable', {
             url: '/app-data/properties',
+            sort: {name: 'ASC'},
             columns: [
-                {
-                    col: 'name',
+                {col: 'name',
                     template: function (data) {
                         return '<a href="/property/' + data.property_id + '">' + data.name + '</a>';
                     }
                 },
                 {col: 'description'},
-                {
-                    col: '',
-                    cellStyle: 'text-align:right;',
-                    search: false,
+                {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function(data) {
                         let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-property="' + data.property_id + '" type="button">Edit</button>';
                         html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-property="' + data.property_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-property/' + data.property_id + '" type="button">Delete</button>';
