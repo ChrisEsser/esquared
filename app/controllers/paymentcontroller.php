@@ -30,7 +30,17 @@ class PaymentController extends BaseController
     }
 
     public function delete($params) {
+
         $this->render = false;
+
+        $paymentId = $params['paymentId'] ?? 0;
+
+        if ($payment = PaymentHistory::findOne(['payment_id' => $paymentId])) {
+            $payment->delete();
+        }
+
+        HTTP::rewindQuick();
+
     }
 
     public function afterAction()

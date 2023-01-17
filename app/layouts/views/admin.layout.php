@@ -189,11 +189,13 @@ $action = $this->getVar('action');
         if (windowWidth < 991) {
             $('#sidebar').css({left: '-250px'});
             $('#body_container').css({marginLeft: '0'});
+            $('.mobile_header_label').show();
             // $('.tableData_general_container thead tr:last-child').hide();
         } else {
             $('#sidebar').css({left: '0'});
             $('#body_container').css({marginLeft: '250px'});
             $('.tableData_general_container thead tr:last-child').show();
+            $('.mobile_header_label').hide();
         }
     }
 

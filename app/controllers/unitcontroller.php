@@ -96,10 +96,10 @@ class UnitController extends BaseController
     {
         $this->render = false;
 
-        $unitId = ($params['unitId']) ?? 0;
-
-        $unit = Unit::findOne(['unit_id' => $unitId]);
-        $unit->delete();
+        $unitId = $params['unitId'] ?? 0;
+        if ($unit = Unit::findOne(['unit_id' => $unitId])) {
+            $unit->delete();
+        }
 
         HTTP::rewindQuick();
     }

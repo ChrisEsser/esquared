@@ -63,8 +63,8 @@ $viewAll = $this->getVar('viewAll');
                 <?php } ?>
                 {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function(data) {
-                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-lead="' + data.lead_id + '" type="button">Edit</button>';
-                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-lead="' + data.lead_id + '" data-message="Are you sure you want to delete this lead?" data-url="/delete-lead/' + data.lead_id + '" type="button">Delete</button>';
+                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-lead="' + data.lead_id + '" type="button"><i class="fa fa-pencil"></i></button>';
+                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-lead="' + data.lead_id + '" data-message="Are you sure you want to delete this lead?" data-url="/delete-lead/' + data.lead_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
                     }
                 },

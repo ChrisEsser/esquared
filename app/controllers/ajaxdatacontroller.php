@@ -203,34 +203,65 @@ class AjaxDataController extends BaseController
     public function notes()
     {
         $where = $order = [];
-        foreach ($this->filters as $key => $value) {
-            if ($key == 'property_id') {
-                $where['property_id'] = $value;
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT n.*, CONCAT(u.first_name, \' \', u.last_name) AS user 
+                FROM notes n
+                INNER JOIN users u ON u.user_id = n.created_by';
+
+        $where['deleted'] = 'n.deleted = 0';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['created', 'note'])) {
+                    $where[$col] = 'p.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'type') {
+                    $in = [];
+                    foreach ((new Note())->typeStrings() as $code => $typeString) {
+                        if (stripos($typeString, $value) !== false) $in[] = $code;
+                    }
+                    $where[$col] = 'n.type IN (' . implode(', ', $in) . ') ';
+                } else if ($col == 'user') {
+                    $where['user'] = '(u.last_name LIKE :user OR u.first_name LIKE :user OR CONCAT(u.first_name, \' \', u.last_name) LIKE :user )';
+                    $params['user'] = '%' . $value . '%';
+                } else if ($col == 'property_id') {
+                    $where['property_id'] = 'n.property_id = :property_id ';
+                    $params['property_id'] = $value;
+                }
             }
         }
 
-        foreach ($this->sort as $col => $dir) {
-            $order[$col] = $dir;
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['created', 'note', 'type'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                } else if ($col == 'user') {
+                    $order[$col] = 'u.last_name ' . $dir;
+                }
+            }
         }
 
-        /** @var Note[] $collection */
-        $collection = Document::find($where, $order);
-        $collection->activePagination($this->pageLength);
-        $collection->paginate($this->page);
-        $total = $collection->queryFoundModels();
-        $totalPAges = $collection->getTotalPages();
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
 
-        $data = [];
-        foreach ($collection as $row) {
-            $row->user = $row->getUser()->first_name . ' ' . $row->getUser()->last_name;
-            $data[] = $row;
-        }
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
 
         echo json_encode([
             'total' => $total,
-            'pages' => $totalPAges,
+            'pages' => $totalPages,
             'page' => $this->page,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 

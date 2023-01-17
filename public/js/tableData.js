@@ -276,6 +276,7 @@ class tableData
     getBaseHtml(callback)
     {
         var origClone = this.element.clone();
+        const headers = $('#' + this.id + ' thead > tr:first-child th');
 
         // add a new row in the thead with text search boxes for each column.
         // by default, they all have it unless the setting no search is set for this column in the config
@@ -287,10 +288,19 @@ class tableData
         for(let i = 0; i < cols; i++) {
             if ((typeof this.config.columns[i].search != 'undefined' && this.config.columns[i].search === false)
                 || typeof this.config.columns[i].col != 'string') {
-                // add an empty td here... no search needed but we still have a collumn
+                // add an empty td here... no search needed however we still have a column
                 html += '<td></td>';
             } else {
-                html += '<td style="padding: 8px 8px"><input class="tableData_search_input" type="text" id="' + this.id + '_headerSearch_' + i + '" data-col="' + this.config.columns[i].col + '" /></td>';
+                // try to grab the col header to display in the label
+                const label = (typeof $(headers[i]).text() == 'string') ? $(headers[i]).text() : '';
+                html += '<td style="padding: 8px 8px">';
+                html += '<div class="mobile_header_label" style="display: none;">';
+                html += '<div  style="display: flex; align-items: center; justify-content: space-between;">';
+                html += '<lable for="' + this.id + '_headerSearch_' + i + '">' + label + '</lable>';
+                html += '</div>';
+                html += '</div>';
+                html += '<input class="tableData_search_input" type="text" id="' + this.id + '_headerSearch_' + i + '" data-col="' + this.config.columns[i].col + '" />';
+                html += '</td>';
                 hasOneSearchColumn = true;
             }
 
@@ -321,11 +331,21 @@ class tableData
         newHtml += '<div class="row g-3 align-items-center">';
         newHtml += '<div class="col-auto"><label for="' + this.id + '_perPage" class="col-form-label" style="font-weight: 500">Show</label></div>';
         newHtml += '<div class="col-auto">';
-        newHtml += '<select class="form-control" id="' + this.id + '_perPage" style="max-width: 50px">'
-        newHtml += '<option value="10">10</option>';
-        newHtml += '<option value="20">20</option>';
-        newHtml += '<option value="50">50</option>';
-        newHtml += '<option value="100">100</option>';
+        newHtml += '<select class="form-control" id="' + this.id + '_perPage" style="max-width: 50px">';
+
+        const pageLength = (typeof this.config.pageLength == 'bigint') ? this.config.pageLength : 10;
+
+        if (typeof this.config.pageLengths == 'object') {
+            for (var i = 0; i < this.config.pageLengths.length; i++) {
+                newHtml += '<option value="' + this.config.pageLengths[i] + '"' + ((pageLength === this.config.pageLengths[i]) ? ' selected' : '') + '>' + this.config.pageLengths[i] + '</option>';
+            }
+        } else {
+            newHtml += '<option value="10"' + ((pageLength === 10) ? ' selected' : '') + '>10</option>';
+            newHtml += '<option value="20"' + ((pageLength === 20) ? ' selected' : '') + '>20</option>';
+            newHtml += '<option value="50"' + ((pageLength === 50) ? ' selected' : '') + '>50</option>';
+            newHtml += '<option value="100"' + ((pageLength === 100) ? ' selected' : '') + '>100</option>';
+        }
+
         newHtml += '</select>';
         newHtml += '</div>';
         newHtml += '</div>'; // end inline container

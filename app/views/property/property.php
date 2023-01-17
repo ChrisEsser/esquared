@@ -16,6 +16,8 @@ $images = $this->getVar('images');
     <button role="button" class="btn btn-secondary edit_trigger" data-type="payment" type="button">Add Rent Payment</button>
 </div>
 
+
+
 <div style="display: flex; justify-content: left; flex-wrap: wrap">
 
     <?php if (!empty($images)) { ?>
@@ -148,8 +150,8 @@ $images = $this->getVar('images');
                 {col: 'rent', format: 'usd'},
                 {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function (data) {
-                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="unit" data-unit="' + data.unit_id + '" type="button">Edit</button>';
-                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-unit="' + data.unit_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-unit/' + data.unit_id + '" type="button">Delete</button>';
+                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="unit" data-unit="' + data.unit_id + '" type="button"><i class="fa fa-pencil"></i></button>';
+                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-unit="' + data.unit_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-unit/' + data.unit_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
                     }
                 },
@@ -166,7 +168,7 @@ $images = $this->getVar('images');
                 {col: 'created', format: 'datetime'},
                 {col: '', search: false, cellStyle: 'text-align:right;', sort: false,
                     template: function (data) {
-                        let html = '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-document="' + data.document_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-document/' + data.document_id + '" type="button">Delete</button>';
+                        let html = '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-document="' + data.document_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-document/' + data.document_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
                     }
                 },
@@ -175,7 +177,7 @@ $images = $this->getVar('images');
 
         var noteTable = new tableData('#noteTable', {
             url: '/app-data/notes',
-            // sort: {created: 'DESC'},
+            sort: {created: 'DESC'},
             filter: {property_id: '<?=$property->property_id?>'},
             columns: [
                 {col: 'created', format: 'datetime'},
@@ -189,8 +191,8 @@ $images = $this->getVar('images');
                 },
                 {col: '', search: false, cellStyle: 'text-align:right;', sort: false,
                     template: function (data) {
-                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="note" data-note="' + data.note_id + '" type="button">Edit</button>';
-                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-note="' + data.note_id + '" data-message="Are you sure you want to delete this note??" data-url="/delete-note/' + data.note_id + '" type="button">Delete</button>';
+                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="note" data-note="' + data.note_id + '" type="button"><i class="fa fa-pencil"></i></button>';
+                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-note="' + data.note_id + '" data-message="Are you sure you want to delete this note??" data-url="/delete-note/' + data.note_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
                     }
                 },
