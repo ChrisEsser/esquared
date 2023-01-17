@@ -9,11 +9,11 @@ $images = $this->getVar('images');
 <h1 class="page_header"><?=$property->name?></h1>
 
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
-    <button role="button" class="btn btn-primary me-md-1 edit_trigger" data-type="property" type="button">Edit Property</button>
-    <button role="button" class="btn btn-secondary me-md-1 edit_trigger" data-type="unit" type="button">Add Unit</button>
-    <button role="button" class="btn btn-secondary edit_trigger" data-type="document" type="button">Add Document</button>
-    <button role="button" class="btn btn-secondary edit_trigger" data-type="note" type="button">Add Note</button>
-    <button role="button" class="btn btn-secondary edit_trigger" data-type="payment" type="button">Add Rent Payment</button>
+    <button role="button" class="btn btn-round btn-primary edit_trigger" data-type="property" type="button">Edit Property</button>
+    <button role="button" class="btn btn-round btn-info edit_trigger" data-type="unit" type="button">Add Unit</button>
+    <button role="button" class="btn btn-round btn-info edit_trigger" data-type="document" type="button">Add Document</button>
+    <button role="button" class="btn btn-round btn-info edit_trigger" data-type="note" type="button">Add Note</button>
+    <button role="button" class="btn btn-round btn-info edit_trigger" data-type="payment" type="button">Add Rent Payment</button>
 </div>
 
 
@@ -150,8 +150,8 @@ $images = $this->getVar('images');
                 {col: 'rent', format: 'usd'},
                 {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function (data) {
-                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="unit" data-unit="' + data.unit_id + '" type="button"><i class="fa fa-pencil"></i></button>';
-                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-unit="' + data.unit_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-unit/' + data.unit_id + '" type="button"><i class="fa fa-times"></i></button>';
+                        let html = '<button role="button" class="btn btn-outline-primary btn-sm me-md-1 edit_trigger" data-type="unit" data-unit="' + data.unit_id + '" type="button"><i class="fa fa-pencil"></i></button>';
+                        html += '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-unit="' + data.unit_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-unit/' + data.unit_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
                     }
                 },
@@ -168,7 +168,7 @@ $images = $this->getVar('images');
                 {col: 'created', format: 'datetime'},
                 {col: '', search: false, cellStyle: 'text-align:right;', sort: false,
                     template: function (data) {
-                        let html = '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-document="' + data.document_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-document/' + data.document_id + '" type="button"><i class="fa fa-times"></i></button>';
+                        let html = '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-document="' + data.document_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-document/' + data.document_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
                     }
                 },
@@ -191,8 +191,8 @@ $images = $this->getVar('images');
                 },
                 {col: '', search: false, cellStyle: 'text-align:right;', sort: false,
                     template: function (data) {
-                        let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-type="note" data-note="' + data.note_id + '" type="button"><i class="fa fa-pencil"></i></button>';
-                        html += '<button role="button" class="btn btn-danger btn-sm me-md-1 confirm_trigger" data-note="' + data.note_id + '" data-message="Are you sure you want to delete this note??" data-url="/delete-note/' + data.note_id + '" type="button"><i class="fa fa-times"></i></button>';
+                        let html = '<button role="button" class="btn btn-outline-primary btn-sm me-md-1 edit_trigger" data-type="note" data-note="' + data.note_id + '" type="button"><i class="fa fa-pencil"></i></button>';
+                        html += '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-note="' + data.note_id + '" data-message="Are you sure you want to delete this note??" data-url="/delete-note/' + data.note_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
                     }
                 },

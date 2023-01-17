@@ -5,9 +5,13 @@ $unit = $this->getVar('unit');
 
 ?>
 
-<h1 class="page_header"><a href="/property/<?=$unit->getProperty()->property_id?>">
-        <?=$unit->getProperty()->name?></a> <small>- <?=$unit->name?></small>
-</h1>
+<h1 class="page_header"><?=$unit->name?></h1>
+
+<ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/properties">Properties</a></li>
+    <li class="breadcrumb-item"><a href="/property/<?=$unit->getProperty()->property_id?>"><?=$unit->getProperty()->name?></a></li>
+    <li class="breadcrumb-item active"><?=$unit->name?></li>
+</ul>
 
 <div style="display: flex; justify-content: left; flex-wrap: wrap">
 

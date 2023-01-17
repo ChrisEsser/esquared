@@ -1,3 +1,10 @@
+body {
+    font-family: "Poppins", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    font-weight: normal;
+}
+
 #sidebar {
     background-color: rgb(40, 40, 40);
     width: 250px;
@@ -45,17 +52,18 @@
     margin: 0;
     padding: 0;
 }
+
 #sidebar ul.list_container > li {
     padding: 0;
     margin: 0;
     border-radius: 0;
-    border-right: 1px solid rgba(0,0,0,.125);
-    border-bottom: 1px solid rgba(0,0,0,.125);
-    border-left: 1px solid rgba(0,0,0,.125);
+    border-right: 1px solid rgba(0, 0, 0, .125);
+    border-bottom: 1px solid rgba(0, 0, 0, .125);
+    border-left: 1px solid rgba(0, 0, 0, .125);
 }
 
 #sidebar ul.list_container > li:first-child {
-    border-top: 1px solid rgba(0,0,0,.125);
+    border-top: 1px solid rgba(0, 0, 0, .125);
 }
 
 #sidebar ul.list_container > li > a {
@@ -72,9 +80,11 @@
 #sidebar ul.list_container > li > a > div {
     padding: 0 12px;
 }
+
 #sidebar ul.list_container > li > a > div > i {
     font-size: 1.4em;
 }
+
 #sidebar ul.list_container > li > a > span {
     padding: 10px 0;
 }
@@ -86,8 +96,6 @@ li.active > a {
 }
 
 
-
-
 h1.page_header {
     border-bottom: 1px solid #C0C0C0;
     padding-bottom: 5px;
@@ -97,7 +105,7 @@ h1.page_header {
 }
 
 h1.page_header small {
-    font-size: .7em;
+    font-size: .6em;
 }
 
 .navbar-nav li.active a {
@@ -124,9 +132,10 @@ h1.page_header small {
 
 .e2-table th,
 .e2-table td {
-    padding: .625em;
+    padding: .4em;
     text-align: left;
 }
+
 .e2-table tr td:last-child {
     white-space: nowrap;
 }
@@ -150,6 +159,7 @@ tr.table-success,
     border-color: #bcd0c7;
     background-color: #d1e7dd;
 }
+
 tr.table-info,
 .table-info tr {
     color: #000;
@@ -162,7 +172,7 @@ tr.table-info,
 }
 
 .btn {
-    padding: 3px 7px;
+    /*padding: 3px 7px;*/
 }
 
 .tableData_search_input {
@@ -185,7 +195,7 @@ tr.table-info,
     overflow: hidden;
     text-overflow: ellipsis;
     -webkit-appearance: none;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.4285714286;
     border-color: rgba(0, 0, 0, 0.08);
     color: #424242;
@@ -204,8 +214,9 @@ tr.table-info,
     margin: 8px;
 }
 
-
-
+ul.pagination {
+    margin-bottom: 0;
+}
 
 
 @media screen and (max-width: 1200px) {
@@ -235,6 +246,7 @@ tr.table-info,
         position: absolute;
         width: 1px;
     }
+
     .e2-table thead tr:last-child {
         display: none;
     }

@@ -21,6 +21,7 @@ $action = $this->getVar('action');
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
     <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.css"/>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"/>
+    <link rel="stylesheet" href="/css/betterButtons.css?ver=99"/>
     <link rel="stylesheet" href="/css/style.css?ver=99"/>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
@@ -45,9 +46,9 @@ $action = $this->getVar('action');
 
                     <div class="p-3"><h4 class="mb-0" style="color: #0d6efd; white-space: nowrap">E<sup>2</sup> Admin</h4></div>
 
-                    <form class="d-flex p-2" style="white-space: nowrap">
-                        <input class="form-control me-2 rounded-0" type="search" placeholder="Search" aria-label="Search">
-                    </form>
+<!--                    <form class="d-flex p-2" style="white-space: nowrap">-->
+<!--                        <input class="form-control me-2 rounded-0" type="search" placeholder="Search" aria-label="Search">-->
+<!--                    </form>-->
 
                     <div class="menu_heading">Menu</div>
 
@@ -146,7 +147,6 @@ $action = $this->getVar('action');
             <div class="modal-body"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="button_save">Save</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
@@ -175,7 +175,7 @@ $action = $this->getVar('action');
             <div class="modal-footer">
                 <form method="POST" action="">
                     <button type="submit" class="btn btn-primary" id="button_save">Yes</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
                 </form>
             </div>
         </div>

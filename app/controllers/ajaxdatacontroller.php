@@ -167,6 +167,8 @@ class AjaxDataController extends BaseController
                 } else if ($col == 'property_id') {
                     $where[$col] = 'd.' . $col . ' = :' . $col;
                     $params[$col] = $value;
+                } else if ($col == 'viewAll' && $value != false) {
+                    $where['viewAll'] = 'd.user_id = ' . intval(Auth::loggedInUser());
                 }
             }
         }
@@ -277,7 +279,7 @@ class AjaxDataController extends BaseController
                           ELSE \'\' END AS unit
                 FROM users u
                 LEFT JOIN units un ON un.unit_id = u.unit_id
-                INNER JOIN properties p ON p.property_id = un.property_id';
+                LEFT JOIN properties p ON p.property_id = un.property_id';
 
         $where['deleted'] = 'u.deleted = 0';
 
@@ -447,7 +449,7 @@ class AjaxDataController extends BaseController
                 FROM payment_history p
                 INNER JOIN users u ON u.user_id = p.user_id
                 LEFT JOIN units un ON un.unit_id = p.unit_id
-                INNER JOIN properties pr ON pr.property_id = un.property_id ';
+                LEFT JOIN properties pr ON pr.property_id = un.property_id ';
 
         $params = [];
         foreach ($this->filters as $filter) {

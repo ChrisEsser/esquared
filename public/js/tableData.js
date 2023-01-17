@@ -190,13 +190,9 @@ class tableData
             return;
         }
 
-        for(let key in filter) {
-            var newFilterKey = key;
-            var newFilterValue = filter[key];
+        for (let key in filter) {
+            this.config.filter[key] = filter;
         }
-
-        let currentFilter = this.config.filter;
-        currentFilter[newFilterKey] = newFilterValue;
 
         var $this = this;
         this.getData(1, function (results) {
@@ -211,8 +207,12 @@ class tableData
             return;
         }
 
-        let currentFilter = this.config.filter;
-        if (currentFilter.hasOwnProperty(filter)) delete currentFilter[filter];
+        for(var i = 0; i < this.config.filter.length; i++) {
+            if (this.config.filter[i].hasOwnProperty(filter)) {
+                this.config.filter = this.config.filter.splice(i, 1);
+                break;
+            }
+        }
 
         var $this = this;
         this.getData(1, function (results) {
@@ -264,7 +264,8 @@ class tableData
                 html += '<li class="page-item"><a class="page-link page_next_trigger" data-page="' + next + '" href="javascript:void(0);"><span aria-hidden="true">&raquo;</span></a></li>';
             }
         }
-        $('#' + this.id + '_paginate ul.pagination').html(html);
+        $('#' + this.id + '_paginate1 ul.pagination').html(html);
+        $('#' + this.id + '_paginate2 ul.pagination').html(html);
     }
 
     showNoResults()
@@ -349,6 +350,27 @@ class tableData
         newHtml += '</select>';
         newHtml += '</div>';
         newHtml += '</div>'; // end inline container
+
+
+        newHtml += '<nav id="' + this.id + '_paginate1">';
+        newHtml += '<ul class="pagination pagination-sm">';
+        newHtml += '<li class="page-item">';
+        newHtml += '<a class="page-link" href="#" aria-label="Previous">';
+        newHtml += '<span aria-hidden="true">&laquo;</span>';
+        newHtml += '</a>';
+        newHtml += '</li>';
+        newHtml += '<li class="page-item"><a class="page-link" href="#">1</a></li>';
+        newHtml += '<li class="page-item">';
+        newHtml += '<a class="page-link" href="#" aria-label="Next">';
+        newHtml += '<span aria-hidden="true">&raquo;</span>';
+        newHtml += '</a>';
+        newHtml += ' </li>';
+        newHtml += '</ul>';
+        newHtml += '</nav>';
+
+
+
+
         // newHtml += '<input class="form-control" id="' + this.id + '_search" type="search" placeholder="Search" aria-label="Search" style="max-width: 150px" />';
         newHtml += '</div>'; // end flex row
         // newHtml += '<div class="showing_counts mb-2">Total: <strong>0</strong></div>';
@@ -358,7 +380,7 @@ class tableData
         newHtml += '<table class="e2-table" id="' + this.id + '_tableActual">' + origClone.html() + '</table>';
         newHtml += '<div class="my-2" style="display: flex; align-items: start; justify-content: space-between">';
         newHtml += '<div class="showing_counts">Total: <strong>0</strong></div>';
-        newHtml += '<nav id="' + this.id + '_paginate">';
+        newHtml += '<nav id="' + this.id + '_paginate2">';
         newHtml += '<ul class="pagination pagination-sm">';
         newHtml += '<li class="page-item">';
         newHtml += '<a class="page-link" href="#" aria-label="Previous">';
