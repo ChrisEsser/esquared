@@ -29,10 +29,10 @@ $viewAll = $this->getVar('viewAll');
 
         var table = new tableData('#leadTable', {
             url: '/app-data/scraper/leads',
-            filter: {
-                search: '',
-                url: '<?=($url->url_id) ? $url->url_id : ''?>'
-            },
+            sort: {active: 'DESC'},
+            filter: [
+                {url_id: '<?=($url->url_id) ? $url->url_id : ''?>'}
+            ],
             columns: [
                 {col: 'active', search: false,
                     template: function (data) {

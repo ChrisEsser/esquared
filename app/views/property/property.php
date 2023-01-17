@@ -130,6 +130,7 @@ $images = $this->getVar('images');
 
         var unitTable = new tableData('#unitTable', {
             url: '/app-data/units',
+            sort: {name: 'ASC'},
             filter: {property_id: '<?=$property->property_id?>'},
             columns: [
                 {col: 'name',
@@ -157,6 +158,7 @@ $images = $this->getVar('images');
 
         var docTable = new tableData('#documentTable', {
             url: '/app-data/documents',
+            sort: {name: 'ASC'},
             filter: {property_id: '<?=$property->property_id?>'},
             columns: [
                 {col: 'name'},
@@ -173,6 +175,7 @@ $images = $this->getVar('images');
 
         var noteTable = new tableData('#noteTable', {
             url: '/app-data/notes',
+            // sort: {created: 'DESC'},
             filter: {property_id: '<?=$property->property_id?>'},
             columns: [
                 {col: 'created', format: 'datetime'},

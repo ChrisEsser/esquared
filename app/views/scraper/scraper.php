@@ -32,6 +32,7 @@
 
         var table = new tableData('#scraperTable', {
             url: '/app-data/scraper/urls',
+            sort: {name: 'ASC'},
             columns: [
                 {col: 'name',
                     template: function (data) {

@@ -29,6 +29,7 @@
 
         var table = new tableData('#unitTable', {
             url: '/app-data/units',
+            sort: {name: 'ASC'},
             columns: [
                 {col: 'name',
                     template: function (data) {

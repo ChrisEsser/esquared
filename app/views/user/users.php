@@ -29,24 +29,22 @@
 
         var table = new tableData('#userTable', {
             url: '/app-data/users',
+            sort: {first_name: 'ASC'},
             columns: [
                 {col: 'first_name'},
                 {col: 'last_name'},
                 {col: 'email'},
-                {
-                    col: 'admin',
+                {col: 'admin',
                     template: function (data) {
                         return (data.admin == 1) ? 'Yes' : 'No';
                     }
                 },
-                {
-                    col: 'unit',
+                {col: 'unit',
                     template: function (data) {
                         return '<a href="/property/' + data.property_id + '" target="_blank" ">' + data.unit + '</a>';
                     }
                 },
-                {
-                    col: '',
+                {col: '', sort: false,
                     cellStyle: 'text-align:right;',
                     template: function(data) {
                         let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-user="' + data.user_id + '" type="button">Edit</button>';

@@ -1,4 +1,4 @@
-<?php
+n<?php
 
 ?>
 
@@ -27,12 +27,12 @@
             url: '/app-data/properties',
             sort: {name: 'ASC'},
             columns: [
-                {col: 'name',
+                {col: 'name', sort: 'ASC',
                     template: function (data) {
                         return '<a href="/property/' + data.property_id + '">' + data.name + '</a>';
                     }
                 },
-                {col: 'description'},
+                {col: 'description', sort: 'ASC'},
                 {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function(data) {
                         let html = '<button role="button" class="btn btn-primary btn-sm me-md-1 edit_trigger" data-property="' + data.property_id + '" type="button">Edit</button>';
@@ -46,7 +46,7 @@
         $(document).on('click', '.edit_trigger', function () {
 
             let property = $(this).data('property');
-            let url = (property) ? '/edit-property/' + property : '/create-property';
+            let url = (property) ? '/edit-property/' + property : '/add-property';
             let modalTitle = (property) ? 'Edit Property' : 'Create Property';
 
             $.get(url).done(function (result) {

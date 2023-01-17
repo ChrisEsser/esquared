@@ -106,7 +106,7 @@ class DocumentController extends BaseController
 
         unlink($file);
 
-        HTTP::rewind();
+        HTTP::rewindQuick();
     }
 
     public function afterAction()

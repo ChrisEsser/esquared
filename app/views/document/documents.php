@@ -32,6 +32,8 @@
 
         var table = new tableData('#documentTable', {
             url: '/app-data/documents',
+            sort: {name: 'ASC'},
+            filter: {property_id: 0},
             columns: [
                 {col: 'name'},
                 {col: 'user'},

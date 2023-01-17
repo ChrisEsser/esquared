@@ -56,6 +56,15 @@ return [
     ['POST', '/delete-unit/[i:unitId]', 'UnitController#delete'],
 	['POST', '/save-unit', 'UnitController#save'],
 
+    ['GET', '/payments', 'PaymentController#payments'],
+    ['GET', '/payments/[i:propertyId]/[i:unitId]', 'PaymentController#payments'],
+    ['GET', '/payments/[i:propertyId]', 'PaymentController#payments'],
+    ['GET', '/payment/[i:paymentIds]', 'PaymentController#payment'],
+    ['GET', '/edit-payment/[i:paymentId]', 'PaymentController#edit'],
+    ['GET', '/add-payment/[i:unitId]', 'PaymentController#edit'],
+    ['POST', '/save-payment', 'PaymentController#save'],
+    ['POST', '/delete-payment/[i:paymentID]', 'PaymentController#delete'],
+
 	['GET', '/note/[i:noteId]', 'NoteController#note'],
     ['GET', '/edit-note/[i:noteId]', 'NoteController#edit'],
     ['GET', '/create-note/[i:propertyId]', 'NoteController#edit'],
@@ -102,20 +111,23 @@ return [
     ['POST', '/save-lead', 'ScraperController#saveLead'],
     ['GET', '/lead-street-view/[i:leadId]', 'ScraperController#leadStreetView'],
     ['GET', '/lead/[i:leadId]', 'ScraperController#lead'],
+    ['GET', '/lead/[i:leadId]', 'ScraperController#lead'],
 
 
 
 
-    ['GET', '/scrapetest', 'ScraperController#scrapeTest'],
+    ['GET', '/test', 'PropertyController#test'],
 
 
 
     ['POST', '/app-data/properties', 'AjaxDataController#properties'],
+    ['GET', '/app-data/properties', 'AjaxDataController#properties'],
     ['POST', '/app-data/units', 'AjaxDataController#units'],
     ['POST', '/app-data/documents', 'AjaxDataController#documents'],
     ['POST', '/app-data/notes', 'AjaxDataController#notes'],
     ['POST', '/app-data/users', 'AjaxDataController#users'],
     ['POST', '/app-data/scraper/urls', 'AjaxDataController#scraperUrls'],
     ['POST', '/app-data/scraper/leads', 'AjaxDataController#scraperLeads'],
+    ['POST', '/app-data/payments', 'AjaxDataController#payments'],
 
 ];

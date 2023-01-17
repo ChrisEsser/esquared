@@ -21,16 +21,16 @@ $action = $this->getVar('action');
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
     <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.css"/>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"/>
-    <link rel="stylesheet" href="/css/style.css?ver=67"/>
+    <link rel="stylesheet" href="/css/style.css?ver=99"/>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
     <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
     <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
-    <script src="/js/confirm.js?ver=1"></script>
+    <script src="/js/confirm.js?ver=99"></script>
     <script src="/js/filepondHelper.js"></script>
-    <script src="/js/tableData.js?ver=45"></script>
+    <script src="/js/tableData.js?ver=99"></script>
     <?= HTML::displayHead() ?>
 </head>
 
@@ -68,6 +68,12 @@ $action = $this->getVar('action');
                             <a href="/units" tabindex="0">
                                 <div><i class="fa fa-building-o"></i></div>
                                 <span>Units</span>
+                            </a>
+                        </li>
+                        <li class="<?=($action == 'payments') ? 'active' : ''?>">
+                            <a href="/payments" tabindex="0">
+                                <div><i class="fa fa-dollar"></i></div>
+                                <span>Payments</span>
                             </a>
                         </li>
                         <li class="<?=($action == 'documents') ? 'active' : ''?>">

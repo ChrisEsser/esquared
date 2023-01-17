@@ -347,10 +347,31 @@ class PropertyController extends BaseController
     {
         $this->render = false;
 
+        $db = new StandardQuery();
+
+        $sql = 'SELECT p.*, CONCAT(u.first_name, " ", u.last_name) AS payment_by, 
+                       IFNULL(un.name, "") AS unit_name, IFNULL(pr.name, "") AS property_name,
+                       IFNULL(un.unit_id, 0) AS unit_id
+                FROM payment_history p
+                INNER JOIN users u ON u.user_id = p.user_id
+                LEFT JOIN units un ON un.unit_id = p.unit_id
+                INNER JOIN properties pr ON pr.property_id = un.property_id
+                WHERE 1=1 ';
+
+        $params = $where = [];
+        foreach (['amount' => 0, 'method' => 'c'] as $col => $value) {
+            if (in_array($col, ['payment_date', 'amount', 'method', 'ype'])) {
+                $where[] = 'p.' . $col . ' LIKE :' . $col;
+                $params[$col] = '%' . $value . '%';
+            }
+        }
+
+        $sql .= (!empty($where)) ? ' AND ' . implode(' AND ', $where) : '';
+
+        $total = $db->count($sql, $params);
 
 
-
-
+        var_dump($total);
     }
 
     public function afterAction()

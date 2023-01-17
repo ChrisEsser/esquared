@@ -8,10 +8,14 @@ class tableData
         var $this = this;
 
         if (typeof this.config.filter == 'undefined') {
-            this.config.filter = {};
+            this.config.filter = [];
+        } else if (typeof this.config.filter == 'object') {
+            this.config.filter = [this.config.filter];
         }
         if (typeof this.config.sort == 'undefined') {
-            this.config.sort = {};
+            this.config.sort = [];
+        } else if (typeof this.config.sort == 'object') {
+            this.config.sort = [this.config.sort];
         }
 
         this.getBaseHtml(function(html) {
@@ -19,10 +23,10 @@ class tableData
             // replaceWith does not work because the element is not in the DOM after
             $this.element.wrap('<div id="' + $this.id + '_tableData_container"></div>');
             $('#' + $this.id + '_tableData_container').html(html);
-
             $this.getData(1, function (results) {
                 $this.loadData(results);
             });
+            $this.toggleSortIcons();
         });
 
         $(document).on('click', '#' + this.id + '_tableData_container .page_prev_trigger', function () {
@@ -39,31 +43,36 @@ class tableData
                 $this.loadData(results);
             });
         });
-        $(document).on('click', '.' + this.id + '_tableData_sort_trigger', function() {
 
+        $(document).on('click', '.' + this.id + '_tableData_sort_trigger', function(e) {
             const order = $(this).attr('data-order');
             const col = $(this).data('col');
-            if (order == 'DESC') {
-                $(this).attr('data-order', 'ASC');
+            if (order == 'DESC') $(this).attr('data-order', 'ASC');
+            else $(this).attr('data-order', 'DESC');
+            if (!e.shiftKey) {
+                // shift click allows us to do multiple filters
+                $this.config.sort = [];
             }
-            else {
-                $(this).attr('data-order', 'DESC');
-            }
-
-
-            $this.config.sort = {col: order};
+            $this.config.sort = [];
+            let tmpObj = {};
+            tmpObj[col] = order;
+            $this.config.sort.push(tmpObj);
+            $this.toggleSortIcons();
             $this.getData(1, function (results) {
                 $this.loadData(results);
             });
         });
 
-        var timeout;
+        var timeoutSearch;
         $(document).on('keyup', '.tableData_search_input', function() {
             const val = $(this).val();
-            const col = $(this).data('column');
-            clearTimeout(timeout);
-            timeout = setTimeout(function() {
-                $this.config.filter[col] = val;
+            const col = $(this).data('col');
+
+            clearTimeout(timeoutSearch);
+            timeoutSearch = setTimeout(function() {
+                let tmpObj = {};
+                tmpObj[col] = val;
+                $this.config.filter.push(tmpObj);
                 $this.getData(1, function (results) {
                     $this.loadData(results);
                 });
@@ -73,6 +82,28 @@ class tableData
         $(document).on('click', '.mobile_filter_trigger', function() {
             $('#' + $this.id + '_tableData_container thead tr:last-child').toggle();
         });
+    }
+
+    toggleSortIcons()
+    {
+        for (let i = 0; i < this.config.columns.length; i++) {
+            for (let j = 0; j < this.config.sort.length; j++) {
+                if (this.config.sort[j].hasOwnProperty(this.config.columns[i].col)) {
+                    // find the th
+                    $('#' + this.id + '_headerSort_' + i).find('.fa').css({color: '#212529'});
+                    if (this.config.sort[j][this.config.columns[i].col] == 'ASC') {
+                        $('#' + this.id + '_headerSort_' + i).find('.fa-chevron-up').hide();
+                        $('#' + this.id + '_headerSort_' + i).find('.fa-chevron-down').show();
+                    } else {
+                        $('#' + this.id + '_headerSort_' + i).find('.fa-chevron-up').show();
+                        $('#' + this.id + '_headerSort_' + i).find('.fa-chevron-down').hide();
+                    }
+                } else {
+                    $('#' + this.id + '_headerSort_' + i).find('.fa').css({color: '#B6B8BA'});
+                    $('#' + this.id + '_headerSort_' + i).find('.fa-chevron-up').hide();
+                }
+            }
+        }
     }
 
     paginationNavigateTrigger(page)
@@ -85,16 +116,15 @@ class tableData
 
     getData(page, callback)
     {
-        const filters = this.config.filter;
-        var query = new URLSearchParams({
+        var test = {
             page: page,
             len: $('#' + this.id + '_perPage').val(),
-            filters: JSON.stringify(filters),
-            sort: JSON.stringify(this.config.sort),
-        });
-        query = query.toString();
+            filter: this.config.filter,
+            sort: this.config.sort
+        };
+        test = 'tableData=' + JSON.stringify(test);
 
-        $.post(this.config.url, query).done(function (results) {
+        $.post(this.config.url, test).done(function (results) {
             if (typeof callback == 'function') callback(results);
             else alert('Invalid callback');
         }).fail(function(result) {
@@ -109,11 +139,10 @@ class tableData
             results = JSON.parse(results);
             if (typeof results.total == 'undefined' || typeof results.data == 'undefined') throw "malformed";
         } catch (e) {
+            console.log(results);
             alert('Invalid response data:');
             return;
         }
-
-        console.log(results);
 
         if (results.total == 0) {
             this.showNoResults();
@@ -124,22 +153,6 @@ class tableData
 
             let $tbody = $('#' + this.id  + '_tableActual tbody');
             let html = '';
-
-            let hasOneSearchColumn = false;
-            for(let j = 0; j < this.config.columns.length; j++) {
-                // if the search functionality for this column is turned off we want to hide the search input
-                if ((typeof this.config.columns[j].search != 'undefined' && this.config.columns[j].search === false)
-                    || typeof this.config.columns[j].col != 'string') {
-                    $('#' + this.id + '_headerSearch_' + j).remove();
-                } else {
-                    hasOneSearchColumn = true;
-                    $('#' + this.id + '_headerSearch_' + j).attr('data-column', this.config.columns[j].col);
-                }
-            }
-
-            if (!hasOneSearchColumn) {
-                $('#' + this.id + '_tableActual thead tr:last-child').hide();
-            }
 
             for (let i = 0; i < results.data.length; i++) {
                 html += '<tr>';
@@ -265,16 +278,29 @@ class tableData
         var origClone = this.element.clone();
 
         // add a new row in the thead with text search boxes for each column.
-        // by default they all have it unless the setting no search is set for this column in the config
+        // by default, they all have it unless the setting no search is set for this column in the config
         const cols = this.getColumnCount('#' + this.id);
 
+        // add the search input row into the thead
+        let hasOneSearchColumn = false;
         let html = '<tr style="padding: 0">';
-        for(let i = 0; i < cols; i++){
-            html += '<td style="padding: 8px 8px"><input class="tableData_search_input" type="text" id="' + this.id + '_headerSearch_' + i + '" /></td>';
+        for(let i = 0; i < cols; i++) {
+            if ((typeof this.config.columns[i].search != 'undefined' && this.config.columns[i].search === false)
+                || typeof this.config.columns[i].col != 'string') {
+                // add an empty td here... no search needed but we still have a collumn
+                html += '<td></td>';
+            } else {
+                html += '<td style="padding: 8px 8px"><input class="tableData_search_input" type="text" id="' + this.id + '_headerSearch_' + i + '" data-col="' + this.config.columns[i].col + '" /></td>';
+                hasOneSearchColumn = true;
+            }
+
         }
         html += '</tr>';
-        origClone.find('thead').append(html);
+        if (hasOneSearchColumn) {
+            origClone.find('thead').append(html);
+        }
 
+        // now add the sort triggers to each header column in the thead
         var i = 0;
         var $this = this;
         origClone.find('thead tr:first-child th').each(function() {
@@ -282,13 +308,14 @@ class tableData
                 const order = (typeof $this.config.columns[i].order == 'undefined' || $this.config.columns[i].order === 'ASC') ? 'ASC' : '';
                 let html = '<div class="' + $this.id + '_tableData_sort_trigger" data-col="' + $this.config.columns[i].col + '" data-order="' + order + '" style="display: flex; align-items: center; justify-content: start; flex-wrap: nowrap; cursor: pointer;" id="' + $this.id + '_headerSort_' + i + '">';
                 html += '<div>' + $(this).html() + '</div>';
-                html += '<div><id class="fa fa-chevron-down fa-sm ms-1"></id></div>';
+                html += '<div><i class="fa fa-chevron-down fa-sm ms-1"></i><i class="fa fa-chevron-up fa-sm ms-1"></i></div>';
                 html += '</div>';
                 $(this).html(html);
                 i++;
             }
         });
 
+        // build the base html
         var newHtml = '<div class="tableData_general_container">';
         newHtml += '<div class="my-2" style="display: flex; align-items: center; justify-content: space-between">';
         newHtml += '<div class="row g-3 align-items-center">';

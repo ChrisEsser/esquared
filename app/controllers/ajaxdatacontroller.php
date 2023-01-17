@@ -5,7 +5,8 @@ class AjaxDataController extends BaseController
     protected $pageLength = 2;
     protected $page = 1;
     protected $filters = [];
-    protected $order = [];
+    protected $sort = [];
+    protected $offset = 0;
 
     public function beforeAction()
     {
@@ -17,184 +18,203 @@ class AjaxDataController extends BaseController
             HTTP::redirect('/');
         }
 
-        $this->page = $_POST['page'] ?? $this->page;
-        $this->pageLength = $_POST['len'] ?? $this->pageLength;
-        $this->filters = $_POST['filters'] ?? $this->filters;
-        $this->filters = json_decode($this->filters);
-        $this->order = $_POST['order'] ?? $this->order;
-//        $this->order = json_decode($this->order);
+        $requestData = json_decode($_POST['tableData']);
+
+        $this->page = $requestData->page ?? $this->page;
+        $this->pageLength = $requestData->len ?? $this->pageLength;
+        $this->filters = $requestData->filter ?? $this->filters;
+        $this->sort = $requestData->sort ?? $this->sort;
+
+        $this->offset = ($this->page - 1) * $this->pageLength;
     }
 
     public function properties()
     {
         $where = $order = [];
-        foreach ($this->filters as $key => $value) {
-            if ($key == 'name' && !empty($value)) {
-                $where['name'] = [
-                    'operator' => 'LIKE',
-                    'value' => '%' . $value . '%'
-                ];
-            } else if ($key == 'description' && !empty($value)) {
-                $where['description'] = [
-                    'operator' => 'LIKE',
-                    'value' => '%' . $value . '%'
-                ];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT p.* 
+                FROM properties p';
+
+        $where['deleted'] = 'p.deleted = 0';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['name', 'description'])) {
+                    $where[$col] = 'p.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                }
             }
         }
 
-        $test = [];
-        foreach ($this->order as $col => $order) {
-//            $order[$col] = $order;
-            $test[$col] = $order;
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['name', 'description'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                }
+            }
         }
 
-        $collection = Property::find($where, $order);
-        $collection->activePagination($this->pageLength);
-        $collection->paginate($this->page);
-        $total = $collection->queryFoundModels();
-        $totalPAges = $collection->getTotalPages();
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
 
-        $data = [];
-        foreach ($collection as $row) {
-            $data[] =  $row;
-        }
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
 
         echo json_encode([
             'total' => $total,
-            'pages' => $totalPAges,
+            'pages' => $totalPages,
             'page' => $this->page,
             'data' => $data,
-            'test' => $test,
         ]);
     }
 
     public function units()
     {
-        $where = [];
-        foreach ($this->filters as $key => $value) {
+        $where = $order = [];
 
-            if (in_array($key, ['name', 'description', 'rent']) && !empty($value)) {
-                $where[$key] = [
-                    'operator' => 'LIKE',
-                    'value' => '%' . $value . '%'
-                ];
-            } else if ($key == 'status') {
-                $in[] = 0;
-                $unit = new Unit();
-                foreach ($unit->statusStrings() as $code => $status) {
-                    if (stripos($status, $value) !== false) $in[] = $code;
-                }
-                $where[$key] = [
-                    'operator' => 'IN',
-                    'value' => [
-                        '(' . implode(',', $in) . ')'
-                    ]
-                ];
-            } else if ($key == 'property' && !empty($value)) {
-                $in[] = 0;
-                /** @var Property[] $properties */
-                $properties = Property::find();
-                foreach ($properties as $property) {
-                    if (stripos($property->name, $value) !== false) {
-                        $in[] =  $property->property_id;
+        $db = new StandardQuery();
+
+        $sql = 'SELECT u.*, p.name AS property 
+                FROM units u
+                INNER JOIN properties p ON p.property_id = u.property_id';
+
+        $where['deleted'] = 'p.deleted = 0';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['name', 'description', 'rent'])) {
+                    $where[$col] = 'u.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'status') {
+                    $in = [];
+                    foreach ((new Unit())->statusStrings() as $code => $statusString) {
+                        if (stripos($statusString, $value) !== false) $in[] = $code;
                     }
+                    $where[$col] = 'u.status IN (' . implode(', ', $in) . ') ';
+                } else if ($col == 'property') {
+                    $where[$col] = 'p.name LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'property_id') {
+                    $where[$col] = 'u.' . $col . ' = :' . $col;
+                    $params[$col] = $value;
                 }
-                $where['property_id'] = [
-                    'operator' => 'IN',
-                    'value' => [
-                        '(' . implode(',', $in) . ')'
-                    ]
-                ];
-            } else if ($key == 'property_id') {
-                $where['property_id'] = $value;
             }
         }
 
-        /** @var Unit[] $collection */
-        $collection = Unit::find($where);
-        $collection->activePagination($this->pageLength);
-        $collection->paginate($this->page);
-        $total = $collection->queryFoundModels();
-        $totalPAges = $collection->getTotalPages();
-
-        $data = [];
-        foreach ($collection as $row) {
-            $row->property = $row->getProperty()->name;
-            $row->property_id = $row->getProperty()->property_id;
-            $data[] =  $row;
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['name', 'description', 'rent', 'status'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                } else if ($col == 'property') {
+                    $order[$col] = 'p.name ' . $dir;
+                }
+            }
         }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
 
         echo json_encode([
             'total' => $total,
-            'pages' => $totalPAges,
+            'pages' => $totalPages,
             'page' => $this->page,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
     public function documents()
     {
-        $where = [];
-        foreach ($this->filters as $key => $value) {
-            if (in_array($key, ['name', 'created']) && !empty($value)) {
-                $where[$key] = [
-                    'operator' => 'LIKE',
-                    'value' => '%' . $value . '%'
-                ];
-            } else if ($key == 'user' && !empty($value)) {
-                $in[] = 0;
-                /** @var User[] $users */
-                $users = User::find(['admin' => 1]);
-                foreach ($users as $user) {
-                    $name = trim($user->first_name) . ' ' . trim($user->last_name);
-                    if (stripos($name, $value) !== false) {
-                        $in[] = $user->user_id;
-                    }
+        $where = $order = [];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT d.*, CONCAT(u.first_name, \' \', u.last_name) AS user 
+                FROM documents d
+                INNER JOIN users u ON u.user_id = d.user_id';
+
+        $where['deleted'] = 'd.deleted = 0';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['name', 'description', 'created'])) {
+                    $where[$col] = 'd.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'user') {
+                    $where[$col] = '(u.first_name LIKE :' . $col . ' OR u.last_name LIKE :' . $col . ' OR CONCAT(u.first_name, \' \', u.last_name) LIKE :' . $col . ' )';
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'property_id') {
+                    $where[$col] = 'd.' . $col . ' = :' . $col;
+                    $params[$col] = $value;
                 }
-                $where['user_id'] = [
-                    'operator' => 'IN',
-                    'value' => [
-                        '(' . implode(',', $in) . ')'
-                    ]
-                ];
-            } else if ($key == 'property_id') {
-                $where['property_id'] = $value;
             }
         }
 
-        /** @var Document[] $collection */
-        $collection = Document::find($where);
-        $collection->activePagination($this->pageLength);
-        $collection->paginate($this->page);
-        $total = $collection->queryFoundModels();
-        $totalPAges = $collection->getTotalPages();
-
-        $data = [];
-        foreach ($collection as $row) {
-            $row->user = $row->getUser()->first_name . ' ' . $row->getUser()->last_name;
-            $row->owner = $row->getOwner()->first_name . ' ' . $row->getOwner()->last_name;
-            $data[] = $row;
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['name', 'description', 'created'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                }
+            }
         }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
 
         echo json_encode([
             'total' => $total,
-            'pages' => $totalPAges,
+            'pages' => $totalPages,
             'page' => $this->page,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
     public function notes()
     {
-        $where = [];
+        $where = $order = [];
         foreach ($this->filters as $key => $value) {
             if ($key == 'property_id') {
                 $where['property_id'] = $value;
             }
         }
 
+        foreach ($this->sort as $col => $dir) {
+            $order[$col] = $dir;
+        }
+
         /** @var Note[] $collection */
-        $collection = Document::find($where);
+        $collection = Document::find($where, $order);
         $collection->activePagination($this->pageLength);
         $collection->paginate($this->page);
         $total = $collection->queryFoundModels();
@@ -216,141 +236,233 @@ class AjaxDataController extends BaseController
 
     public function users()
     {
-        $where = [];
-        foreach ($this->filters as $key => $value) {
-            if (in_array($key, ['first_name', 'last_name', 'email']) && !empty($value)) {
-                $where[$key] = [
-                    'operator' => 'LIKE',
-                    'value' => '%' . $value . '%'
-                ];
-            } else if ($key == 'admin' && $value != '') {
-                $admin = 0;
-                if (stripos('yes', $value) !== false || $value == '1') {
-                    $admin = 1;
-                }
-                $where[$key] = $admin;
-            } else if ($key == 'unit' && !empty($value)) {
-                // get all the units... this might be a little slow since we have to look at property too for this one
-                // it might be ok since this is paginated results anyways
-                $in[] = 0;
-                /** @var Unit[] $units */
-                $units = Unit::find();
-                foreach ($units as $unit) {
-                    if (stripos($unit->name, $value) !== false || stripos($unit->getProperty()->name, $value) !== false) {
-                        $in[] = $unit->unit_id;
-                    }
-                }
-                $where['unit_id'] = [
-                    'operator' => 'IN',
-                    'value' => [
-                        '(' . implode(',', $in) . ')'
-                    ]
-                ];
-            }
+        $where = $order = [];
 
+        $db = new StandardQuery();
+
+        $sql = 'SELECT u.*, IFNULL(un.property_id, 0) AS property_id,
+                       CASE 
+                          WHEN ISNULL(un.name) = 0 THEN CONCAT(p.name, \' | \', un.name) 
+                          ELSE \'\' END AS unit
+                FROM users u
+                LEFT JOIN units un ON un.unit_id = u.unit_id
+                INNER JOIN properties p ON p.property_id = un.property_id';
+
+        $where['deleted'] = 'u.deleted = 0';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['first_name', 'last_name', 'email', 'admin'])) {
+                    $where[$col] = 'u.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'unit') {
+                    $where[$col] = 'un.name LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'unit_id') {
+                    $where[$col] = 'un.' . $col . ' = :' . $col;
+                    $params[$col] = $value;
+                }
+            }
         }
 
-        $collection = User::find($where);
-        $collection->activePagination($this->pageLength);
-        $collection->paginate($this->page);
-        $total = $collection->queryFoundModels();
-        $totalPAges = $collection->getTotalPages();
-
-        $data = [];
-        foreach ($collection as $row) {
-            $row->unit = '';
-            $row->property_id = 0;
-            if (!empty($row->unit_id)) {
-                $row->unit = $row->getUnit()->getProperty()->name . ' | ' . $row->getUnit()->name;
-                $row->property_id = $row->getUnit()->getProperty()->property_id;
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['first_name', 'last_name', 'email', 'admin'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                } else if ($col == 'unit') {
+                    $order[$col] = 'un.name ' . $dir;
+                }
             }
-            $data[] =  $row;
         }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
 
         echo json_encode([
             'total' => $total,
-            'pages' => $totalPAges,
+            'pages' => $totalPages,
             'page' => $this->page,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
     public function scraperUrls()
     {
-        $where = [];
-        foreach ($this->filters as $key => $value) {
-            if (in_array($key, ['name', 'state', 'last_scraped']) && !empty($value)) {
-                $where[$key] = [
-                    'operator' => 'LIKE',
-                    'value' => '%' . $value . '%'
-                ];
+        $where = $order = [];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT s.* 
+                FROM scraper_urls s';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['name', 'state', 'last_scraped'])) {
+                    $where[$col] = 's.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                }
             }
         }
 
-        $collection = ScraperUrl::find($where);
-        $collection->activePagination($this->pageLength);
-        $collection->paginate($this->page);
-        $total = $collection->queryFoundModels();
-        $totalPAges = $collection->getTotalPages();
-
-        $data = [];
-        foreach ($collection as $row) {
-            $data[] =  $row;
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['name', 'state', 'last_scraped', 'leads_count'])) {
+                    $order[$col] = 's.' . $col . ' ' . $dir;
+                }
+            }
         }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
 
         echo json_encode([
             'total' => $total,
-            'pages' => $totalPAges,
+            'pages' => $totalPages,
             'page' => $this->page,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
     public function scraperLeads()
     {
-        $where = [];
-        foreach ($this->filters as $key => $value) {
-            if ($key == 'url_name' && !empty($value)) {
-                /** @var ScraperUrl[] $urls */
-                $urls = ScraperUrl::find();
-                $in[] = 0;
-                foreach ($urls as $url) {
-                    if (stripos($url->name, $value) !== false) {
-                        $in[] = $url->url_id;
-                    }
-                }
-                $where['url_id'] = [
-                    'operator' => 'IN',
-                    'value' => [
-                        '(' . implode(',', $in) . ')'
-                    ]
-                ];
-            } else if ($key == 'address' && !empty($value)) {
+        $where = $order = [];
 
-            } else if ($key == 'url' && !empty($value)) {
-                $where['url_id'] = intval($value);
+        $db = new StandardQuery();
+
+        $sql = 'SELECT l.* 
+                FROM scraper_leads l ';
+
+        $where['deleted'] = 'l.deleted = 0';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['url', 'judgment_amount', 'last_seen'])) {
+                    $where[$col] = 'l.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'address') {
+                    $where[$col] = ' (l.street LIKE :address OR l.city LIKE :address OR l.state LIKE :address OR l.zip LIKE :address ) ';
+                    $params['address'] = '%' . $value . '%';
+                } else if ($col == 'active') {
+                    $where['active'] = 'l.active = :active ';
+                    $params['active'] = $value;
+                }
             }
         }
 
-        /** @var ScraperLead[] $collection */
-        $collection = ScraperLead::find($where, ['active' => 'DESC']);
-        $collection->activePagination($this->pageLength);
-        $collection->paginate($this->page);
-        $total = $collection->queryFoundModels();
-        $totalPAges = $collection->getTotalPages();
-
-        $data = [];
-        foreach ($collection as $row) {
-            $row->url_name = $row->getScraperUrl()->name;
-            $data[] =  $row;
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['url', 'judgment_amount', 'last_seen', 'active'])) {
+                    $order[$col] = 'l.' . $col . ' ' . $dir;
+                }
+            }
         }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
 
         echo json_encode([
             'total' => $total,
-            'pages' => $totalPAges,
+            'pages' => $totalPages,
             'page' => $this->page,
-            'data' => $data
+            'data' => $data,
         ]);
+    }
+
+    public function payments()
+    {
+        $where = $order = [];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT p.*, CONCAT(u.first_name, " ", u.last_name) AS payment_by, 
+                       IFNULL(un.name, "") AS unit_name, IFNULL(pr.name, "") AS property_name,
+                       IFNULL(un.unit_id, 0) AS unit_id
+                FROM payment_history p
+                INNER JOIN users u ON u.user_id = p.user_id
+                LEFT JOIN units un ON un.unit_id = p.unit_id
+                INNER JOIN properties pr ON pr.property_id = un.property_id ';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['payment_date', 'amount', 'method', 'type'])) {
+                    $where[$col] = 'p.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'payment_by') {
+                    $where[$col] = '(u.first_name LIKE :' . $col . ' OR u.last_name LIKE :' . $col . ' OR CONCAT(u.first_name, \' \', u.last_name) LIKE :' . $col . ' )';
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'unit_name') {
+                    $where[$col] = '(un.name LIKE :' . $col . ' OR pr.name LIKE :' . $col . ' )';
+                    $params[$col] = '%' . $value . '%';
+                }
+            }
+        }
+
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['payment_date', 'amount', 'method', 'type'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                } else if ($col == 'payment_by') {
+                    $order[$col] = 'u.last_name ' . $dir;
+                } else if ($col == 'unit_name') {
+                    $order[$col] = 'pr.name ' . $dir . ', un.name ' . $dir;
+                }
+            }
+        }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
+
+        echo json_encode([
+            'total' => $total,
+            'pages' => $totalPages,
+            'page' => $this->page,
+            'data' => $data,
+        ]);
+
     }
 
 }
