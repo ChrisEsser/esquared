@@ -38,7 +38,14 @@
             sort: {name: 'ASC'},
             filter: {property_id: 0},
             columns: [
-                {col: 'name'},
+                {col: 'name',
+                    template: function (data) {
+                        let url = '/file/proxy?file=';
+                        if (data.property_id) url += '/properties/' + data.property_id + '/documents/' + data.name
+                        else url += '/documents/' + data.user_id + '/' + data.name;
+                        return '<a href="' + url + '">' + data.name + '</a>';
+                    }
+                },
                 {col: 'user'},
                 {col: 'created', format: 'datetime'},
                 {col: '', search: false, cellStyle: 'text-align:right;', sort: false,
