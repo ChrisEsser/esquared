@@ -400,8 +400,8 @@ class AjaxDataController extends BaseController
                     $where['active'] = 'l.active = :active ';
                     $params['active'] = $value;
                 } else if ($col == 'url_id') {
-                    $where['active'] = 'l.url_id = :url_id ';
-                    $params['active'] = $value;
+                    $where['url_id'] = 'l.url_id = :url_id ';
+                    $params['url_id'] = $value;
                 }
             }
         }
