@@ -31,7 +31,7 @@ $property = $this->getVar('property');
     </div>
 
     <div class="mb-3">
-        <label for="image" class="form-label">Image(s)</label>
+        <label for="image" class="form-label">Image</label>
         <div id="image" name="filepond"></div>
     </div>
 

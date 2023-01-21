@@ -51,7 +51,13 @@ class PropertyController extends BaseController
             ? Property::findOne(['property_id' => $propertyId])
             : new Property();
 
+        $images = [];
+        foreach (glob(ROOT . DS . 'app' . DS . 'files' . DS . 'properties' . DS . $property->property_id . DS . 'images' . DS . '*.*') as $file) {
+            $images[] = basename($file);
+        }
+
         $this->view->setVar('property', $property);
+        $this->view->setVar('images', $images);
     }
 
     public function save()
@@ -93,7 +99,7 @@ class PropertyController extends BaseController
             $propertyFilePath = $tmpBasePath . DS . 'documents';
             if (!is_dir($propertyFilePath)) mkdir($propertyFilePath);
 
-            // get the image path for this property so we can drop the image in
+            // get the image path for this property. so we can drop the image in
             $propertyFilePath = $tmpBasePath . DS . 'images';
             if (!is_dir($propertyFilePath)) mkdir($propertyFilePath);
 
@@ -130,6 +136,20 @@ class PropertyController extends BaseController
 
         $property = Property::findOne(['property_id' => $propertyId]);
         $property->delete();
+
+        HTTP::rewindQuick();
+    }
+
+    public function deleteImage($params)
+    {
+        HTTP::removePageFromHistory();
+
+        $propertyId = ($params['propertyId']) ?? 0;
+        $image = ($_GET['image']) ?? '';
+
+        foreach (glob(ROOT . DS . 'app' . DS . 'files' . DS . 'properties' . DS . $propertyId . DS . 'images' . DS . $image) as $file) {
+            unlink($file);
+        }
 
         HTTP::rewindQuick();
     }

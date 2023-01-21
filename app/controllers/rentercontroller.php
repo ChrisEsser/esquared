@@ -292,8 +292,8 @@ class RenterController extends BaseController
 
     public function managePayment()
     {
+        HTTP::removePageFromHistory();
         $this->render_header = false;
-
     }
 
     public function achSetupProcess()
@@ -391,6 +391,16 @@ class RenterController extends BaseController
         }
     }
 
+    public function removeAch()
+    {
+        HTTP::removePageFromHistory();
+
+        $this->user->payment_details = '';
+        $this->user->save();
+
+        HTTP::rewindQuick();
+    }
+
     private function sendPaymentConfirmationEmail($total)
     {
         $hStyle = 'color: #414552; font-family: -apple-system,\'SF Pro Display\',\'Segoe UI\',Roboto,\'Helvetica Neue\',Ubuntu,sans-serif;font-size: 28px;line-height: 36px;font-weight: 700!important;';
@@ -420,7 +430,7 @@ class RenterController extends BaseController
 
         $html = '<h2 style="' . $hStyle . '">Payment Notification</h2>';
         $html .= '<p style="' . $pStyle . '">A payment was received from ' . $this->user->first_name . ' ' . $this->user->last_name . ' via ' . $type . '</p>';
-        $html .= '<p style="' . $pStyle . '"><strong>$' . number_format($total/100, 2) . '</strong> - ' . $this->user->getUnit()->getProperty()->name . ' | ' . $this->user->getUnit()->name . '</p>';
+        $html .= '<p style="' . $pStyle . '"><strong>$' . number_format($total/100, 2) . '</strong> - <a href="' . $_ENV['BASE_PATH'] . '/property/' . $this->user->getUnit()->getProperty()->property_id . '">' . $this->user->getUnit()->getProperty()->name . ' | ' . $this->user->getUnit()->name . '</a></p>';
         $mailer->html = $html;
         return $mailer->send();
     }

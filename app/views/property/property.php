@@ -16,13 +16,25 @@ $images = $this->getVar('images');
     <button role="button" class="btn btn-round btn-info edit_trigger" data-type="payment" type="button">Add Rent Payment</button>
 </div>
 
-
-
 <div style="display: flex; justify-content: left; flex-wrap: wrap">
 
     <?php if (!empty($images)) { ?>
 
-        <img src="/file/proxy?file=properties/<?=$property->property_id?>/images/<?=$images[0]?>" class="property_image mb-2" />
+        <div class="mb-2" style="display: flex; align-items: start; justify-content: start; flex-wrap: nowrap;">
+            <?php if (count($images) > 1) { ?>
+                <div style="display: flex; flex-direction: column; justify-content: start;margin-right: 5px;">
+                    <?php for ($i = 1; $i < count($images); $i++) { ?>
+                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#imageModal">
+                            <div style="height: 40px; width: 40px; margin-bottom: 5px; background-repeat: no-repeat; background-size: cover; background-position: center center; background-image: url('/file/proxy?file=properties/<?=$property->property_id?>/images/<?=$images[$i]?>')"></div>
+                        </a>
+                    <?php } ?>
+                </div>
+            <?php } ?>
+
+            <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#imageModal">
+                <img src="/file/proxy?file=properties/<?=$property->property_id?>/images/<?=$images[0]?>" class="property_image mb-2" />
+            </a>
+        </div>
 
         <?php if (count($images) > 1) { ?>
             <?php for($i = 1; $i < count($images); $i++) { ?>
@@ -117,6 +129,25 @@ $images = $this->getVar('images');
 
     </div>
 
+</div>
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel"><?=$property->name?> Images</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <?php foreach ($images as $image) { ?>
+                    <div class="mb-4">
+                        <img src="/file/proxy?file=properties/<?=$property->property_id?>/images/<?=$image?>" style="max-width: 100%" /><br />
+                        <a href="/property/<?=$property->property_id?>/delete-image?image=<?=$image?>"><i class="fa fa-times"></i> Remove Image</a>
+                    </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>

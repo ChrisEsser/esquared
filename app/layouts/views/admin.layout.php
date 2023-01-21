@@ -112,7 +112,7 @@ $action = $this->getVar('action');
 
         <div class="col" id="body_container">
 
-            <div class="top_bar py-2" style="display: flex; align-items: center; justify-content: end">
+            <div class="top_bar py-3" style="display: flex; align-items: center; justify-content: end">
 
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-dark px-3 text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">

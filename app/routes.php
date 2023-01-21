@@ -22,6 +22,7 @@ return [
     ['POST', '/account/save', 'RenterController#saveAccount'],
     ['POST', '/account/password', 'RenterController#password'],
     ['POST', '/account/save-password', 'RenterController#savePassword'],
+    ['GET', '/account/remove-ach', 'RenterController#removeAch'],
 
     ['GET', '/rent-history', 'RenterController#rentHistory'],
     ['GET', '/pay-rent', 'RenterController#payRent'],
@@ -47,6 +48,7 @@ return [
 	['GET', '/property/edit-payment/[:paymentId]', 'PropertyController#editPayment'],
 	['POST', '/property/delete-payment/[:paymentId]', 'PropertyController#editPayment'],
 	['POST', '/property/save-payment', 'PropertyController#savePayment'],
+	['GET', '/property/[i:propertyId]/delete-image', 'PropertyController#deleteImage'],
 
     ['GET', '/units', 'UnitController#units'],
     ['GET', '/units/[i:propertyId]', 'UnitController#units'],

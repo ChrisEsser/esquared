@@ -40,7 +40,11 @@ $paymentDetails = $this->getVar('paymentDetails');
 
 <?php } else if (!empty($paymentDetails) && $paymentDetails['stripe_ach_verified'] == 2) { // ach setup complete ?>
 
+    <div class="alert alert-info" role="alert">
+        <p class="mb-0">You have an ACH payment method setup and ready to use. If you need to add a different bank, then delete the method below and start the ACH setup process over.</p>
+    </div>
 
+    <div><a href="/account/remove-ach">Remove ACH Payment Method</a></div>
 
 <?php } else { // no valid ach ?>
 
