@@ -116,15 +116,15 @@ class tableData
 
     getData(page, callback)
     {
-        var test = {
+        var data = {
             page: page,
             len: $('#' + this.id + '_perPage').val(),
             filter: this.config.filter,
             sort: this.config.sort
         };
-        test = 'tableData=' + JSON.stringify(test);
+        data = 'tableData=' + JSON.stringify(data);
 
-        $.post(this.config.url, test).done(function (results) {
+        $.post(this.config.url, data).done(function (results) {
             if (typeof callback == 'function') callback(results);
             else alert('Invalid callback');
         }).fail(function(result) {

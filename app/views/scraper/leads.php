@@ -23,6 +23,22 @@ $viewAll = $this->getVar('viewAll');
     <tbody></tbody>
 </table>
 
+<div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editAddressModalLabel">Edit Address</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <a href="/lead/quarantine-address/" id="quarantine_link"><i class="fa fa-times"></i>&nbsp;Quarantine</a>
+                <button type="button" class="btn btn-primary" id="button_save">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 
     $(document).ready(function() {
@@ -49,10 +65,21 @@ $viewAll = $this->getVar('viewAll');
                 {col: 'address',
                     template: function (data) {
                         let html = '';
-                        if (data.lom != '') html += '<a href="javascript:void(0);" class="trigger_street_view" data-lead="' + data.lead_id + '">';
-                        html += data.street + '<br />' + data.city + ', ' + data.state + ' ' + data.zip;
-                        if (data.lom != '') html += '</a>';
-
+                        if (typeof data.addresses == 'object') {
+                            if (data.addresses.length === 0) {
+                                html = '<a href="javascript:void(0);" class="edit_trigger" data-address="" data-lead="' + data.lead_id + '">Add an address</a>';
+                            } else {
+                                var sep = '';
+                                for (var i = 0; i < data.addresses.length; i++) {
+                                    html += sep;
+                                    sep = '<div style="height: 7px;"></div>';
+                                    if (data.addresses[i].lom != '') html += '<a href="javascript:void(0);" class="trigger_street_view" data-address="' + data.addresses[i].address_id + '">';
+                                    html += data.addresses[i].street + '<br />' + data.addresses[i].city + ', ' + data.addresses[i].state + ' ' + data.addresses[i].zip;
+                                    if (data.addresses[i].lom != '') html += '</a>';
+                                    html += '&nbsp;<span class="edit_trigger" style="cursor: pointer;" data-address="' + data.addresses[i].address_id + '"><i class="fa fa-pencil"></i></span>';
+                                }
+                            }
+                        }
                         return html;
                     }
                 },
@@ -63,7 +90,6 @@ $viewAll = $this->getVar('viewAll');
                 <?php } ?>
                 {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function(data) {
-                        console.log(data);
                         let html = '<button role="button" class="btn btn-outline-primary btn-sm me-md-1 edit_trigger" data-lead="' + data.lead_id + '" type="button"><i class="fa fa-pencil"></i></button>';
                         html += '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-lead="' + data.lead_id + '" data-message="Are you sure you want to delete this lead?" data-url="/delete-lead/' + data.lead_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
@@ -73,8 +99,8 @@ $viewAll = $this->getVar('viewAll');
         });
 
         $(document).on('click', '.trigger_street_view', function() {
-            let lead = $(this).data('lead');
-            $.get('/lead-street-view/' + lead).done(function(result) {
+            let address = $(this).data('address');
+            $.get('/lead-street-view/' + address).done(function(result) {
                 $('#viewModalLabel').text('Street View');
                 $('#viewModal .modal-body').html(result);
                 $('#viewModal').modal('show');
@@ -107,14 +133,33 @@ $viewAll = $this->getVar('viewAll');
         $(document).on('click', '.edit_trigger', function () {
 
             let lead = $(this).data('lead');
-            let href = '/edit-lead/' + lead;
-            let modalTitle = 'Edit Lead Address';
+            let address = $(this).data('address');
 
-            $.get(href).done(function(result) {
-                $('#editModalLabel').text(modalTitle);
-                $('#editModal .modal-body').html(result);
-                $('#editModal').modal('show');
-            });
+            let href = '/edit-lead/' + lead;
+            let modalTitle = 'Edit Lead';
+
+            if (typeof address != 'undefined') {
+                if (address) {
+                    href = '/lead/edit-address/' + address;
+                    modalTitle = 'Edit Address';
+                    $('#quarantine_link').attr('href', '/lead/quarantine-address/' + address).show();
+                } else {
+                    href = '/lead/' + lead + '/add-address';
+                    modalTitle = 'Add Address';
+                    $('#quarantine_link').hide();
+                }
+                $.get(href).done(function(result) {
+                    $('#editAddressModalLabel').text(modalTitle);
+                    $('#editAddressModal .modal-body').html(result);
+                    $('#editAddressModal').modal('show');
+                });
+            } else {
+                $.get(href).done(function(result) {
+                    $('#editModalLabel').text(modalTitle);
+                    $('#editModal .modal-body').html(result);
+                    $('#editModal').modal('show');
+                });
+            }
         });
 
     });

@@ -198,8 +198,6 @@ class ScraperController extends BaseController
             'message' => '',
         ];
 
-        $missing = [];
-
         try {
 
             $leadId = ($_POST['lead']) ?? 0;
@@ -209,35 +207,6 @@ class ScraperController extends BaseController
 
             if (!$lead->lead_id) throw new Exception('Invalid Lead');
 
-            $missing = [];
-            if (empty($_POST['street'])) $missing[] = 'street';
-            if (empty($_POST['city'])) $missing[] = 'city';
-            if (empty($_POST['state'])) $missing[] = 'state';
-            if (empty($_POST['zip'])) $missing[] = 'zip';
-
-            if (!empty($missing)) throw new Exception('Some required fields were missing');
-
-            $address = $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['state'];
-            $address = urlencode($address);
-            $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&key=' . $_ENV['GOOGLE_MAPS_API_KEY'];
-            $resp_json = file_get_contents($url);
-            $resp = json_decode($resp_json, true);
-
-            if ($resp['status'] == 'OK') {
-
-                // get the important data
-                $lat = isset($resp['results'][0]['geometry']['location']['lat']) ? $resp['results'][0]['geometry']['location']['lat'] : "";
-                $lon = isset($resp['results'][0]['geometry']['location']['lng']) ? $resp['results'][0]['geometry']['location']['lng'] : "";
-
-                $lead->lat = $lat;
-                $lead->lon = $lon;
-
-            }
-
-            $lead->street = $_POST['street'];
-            $lead->city = $_POST['city'];
-            $lead->state = $_POST['state'];
-            $lead->zip = $_POST['zip'];
             $lead->judgment_amount = floatval($_POST['judgment_amount'] ?? 0);
             $lead->save();
 
@@ -249,6 +218,116 @@ class ScraperController extends BaseController
         }
 
         echo json_encode($return);
+    }
+
+    public function editAddress($params)
+    {
+        HTTP::removePageFromHistory();
+        $this->render_header = false;
+
+        $addressId = $params['addressId'] ?? 0;
+        $leadId = $params['leadId'] ?? 0;
+
+        $address = ($addressId)
+            ? ScraperLeadAddress::findOne(['address_id' => $addressId])
+            : new ScraperLeadAddress();
+
+        if ($address->lead_id) $leadId = $address->lead_id;
+
+        if (!$address) throw new Exception404();
+
+        $this->view->setVar('address', $address);
+        $this->view->setVar('leadId', $leadId);
+    }
+
+    public function saveAddress()
+    {
+        $this->render = false;
+
+        $return = [
+            'result' => 'success',
+            'message' => '',
+        ];
+
+        try {
+
+            $missing = [];
+            if (empty($_POST['street'])) $missing[] = 'street';
+            if (empty($_POST['city'])) $missing[] = 'city';
+            if (empty($_POST['state'])) $missing[] = 'state';
+            if (empty($_POST['zip'])) $missing[] = 'zip';
+
+            if (!empty($missing)) throw new Exception('Some required fields were missing');
+
+            $addressId = $_POST['address'] ?? 0;
+            $leadId = $_POST['lead'] ?? 0;
+
+            $address = ($addressId)
+                ? ScraperLeadAddress::findOne(['address_id' => $addressId])
+                : new ScraperLeadAddress();
+
+            if (!empty($address->lead_id)) $leadId = $address->lead_id;
+
+            $address->lead_id = $leadId;
+            $address->street = $_POST['street'];
+            $address->city = $_POST['city'];
+            $address->state = $_POST['state'];
+            $address->zip = $_POST['zip'];
+
+            $addressString = $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['state'];
+            $addressString = urlencode($addressString);
+            $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $addressString . '&key=' . $_ENV['GOOGLE_MAPS_API_KEY'];
+            $resp_json = @file_get_contents($url);
+            $resp = json_decode($resp_json, true);
+
+            if ($resp['status'] == 'OK') {
+
+                $lat = isset($resp['results'][0]['geometry']['location']['lat']) ? $resp['results'][0]['geometry']['location']['lat'] : "";
+                $lon = isset($resp['results'][0]['geometry']['location']['lng']) ? $resp['results'][0]['geometry']['location']['lng'] : "";
+
+                $address->lat = $lat;
+                $address->lon = $lon;
+
+            }
+
+            $address->save();
+
+        } catch (Exception $e) {
+            $return = [
+                'result' => 'error',
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        echo json_encode($return);
+    }
+
+    public function quarantineAddress($params)
+    {
+        HTTP::removePageFromHistory();
+        $this->render = false;
+
+        $addressId = $params['addressId'] ?? 0;
+        $address = ScraperLeadAddress::findOne(['address_id' => $addressId]);
+
+        if (!$address) throw new Exception404();
+
+        $qAddress = new ScraperQuarantineAddress();
+        $qAddress->street = $address->street;
+        $qAddress->city = $address->city;
+        $qAddress->state = $address->state;
+        $qAddress->zip = $address->zip;
+        $qAddress->lon = $address->lon;
+        $qAddress->lat = $address->lat;
+        $qAddress->save();
+
+        ScraperLeadAddress::find([
+            'street' => $address->street,
+            'city' => $address->city,
+            'state' => $address->state
+        ])->delete();
+
+        HTTP::rewindQuick();
     }
 
     public function deleteLead($params)
@@ -267,13 +346,13 @@ class ScraperController extends BaseController
     {
         $this->render_header = false;
 
-        $leadId = ($params['leadId']) ?? 0;
-        /** @var \ScraperLead $lead */
-        $lead = ScraperLead::findOne(['lead_id' => $leadId]);
+        $addressId = ($params['addressId']) ?? 0;
+        /** @var \ScraperLeadAddress $address */
+        $address = ScraperLeadAddress::findOne(['address_id' => $addressId]);
 
-        if (!$lead->lead_id) throw new Exception404();
+        if (!$address->address_id) throw new Exception404();
 
-        $this->view->setVar('lead', $lead);
+        $this->view->setVar('address', $address);
     }
 
     public function afterAction()

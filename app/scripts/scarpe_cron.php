@@ -92,19 +92,14 @@ try {
 
             $dollarAmount = 0;
 
-            $addressParts = clearAddressParts();
-
             if (!empty($plainSTring)) {
                 $dollarAmount = pullDollarAmountFromString($plainSTring);
                 $addresses = pullAddressesFromString($plainSTring);
                 if ($addresses) {
-                    $addressParts = parseAddressPartsFromGoogle($addresses);
+                    $addresses = parseAddressPartsFromGoogle($addresses);
+                    removeQuarantinedAddressFromArray($addresses);
                 }
             }
-
-            $street = $addressParts['streetNumber'] ?? '';
-            if ($street) $street .= ' ';
-            $street .= $addressParts['streetName'] ?? '';
 
             /** @var ScraperLead $lead */
             $lead = new ScraperLead();
@@ -114,14 +109,22 @@ try {
             $lead->active = 1;
             $lead->flagged = 0;
             $lead->judgment_amount = floatval($dollarAmount);
-            $lead->lat = $addressParts['lat'] ?? '';
-            $lead->lon = $addressParts['lon'] ?? '';
-            $lead->street = $street;
-            $lead->city = $addressParts['city'] ?? '';
-            $lead->state = $addressParts['state'] ?? '';
-            $lead->zip = $addressParts['zip'] ?? '';
             $lead->save();
             $newLeads[] = $lead;
+
+            // now save any addresses that were found for this lead
+            foreach($addresses as $address) {
+                $addr = new ScraperLeadAddress();
+                $addr->lead_id = $lead->lead_id;
+                $addr->street = $address['streetNumber'] . ' ' . $address['streetName'];
+                $addr->city = $address['city'];
+                $addr->state = $address['state'];
+                $addr->zip = $address['zip'];
+                $addr->lat = $address['lat'];
+                $addr->lon = $address['lon'];
+                $addr->type = 0;
+                $addr->save();
+            }
 
         }
 
@@ -371,6 +374,25 @@ function getHtmlString($url, $client)
     return (string)$request->getBody();
 }
 
+function removeQuarantinedAddressFromArray(&$addresses)
+{
+    foreach ($addresses as $key => $address) {
+
+        $db = new StandardQuery();
+        $sql = 'SELECT address_id FROM quarantine_addresses WHERE street = :street AND city = :city AND state = :state ';
+        $params = [
+            'street' => $address['streetNumber'] . ' ' . $address['streetNumber'],
+            'city' => $address['city'],
+            'state' => $address['state']
+        ];
+
+        if ($db->count($sql, $params)) {
+            unset($addresses[$key]);
+        }
+
+    }
+}
+
 /**
  * Searches a string for potential addresses
  *
@@ -410,11 +432,12 @@ function pullDollarAmountFromString($string)
 
 function parseAddressPartsFromGoogle($addresses)
 {
-    $returnParts = clearAddressParts();
+
+    $return = [];
 
     if (is_string($addresses)) {
 
-        $returnParts = googleGeoAndParse($addresses);
+        $return[] = googleGeoAndParse($addresses);
 
     } else if (is_array($addresses)) {
 
@@ -423,14 +446,14 @@ function parseAddressPartsFromGoogle($addresses)
 
             $tmpParts = googleGeoAndParse($address);
             if (!empty($tmpParts['streetNumber'])) {
-                $returnParts = $tmpParts;
+                $return[] = $tmpParts;
             }
 
         }
 
     }
 
-    return $returnParts;
+    return $return;
 }
 
 function clearAddressParts()

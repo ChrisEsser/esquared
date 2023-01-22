@@ -1,7 +1,7 @@
 <?php
 
-/** @var \ScraperLead $lead */
-$lead = $this->getVar('lead');
+/** @var \ScraperLeadAddress $address */
+$address = $this->getVar('address');
 
 ?>
 
@@ -31,7 +31,7 @@ $lead = $this->getVar('lead');
     var geocoder;
 
     function initialize() {
-        const fenway = { lat: <?=$lead->lat?>, lng: <?=$lead->lon?> };
+        const fenway = { lat: <?=$address->lat?>, lng: <?=$address->lon?> };
         const map = new google.maps.Map(document.getElementById("map"), {
             center: fenway,
             zoom: 14,

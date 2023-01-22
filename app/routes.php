@@ -114,9 +114,13 @@ return [
     ['POST', '/toggle-lead-flagged/[i:leadId]/[i:flagged]', 'ScraperController#toggleLeadFlagged'],
     ['GET', '/edit-lead/[i:leadId]', 'ScraperController#editLead'],
     ['POST', '/save-lead', 'ScraperController#saveLead'],
-    ['GET', '/lead-street-view/[i:leadId]', 'ScraperController#leadStreetView'],
+    ['POST', '/lead/save-address', 'ScraperController#saveAddress'],
+    ['GET', '/lead-street-view/[i:addressId]', 'ScraperController#leadStreetView'],
     ['GET', '/lead/[i:leadId]', 'ScraperController#lead'],
     ['GET', '/lead/[i:leadId]', 'ScraperController#lead'],
+    ['GET', '/lead/edit-address/[i:addressId]', 'ScraperController#editAddress'],
+    ['GET', '/lead/[i:leadId]/add-address', 'ScraperController#editAddress'],
+    ['GET', '/lead/quarantine-address/[i:addressId]', 'ScraperController#quarantineAddress'],
 
 
 

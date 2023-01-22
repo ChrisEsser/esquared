@@ -407,8 +407,8 @@ class AjaxDataController extends BaseController
                     $where['url_name'] = 'u.name LIKE :url_name ';
                     $params['url_name'] = '%' . $value . '%';
                 } else if ($col == 'address') {
-                    $where[$col] = ' (l.street LIKE :address OR l.city LIKE :address OR l.state LIKE :address OR l.zip LIKE :address ) ';
-                    $params['address'] = '%' . $value . '%';
+//                    $where[$col] = ' (l.street LIKE :address OR l.city LIKE :address OR l.state LIKE :address OR l.zip LIKE :address ) ';
+//                    $params['address'] = '%' . $value . '%';
                 } else if ($col == 'active') {
                     $where['active'] = 'l.active = :active ';
                     $params['active'] = $value;
@@ -441,6 +441,16 @@ class AjaxDataController extends BaseController
         $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
 
         $data = $db->rows($sql, $params);
+
+        // this is not ideal but im not sure how else to do this with paginated results in the initial query
+        foreach ($data as $key => $row) {
+
+            $sql = 'SELECT * FROM lead_addresses WHERE lead_id = :lead_id ';
+            $params = ['lead_id' => $row->lead_id];
+            $addresses = $db->rows($sql, $params);
+            $data[$key]->addresses = $addresses;
+
+        }
 
         echo json_encode([
             'total' => $total,

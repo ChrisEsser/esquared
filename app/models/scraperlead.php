@@ -8,16 +8,9 @@
  */
 class ScraperLead extends BaseModel
 {
-
     public $lead_id;
     public $url_id;
     public $url;
-    public $street;
-    public $city;
-    public $state;
-    public $zip;
-    public $lat;
-    public $lon;
     public $created;
     public $last_seen;
     public $deleted;
@@ -34,12 +27,6 @@ class ScraperLead extends BaseModel
     protected static $_tableFields = [
         'url_id',
         'url',
-        'street',
-        'city',
-        'state',
-        'zip',
-        'lat',
-        'lon',
         'created',
         'last_seen',
         'deleted',
