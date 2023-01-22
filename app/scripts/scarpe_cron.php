@@ -297,7 +297,7 @@ function recursiveCrawl($url, $currentLevel, $totalLevels, $domTarget, $filters,
 
         if ($currentLevel < $totalLevels) {
 
-            $tmpLeads = recursiveCrawl($href, $currentLevel+1, $totalLevels, $filters, $client);
+            $tmpLeads = recursiveCrawl($href, $currentLevel+1, $totalLevels, $domTarget, $filters, $client);
             $leads = array_merge($tmpLeads, $leads);
 
         } else {
