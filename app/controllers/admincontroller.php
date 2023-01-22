@@ -10,7 +10,7 @@ class AdminController extends BaseController
 
     public function beforeAction()
     {
-        if (!Auth::isAdmin()) {
+        if (!Auth::isAdmin() && strtolower($this->_action) != 'qbcallback') {
             HTML::addAlert('Unauthorized access');
             HTTP::redirect('/');
         }
