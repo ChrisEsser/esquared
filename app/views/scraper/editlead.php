@@ -39,6 +39,11 @@ $lead = $this->getVar('lead');
 
     </div>
 
+    <div class="mb-3">
+        <label for="city" class="form-label">Judgment Amount</label>
+        <input type="number" min="0" step=".01" class="form-control" id="judgment_amount" name="judgment_amount" aria-describedby="judgment_amountHelp" autocomplete="off" value="<?= $lead->judgment_amount ?>"/>
+    </div>
+
 </form>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=<?=$_ENV['GOOGLE_MAPS_API_KEY']?>&callback=initAutocomplete&libraries=places&v=weekly" defer></script>

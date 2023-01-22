@@ -26,9 +26,17 @@ $url = $this->getVar('url');
     </div>
 
     <div class="mb-3">
+        <label for="description" class="form-label">Doc Type</label>
+        <select class="form-control" id="doc_type" name="doc_type" aria-describedby="doc_typeHelp">
+            <option value="pdf" <?=($url->doc_type == 'pdf') ? 'selected' : ''?>>PDF</option>
+            <option value="html"<?=($url->doc_type == 'html') ? 'selected' : ''?>>HTML</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
         <label for="depth" class="form-label">Scrape Depth</label>
         <input type="number" min="1" step="1" class="form-control" id="depth" name="depth" aria-describedby="depthHelp" value="<?=intval($url->depth)+1?>" />
-        <div id="search_stringHelp" class="form-text">The depth is how many pages deep does the crawler need to go to find the correct information. each depth is associated with a filter string level below.</div>
+        <div id="depthHelp" class="form-text">The depth is how many pages deep does the crawler need to go to find the correct information. each depth is associated with a filter string level below.</div>
     </div>
 
     <div id="filter_levels">
@@ -44,6 +52,12 @@ $url = $this->getVar('url');
             </div>
         <?php } ?>
 
+    </div>
+
+    <div class="mb-3">
+        <label for="depth" class="form-label">Target Dom Element</label>
+        <input type="text" class="form-control" id="dom_target" name="dom_target" aria-describedby="dom_targetHelp" value="<?=$url->dom_target?>" />
+        <div id="dom_targetHelp" class="form-text">Use this to target links within a specific DOM element on the page. For example, say every link is formatted with a code but you know the links are all in a certain html table or container. Enter the class or id of said container here. Example: id=some_dom_id or class=some_dom_class.</div>
     </div>
 
 </form>

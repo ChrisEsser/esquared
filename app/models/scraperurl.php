@@ -16,6 +16,8 @@ class ScraperUrl extends BaseModel
     public $state;
     public $depth;
     public $leads_count;
+    public $dom_target;
+    public $doc_type;
 
     protected static $_tableName = 'scraper_urls';
     protected static $_primaryKey = 'url_id';
@@ -31,6 +33,8 @@ class ScraperUrl extends BaseModel
         'state',
         'depth',
         'leads_count',
+        'dom_target',
+        'doc_type',
     ];
 
     protected static function defineRelations()

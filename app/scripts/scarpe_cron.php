@@ -10,6 +10,9 @@ session_start();
 
 ini_set('max_execution_time', 0);
 set_time_limit(0);
+//ini_set("xdebug.var_display_max_children", '-1');
+//ini_set("xdebug.var_display_max_data", '-1');
+//ini_set("xdebug.var_display_max_depth", '-1');
 
 define('ROOT', dirname(dirname(dirname(__FILE__))));
 define('DS', DIRECTORY_SEPARATOR);
@@ -61,7 +64,7 @@ try {
 
         $filters = unserialize(base64_decode($urlRow->search_string));
         $client = new GuzzleHttp\Client();
-        $leads = recursiveCrawl($urlRow->url, 0, $urlRow->depth, $filters, $client);
+        $leads = recursiveCrawl($urlRow->url, 0, $urlRow->depth, $urlRow->dom_target, $filters, $client);
 
         $leadHrefs = [];
         $newLeads = [];
@@ -79,26 +82,29 @@ try {
                 continue;
             }
 
-            $plainSTring = getPdfString($href);
+            if ($urlRow->doc_type === 'pdf') {
+                $plainSTring = getPdfString($href, $client);
+            } else if ($urlRow->doc_type === 'html') {
+                $plainSTring = getHtmlString($href, $client);
+            } else {
+                continue;
+            }
 
-            $addressParts = [
-                'lat' => '',
-                'lon' => '',
-                'streetNumber' => '',
-                'streetName' => '',
-                'city' => '',
-                'state' => '',
-                'zip' => '',
-            ];
             $dollarAmount = 0;
+
+            $addressParts = clearAddressParts();
 
             if (!empty($plainSTring)) {
                 $dollarAmount = pullDollarAmountFromString($plainSTring);
-                $address = pullAddressFromString($plainSTring);
-                if ($address) {
-                    $addressParts = parseAddressPartsFromGoogle($address);
+                $addresses = pullAddressesFromString($plainSTring);
+                if ($addresses) {
+                    $addressParts = parseAddressPartsFromGoogle($addresses);
                 }
             }
+
+            $street = $addressParts['streetNumber'] ?? '';
+            if ($street) $street .= ' ';
+            $street .= $addressParts['streetName'] ?? '';
 
             /** @var ScraperLead $lead */
             $lead = new ScraperLead();
@@ -108,12 +114,12 @@ try {
             $lead->active = 1;
             $lead->flagged = 0;
             $lead->judgment_amount = floatval($dollarAmount);
-            $lead->lat = $addressParts['lat'];
-            $lead->lon = $addressParts['lon'];
-            $lead->street = $addressParts['streetNumber'] . ' ' . $addressParts['streetName'];
-            $lead->city = $addressParts['city'];
-            $lead->state = $addressParts['state'];
-            $lead->zip = $addressParts['zip'];
+            $lead->lat = $addressParts['lat'] ?? '';
+            $lead->lon = $addressParts['lon'] ?? '';
+            $lead->street = $street;
+            $lead->city = $addressParts['city'] ?? '';
+            $lead->state = $addressParts['state'] ?? '';
+            $lead->zip = $addressParts['zip'] ?? '';
             $lead->save();
             $newLeads[] = $lead;
 
@@ -183,7 +189,7 @@ echo 'done';
  * @param $client
  * @return array
  */
-function recursiveCrawl($url, $currentLevel, $totalLevels, $filters, $client)
+function recursiveCrawl($url, $currentLevel, $totalLevels, $domTarget, $filters, $client): array
 {
     $request = $client->request('GET', $url);
     $html = (string)$request->getBody();
@@ -195,29 +201,70 @@ function recursiveCrawl($url, $currentLevel, $totalLevels, $filters, $client)
 
     $thisFilters = explode(',', ($filters[$currentLevel]) ?? []);
 
-    foreach ($dom->getElementsByTagName('a') as $e) {
+    if ($currentLevel >= $totalLevels && !empty($domTarget)) {
 
-        $href = $e->getAttribute('href');
+        // we are on the last level, and we have a specific DOM parent container to look in
 
-        // dont save if there is not text. One site has empty links. probably pre set in a CMS editor or something.
-        if (empty(trim($e->textContent))) continue;
+        if (stripos($domTarget, 'id=') !== false) {
+
+            $id = str_replace('id=', '', $domTarget);
+            $c = $dom->getElementById($id);
+            $anchors = $c->getElementsByTagName('a');
+
+        } else if (stripos($domTarget, 'class=') !== false) {
+
+            $class = str_replace('class=', '', $domTarget);
+            $xpath = new DOMXpath($dom);
+
+            $cs = $xpath->query("//*[contains(@class, '$class')]");
+
+            foreach ($cs as $c) {
+                foreach ($c->getElementsByTagName('a') as $key => $a) {
+                    $anchors[] = $a;
+                }
+            }
+        }
+
+    } else {
+
+        $anchors = $dom->getElementsByTagName('a');
+
+    }
+
+    $used = [];
+    foreach ($anchors as $anchor) {
+
+        $href = $anchor->getAttribute('href');
+
+        if (in_array($href, $used)) continue;
+        $used[] = $href;
+
+        // dont save if there is not text. One site has empty links. probably preset in a CMS editor or something.
+        if (empty(trim($anchor->textContent))) continue;
 
         // check the filters for this level.
         $goodLink = true;
 
         foreach ($thisFilters as $thisFilter) {
+
             $thisFilter = trim($thisFilter);
+
             if (str_starts_with($thisFilter, '!!')) {
+
                 if (stripos($href, substr($thisFilter, 2)) !== false) {
                     $goodLink = false;
                     break;
                 }
+
             } else {
+
                 if (stripos($href, $thisFilter) === false) {
                     $goodLink = false;
                     break;
                 }
+
             }
+
         }
 
         if (!$goodLink) continue;
@@ -228,23 +275,35 @@ function recursiveCrawl($url, $currentLevel, $totalLevels, $filters, $client)
             $parse = parse_url($url);
 
             if (str_starts_with($href, '//')) {
+
                 // do nothing.. we should be able to navigate
                 $href = $parse['scheme'] . '://' . substr($href, 2);
+
             } else {
+
                 if (str_starts_with($href, '/')) {
+
                     $href = $parse['scheme'] . '://' . $parse['host'] . $href;
-                }
-                else {
+
+                } else {
+
                     $href = $parse['scheme'] . '://' . $parse['host'] . '/' . $href;
+
                 }
+
             }
+
         }
 
         if ($currentLevel < $totalLevels) {
+
             $tmpLeads = recursiveCrawl($href, $currentLevel+1, $totalLevels, $filters, $client);
             $leads = array_merge($tmpLeads, $leads);
+
         } else {
+
             $leads[] = $href;
+
         }
 
     }
@@ -252,11 +311,13 @@ function recursiveCrawl($url, $currentLevel, $totalLevels, $filters, $client)
     return $leads;
 }
 
-function getPdfString($url)
+function getPdfString($url, $client)
 {
     $tmpPdfPath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmppdf' . time() . '.pdf';
 
-    $contents = @file_get_contents($url);
+    $request = $client->request('GET', $url);
+    $contents = (string)$request->getBody();
+
     if ($contents === false || empty($contents)) return false;
     $result = @file_put_contents($tmpPdfPath, $contents);
     if ($result === false) return false;
@@ -266,49 +327,115 @@ function getPdfString($url)
     $command = 'pdftoppm -jpeg ' . $tmpPdfPath . ' ' . $tmpImgFilePath;
     exec($command);
 
-    // pdftoppm appends -1.jpg for some reason
-    $tmpImgFilePath .= '-1.jpg';
 
-    // now we should have an image file which we can use tesseract-ocr to pull a string out of
-    $text = (new thiagoalessio\TesseractOCR\TesseractOCR($tmpImgFilePath))
-        ->run();
+
+
+    if (file_exists($tmpImgFilePath . '.jpg')) {
+
+        $tmpImgFilePath .= '.jpg';
+
+        // only one files exists. we don't need to run the loop
+        // now we should have an image file which we can use tesseract-ocr to pull a string out of
+        $text = (new thiagoalessio\TesseractOCR\TesseractOCR($tmpImgFilePath))
+            ->run();
+
+        unlink($tmpImgFilePath);
+
+    } else {
+
+        $text = '';
+
+        // pdftoppm creates multiple files appended with a number on the end for multiple page pdfs
+        // filename-1, filename-2, etc
+        for($i = 1; $i <= 3; $i++) {
+
+            $tmpImagePath2 = $tmpImgFilePath . '-' . $i . '.jpg';
+            if (file_exists($tmpImagePath2)) {
+                $text .= (new thiagoalessio\TesseractOCR\TesseractOCR($tmpImagePath2))
+                    ->run();
+                unlink($tmpImagePath2);
+            }
+
+        }
+
+    }
 
     unlink($tmpPdfPath);
-    unlink($tmpImgFilePath);
 
     return $text;
 }
 
-function pullAddressFromString($string)
+function getHtmlString($url, $client)
 {
-    $starts = stripos($string,'Address: ') + strlen('Address: ');
-    $ends = stripos($string, "\n", $starts);
-    $address = substr($string, $starts, $ends - $starts);
-
-    return $address;
+    $request = $client->request('GET', $url);
+    return (string)$request->getBody();
 }
 
+/**
+ * Searches a string for potential addresses
+ *
+ * @param $string
+ * @return array of address strings
+ */
+function pullAddressesFromString($string)
+{
+    $string = strip_tags($string);
+    $string = preg_replace("/&nbsp;/"," ",$string);
+
+    preg_match_all("/[0-9]{2,10}+\s+[^0-9]{0,50}(wi|ia)+\s+[0-9]{5}/is", $string, $matches);
+
+    return (!empty($matches[0])) ? $matches[0] : [];
+}
+
+/**
+ * searches a string for a dollar amount
+ *
+ * @param $string
+ * @return array|int|string|string[]
+ */
 function pullDollarAmountFromString($string)
 {
     $dollar = 0;
     preg_match('/\$([0-9]+[\.,0-9]*)/', $string, $m);
+
     if (!empty($m[1])) {
+
         $dollar = $m[1];
         $dollar = str_replace(',', '', $dollar);
+
     }
 
     return $dollar;
 }
 
-function parseAddressPartsFromGoogle($address)
+function parseAddressPartsFromGoogle($addresses)
 {
-    // call google maps to get the address information
-    $address = urlencode($address);
-    $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&key=' . $_ENV['GOOGLE_MAPS_API_KEY'];
-    $result = file_get_contents($apiUrl);
-    $result = json_decode($result, true);
+    $returnParts = clearAddressParts();
 
-    $returnParts = [
+    if (is_string($addresses)) {
+
+        $returnParts = googleGeoAndParse($addresses);
+
+    } else if (is_array($addresses)) {
+
+        // this will take the last good address found and return ony one set of parts
+        foreach ($addresses as $address) {
+
+            $tmpParts = googleGeoAndParse($address);
+            if (!empty($tmpParts['streetNumber'])) {
+                $returnParts = $tmpParts;
+            }
+
+        }
+
+    }
+
+    return $returnParts;
+}
+
+function clearAddressParts()
+{
+    return [
         'streetNumber' => '',
         'streetName' => '',
         'city' => '',
@@ -317,6 +444,17 @@ function parseAddressPartsFromGoogle($address)
         'lat' => '',
         'lon' => '',
     ];
+}
+
+function googleGeoAndParse($address)
+{
+    $returnParts = clearAddressParts();
+
+    // call google maps to get the address information
+    $address = urlencode($address);
+    $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&key=' . $_ENV['GOOGLE_MAPS_API_KEY'];
+    $result = file_get_contents($apiUrl);
+    $result = json_decode($result, true);
 
     if (isset($result['status']) && $result['status'] = 'OK') {
 
@@ -324,14 +462,17 @@ function parseAddressPartsFromGoogle($address)
         $geo = $result['results'][0]['geometry']['location'];
 
         if ($geo) {
+
             $returnParts['lat'] = $geo['lat'];
             $returnParts['lon'] = $geo['lng'];
+
         }
 
         foreach ($parts as $key => $part) {
+
             switch($part['types'][0]) {
                 case 'street_number':
-                    $returnParts['streetNumber'] =  $part['long_name'];
+                    $returnParts['streetNumber'] = $part['long_name'];
                     break;
                 case 'route':
                     $returnParts['streetName'] = $part['short_name'];
@@ -347,11 +488,12 @@ function parseAddressPartsFromGoogle($address)
                 default:
                     break;
             }
+
         }
+
     }
 
     return $returnParts;
-
 }
 
 

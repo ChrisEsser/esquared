@@ -67,7 +67,10 @@ class Auth
         if (!$authenticated) {
 
             self::logout();
-            sleep(1);
+
+            // sleep a random amount of time between a half and 2 seconds
+            $rand = rand(500000,2000000);
+            usleep($rand);
 
         } else {
 

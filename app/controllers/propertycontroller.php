@@ -367,31 +367,62 @@ class PropertyController extends BaseController
     {
         $this->render = false;
 
-        $db = new StandardQuery();
+        ini_set("xdebug.var_display_max_children", '-1');
+        ini_set("xdebug.var_display_max_data", '-1');
+        ini_set("xdebug.var_display_max_depth", '-1');
 
-        $sql = 'SELECT p.*, CONCAT(u.first_name, " ", u.last_name) AS payment_by, 
-                       IFNULL(un.name, "") AS unit_name, IFNULL(pr.name, "") AS property_name,
-                       IFNULL(un.unit_id, 0) AS unit_id
-                FROM payment_history p
-                INNER JOIN users u ON u.user_id = p.user_id
-                LEFT JOIN units un ON un.unit_id = p.unit_id
-                INNER JOIN properties pr ON pr.property_id = un.property_id
-                WHERE 1=1 ';
+        $pdfUrl = 'http://nebula.wsimg.com/d9a05876408d059df98d8584dfdde1b5?AccessKeyId=B48848253604581C6DC2&disposition=0&alloworigin=1';
 
-        $params = $where = [];
-        foreach (['amount' => 0, 'method' => 'c'] as $col => $value) {
-            if (in_array($col, ['payment_date', 'amount', 'method', 'ype'])) {
-                $where[] = 'p.' . $col . ' LIKE :' . $col;
-                $params[$col] = '%' . $value . '%';
+
+        $client = new GuzzleHttp\Client();
+        $tmpPdfPath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmppdf' . time() . '.pdf';
+
+        $request = $client->request('GET', $pdfUrl);
+        $contents = (string)$request->getBody();
+
+        if ($contents === false || empty($contents)) return false;
+        $result = @file_put_contents($tmpPdfPath, $contents);
+        if ($result === false) return false;
+
+        $tmpImgFilePath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmptxt' . time();
+
+        $command = 'pdftoppm -jpeg ' . $tmpPdfPath . ' ' . $tmpImgFilePath;
+        exec($command);
+
+        $text = '';
+        // pdftoppm creates multiple files appended with a number on the end for multiple page pdfs
+        // filename-1, filename-2, etc
+        for($i = 1; $i <= 3; $i++) {
+
+            $tmpImagePath2 = $tmpImgFilePath . '-' . $i . '.jpg';
+            if (file_exists($tmpImagePath2)) {
+                $text .= (new thiagoalessio\TesseractOCR\TesseractOCR($tmpImagePath2))
+                    ->run();
+                unlink($tmpImagePath2);
             }
+
         }
 
-        $sql .= (!empty($where)) ? ' AND ' . implode(' AND ', $where) : '';
-
-        $total = $db->count($sql, $params);
+        unlink($tmpPdfPath);
 
 
-        var_dump($total);
+        $string = strip_tags($text);
+        $string = preg_replace("/&nbsp;/"," ",$string);
+
+        preg_match_all("/[0-9]{2,10}+\s+[^0-9]{0,50}(wi|ia)+\s+[0-9]{5}/is", $string, $m);
+
+        foreach ($m[0] as $address) {
+
+            var_dump($address);
+
+            $address = urlencode($address);
+            $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&key=' . $_ENV['GOOGLE_MAPS_API_KEY'];
+            $result = file_get_contents($apiUrl);
+            $result = json_decode($result, true);
+
+            var_dump($result);
+        }
+
     }
 
     public function afterAction()
