@@ -344,6 +344,7 @@ class ScraperController extends BaseController
 
     public function leadStreetView($params)
     {
+        HTTP::removePageFromHistory();
         $this->render_header = false;
 
         $addressId = ($params['addressId']) ?? 0;
