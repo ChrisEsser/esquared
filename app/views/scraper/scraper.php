@@ -33,7 +33,7 @@
             columns: [
                 {col: 'name',
                     template: function (data) {
-                        return '<a href="/">' + data.name + '</a>';
+                        return '<a href="' + data.url + '" target="_blank">' + data.name + '</a>';
                     }
                 },
                 {col: 'state'},

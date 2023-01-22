@@ -1,17 +1,33 @@
 <?php
 
-/** @var \Unit $unit */
+/** @var Unit $unit */
 $unit = $this->getVar('unit');
-/** @var \Property $property */
+/** @var Property $property */
 $property = $this->getVar('property');
+/** @var Property[] $properties */
+$properties = $this->getVar('properties');
 
 ?>
-
 
 <form id="unitForm">
 
     <input type="hidden" name="unit" id="unit" value="<?=$unit->unit_id?>" />
-    <input type="hidden" name="property" id="property" value="<?=$property->property_id?>" />
+
+    <?php if (!$property->property_id) { ?>
+        <div class="mb-3">
+            <label for="name" class="form-label">Property</label>
+            <select name="property" id="property" class="form-control">
+                <option value="">- Select -</option>
+                <?php foreach ($properties as $prop) { ?>
+                    <option value="<?=$prop->property_id?>" <?=($prop->property_id == $property->property_id) ? 'selected' : ''?>><?=$prop->name?></option>
+                <?php } ?>
+            </select>
+        </div>
+    <?php } else { ?>
+
+        <input type="hidden" name="property" id="property" value="<?=$property->property_id?>" />
+
+    <?php } ?>
 
     <div class="mb-3">
         <label for="name" class="form-label">Name</label>

@@ -11,6 +11,10 @@ class NoteController extends BaseController
         }
     }
 
+    public function notes()
+    {
+
+    }
 
     public function note($params)
     {
@@ -73,7 +77,7 @@ class NoteController extends BaseController
             if (!empty($missing)) throw new Exception('Some required fields were missing');
 
             $note->note = $_POST['note'];
-            $note->property_id = $propertyId;
+            $note->property_id = intval($propertyId);
             $note->status = $_POST['status'];
             $note->type = $_POST['type'];
             $note->created_by = Auth::loggedInUser();

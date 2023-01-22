@@ -6,7 +6,7 @@
 <h1 class="page_header">Units</h1>
 
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
-    <button role="button" class="btn btn-round btn-primary edit_trigger" type="button" id="new_unit_button" style="display: none">Add Unit</button>
+    <button role="button" class="btn btn-round btn-primary edit_trigger" type="button">Add Unit</button>
 </div>
 
 <table class="e2-table" id="unitTable">
@@ -52,7 +52,7 @@
                 {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function (data) {
                         let html = '<button role="button" class="btn btn-outline-primary btn-sm me-md-1 edit_trigger" data-unit="' + data.unit_id + '" type="button"><i class="fa fa-pencil"></i></button>';
-                        html += '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-unit="' + data.unit_id + '" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-unit/' + data.unit_id + '" type="button"><i class="fa fa-times"></i></button>';
+                        html += '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-message="Are you sure you want to delete <strong>' + data.name + '</strong>?" data-url="/delete-unit/' + data.unit_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
                     }
                 },
@@ -62,7 +62,7 @@
         $(document).on('click', '.edit_trigger', function () {
 
             let unit = $(this).data('unit');
-            let url = (unit) ? '/edit-unit/' + unit : '/create-unit/' + $('#property_trigger').val();
+            let url = (unit) ? '/edit-unit/' + unit : '/create-unit';
             let modalTitle = (unit) ? 'Edit Unit' : 'Create Unit';
 
             $.get(url).done(function (result) {

@@ -55,6 +55,7 @@ return [
     ['GET', '/unit/[i:unitId]', 'UnitController#unit'],
     ['GET', '/edit-unit/[i:unitId]', 'UnitController#edit'],
     ['GET', '/create-unit/[i:propertyId]', 'UnitController#edit'],
+    ['GET', '/create-unit', 'UnitController#edit'],
     ['POST', '/delete-unit/[i:unitId]', 'UnitController#delete'],
 	['POST', '/save-unit', 'UnitController#save'],
 
@@ -65,11 +66,13 @@ return [
     ['GET', '/edit-payment/[i:paymentId]', 'PaymentController#edit'],
     ['GET', '/add-payment/[i:unitId]', 'PaymentController#edit'],
     ['POST', '/save-payment', 'PaymentController#save'],
-    ['POST', '/delete-payment/[i:paymentID]', 'PaymentController#delete'],
+    ['POST', '/delete-payment/[i:paymentId]', 'PaymentController#delete'],
 
+	['GET', '/notes', 'NoteController#notes'],
 	['GET', '/note/[i:noteId]', 'NoteController#note'],
     ['GET', '/edit-note/[i:noteId]', 'NoteController#edit'],
     ['GET', '/create-note/[i:propertyId]', 'NoteController#edit'],
+    ['GET', '/create-note', 'NoteController#edit'],
     ['POST', '/delete-note/[i:noteId]', 'NoteController#delete'],
 	['POST', '/save-note', 'NoteController#save'],
 

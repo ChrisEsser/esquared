@@ -83,6 +83,12 @@ $action = $this->getVar('action');
                                 <span>Documents</span>
                             </a>
                         </li>
+                        <li class="<?=($action == 'notes') ? 'active' : ''?>">
+                            <a href="/notes" tabindex="0">
+                                <div><i class="fa fa-sticky-note"></i></div>
+                                <span>Notes</span>
+                            </a>
+                        </li>
                         <li class="<?=($action == 'users') ? 'active' : ''?>">
                             <a href="/users" tabindex="0">
                                 <div><i class="fa fa-users"></i></div>

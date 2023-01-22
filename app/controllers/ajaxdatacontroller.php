@@ -88,7 +88,7 @@ class AjaxDataController extends BaseController
                 FROM units u
                 INNER JOIN properties p ON p.property_id = u.property_id';
 
-        $where['deleted'] = 'p.deleted = 0';
+        $where['deleted'] = 'u.deleted = 0';
 
         $params = [];
         foreach ($this->filters as $filter) {
@@ -208,9 +208,11 @@ class AjaxDataController extends BaseController
 
         $db = new StandardQuery();
 
-        $sql = 'SELECT n.*, CONCAT(u.first_name, \' \', u.last_name) AS user 
+        $sql = 'SELECT n.*, CONCAT(u.first_name, \' \', u.last_name) AS user,
+                       IFNULL(p.name, \'\') AS property
                 FROM notes n
-                INNER JOIN users u ON u.user_id = n.created_by';
+                INNER JOIN users u ON u.user_id = n.created_by
+                LEFT JOIN properties p ON p.property_id = n.property_id ';
 
         $where['deleted'] = 'n.deleted = 0';
 
@@ -218,7 +220,7 @@ class AjaxDataController extends BaseController
         foreach ($this->filters as $filter) {
             foreach ($filter as $col => $value) {
                 if (in_array($col, ['created', 'note'])) {
-                    $where[$col] = 'p.' . $col . ' LIKE :' . $col;
+                    $where[$col] = 'n.' . $col . ' LIKE :' . $col;
                     $params[$col] = '%' . $value . '%';
                 } else if ($col == 'type') {
                     $in = [];
@@ -232,6 +234,9 @@ class AjaxDataController extends BaseController
                 } else if ($col == 'property_id') {
                     $where['property_id'] = 'n.property_id = :property_id ';
                     $params['property_id'] = $value;
+                } else if ($col == 'property') {
+                    $where['property'] = 'p.name LIKE :property ';
+                    $params['property'] = '%' . $value . '%';
                 }
             }
         }
@@ -242,6 +247,8 @@ class AjaxDataController extends BaseController
                     $order[$col] = $col . ' ' . $dir;
                 } else if ($col == 'user') {
                     $order[$col] = 'u.last_name ' . $dir;
+                } else if ($col == 'property') {
+                    $order['property'] = 'p.name ' . $dir;
                 }
             }
         }
@@ -384,8 +391,9 @@ class AjaxDataController extends BaseController
 
         $db = new StandardQuery();
 
-        $sql = 'SELECT l.* 
-                FROM scraper_leads l ';
+        $sql = 'SELECT l.*, u.name AS url_name
+                FROM scraper_leads l 
+                INNER JOIN scraper_urls u ON u.url_id = l.url_id ';
 
         $where['deleted'] = 'l.deleted = 0';
 
@@ -395,6 +403,9 @@ class AjaxDataController extends BaseController
                 if (in_array($col, ['url', 'judgment_amount', 'last_seen'])) {
                     $where[$col] = 'l.' . $col . ' LIKE :' . $col;
                     $params[$col] = '%' . $value . '%';
+                } else if ($col == 'url_name') {
+                    $where['url_name'] = 'u.name LIKE :url_name ';
+                    $params['url_name'] = '%' . $value . '%';
                 } else if ($col == 'address') {
                     $where[$col] = ' (l.street LIKE :address OR l.city LIKE :address OR l.state LIKE :address OR l.zip LIKE :address ) ';
                     $params['address'] = '%' . $value . '%';
@@ -412,6 +423,8 @@ class AjaxDataController extends BaseController
             foreach ($sort as $col => $dir) {
                 if (in_array($col, ['url', 'judgment_amount', 'last_seen', 'active'])) {
                     $order[$col] = 'l.' . $col . ' ' . $dir;
+                } else if ($col == 'url_name') {
+                    $order[$col] = 'u.name ' . $dir;
                 }
             }
         }

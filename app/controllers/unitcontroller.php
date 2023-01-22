@@ -46,8 +46,11 @@ class UnitController extends BaseController
             ? Property::findOne(['property_id' => $propertyId])
             : new Property();
 
+        $properties = (!$property->property_id) ? Property::find([], ['name' => 'ASC']) : [];
+
         $this->view->setVar('unit', $unit);
         $this->view->setVar('property', $property);
+        $this->view->setVar('properties', $properties);
     }
 
     public function save()
@@ -97,6 +100,7 @@ class UnitController extends BaseController
         $this->render = false;
 
         $unitId = $params['unitId'] ?? 0;
+
         if ($unit = Unit::findOne(['unit_id' => $unitId])) {
             $unit->delete();
         }
