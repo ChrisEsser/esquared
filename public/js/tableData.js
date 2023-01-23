@@ -341,15 +341,17 @@ class tableData
             pageLength = sessionStorage.getItem(this.id + '_pageLength');
         }
 
+        console.log(pageLength);
+
         if (typeof this.config.pageLengths == 'object') {
             for (var i = 0; i < this.config.pageLengths.length; i++) {
-                newHtml += '<option value="' + this.config.pageLengths[i] + '"' + ((pageLength === this.config.pageLengths[i]) ? ' selected' : '') + '>' + this.config.pageLengths[i] + '</option>';
+                newHtml += '<option value="' + this.config.pageLengths[i] + '"' + ((pageLength == this.config.pageLengths[i]) ? ' selected' : '') + '>' + this.config.pageLengths[i] + '</option>';
             }
         } else {
-            newHtml += '<option value="10"' + ((pageLength === 10) ? ' selected' : '') + '>10</option>';
-            newHtml += '<option value="20"' + ((pageLength === 20) ? ' selected' : '') + '>20</option>';
-            newHtml += '<option value="50"' + ((pageLength === 50) ? ' selected' : '') + '>50</option>';
-            newHtml += '<option value="100"' + ((pageLength === 100) ? ' selected' : '') + '>100</option>';
+            newHtml += '<option value="10"' + ((pageLength == 10) ? ' selected' : '') + '>10</option>';
+            newHtml += '<option value="20"' + ((pageLength == 20) ? ' selected' : '') + '>20</option>';
+            newHtml += '<option value="50"' + ((pageLength == 50) ? ' selected' : '') + '>50</option>';
+            newHtml += '<option value="100"' + ((pageLength == 100) ? ' selected' : '') + '>100</option>';
         }
 
         newHtml += '</select>';
