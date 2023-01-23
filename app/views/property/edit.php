@@ -20,15 +20,34 @@ $property = $this->getVar('property');
         <textarea class="form-control" id="description" name="description" aria-describedby="descriptionHelp"><?=$property->description?></textarea>
     </div>
 
-    <div class="mb-3">
-        <label for="purchase_price" class="form-label">Purchase Price</label>
-        <input type="number" min="0" step=".01" class="form-control" id="purchase_price" name="purchase_price" aria-describedby="purchase_priceHelp" value="<?=$property->purchase_price?>" />
+    <div class="row">
+
+        <div class="mb-3 col-md-6">
+            <label for="purchase_price" class="form-label">Purchase Price</label>
+            <div class="input-group">
+                <span class="input-group-append">
+                    <span class="input-group-text bg-light d-block">
+                        <i class="fa fa-dollar"></i>
+                    </span>
+                </span>
+                <input type="number" min="0" step=".01" class="form-control" id="purchase_price" name="purchase_price" aria-describedby="purchase_priceHelp" value="<?=$property->purchase_price?>" />
+            </div>
+        </div>
+
+        <div class="mb-3 col-md-6">
+            <label for="purchase_date" class="form-label">Purchase Date</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="purchase_date" name="purchase_date" aria-describedby="purchase_dateHelp" value="<?=date('m/d/Y', strtotime($property->purchase_date))?>" />
+                <span class="input-group-append">
+                    <span class="input-group-text bg-light d-block">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                </span>
+            </div>
+        </div>
+
     </div>
 
-    <div class="mb-3">
-        <label for="purchase_date" class="form-label">Purchase Date</label>
-        <input type="text" class="form-control" id="purchase_date" name="purchase_date" aria-describedby="purchase_dateHelp" value="<?=date('m/d/Y', strtotime($property->purchase_date))?>" />
-    </div>
 
     <div class="mb-3">
         <label for="image" class="form-label">Image</label>

@@ -54,7 +54,7 @@
         $(document).on('click', '.edit_trigger', function () {
 
             let payment = $(this).data('payment');
-            let url = (payment) ? '/edit-payment/' + payment : '/create-payment';
+            let url = (payment) ? '/edit-payment/' + payment : '/add-payment';
             let modalTitle = (payment) ? 'Edit Payment' : 'Create Payment';
 
             $.get(url).done(function (result) {

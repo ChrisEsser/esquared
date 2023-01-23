@@ -37,25 +37,25 @@ return [
 
     ['GET', '/properties', 'PropertyController#properties'],
     ['GET', '/edit-property/[i:propertyId]', 'PropertyController#edit'],
-    ['GET', '/create-property', 'PropertyController#edit'],
+    ['GET', '/add-property', 'PropertyController#edit'],
 	['POST', '/save-property', 'PropertyController#save'],
 	['POST', '/delete-property/[i:propertyId]', 'PropertyController#delete'],
 	['GET', '/property/[i:propertyId]', 'PropertyController#property'],
 	['GET', '/property/[i:propertyId]/add-document', 'PropertyController#addDocument'],
 	['POST', '/property/[i:propertyId]/save-document', 'PropertyController#saveDocument'],
 	['GET', '/property/[i:propertyId]/delete-document', 'PropertyController#deleteDocument'],
-	['GET', '/property/[i:propertyId]/add-payment', 'PropertyController#editPayment'],
-	['GET', '/property/edit-payment/[:paymentId]', 'PropertyController#editPayment'],
-	['POST', '/property/delete-payment/[:paymentId]', 'PropertyController#editPayment'],
-	['POST', '/property/save-payment', 'PropertyController#savePayment'],
+//	['GET', '/property/[i:propertyId]/add-payment', 'PropertyController#editPayment'],
+//	['GET', '/property/edit-payment/[:paymentId]', 'PropertyController#editPayment'],
+//	['POST', '/property/delete-payment/[:paymentId]', 'PropertyController#editPayment'],
+//	['POST', '/property/save-payment', 'PropertyController#savePayment'],
 	['GET', '/property/[i:propertyId]/delete-image', 'PropertyController#deleteImage'],
 
     ['GET', '/units', 'UnitController#units'],
     ['GET', '/units/[i:propertyId]', 'UnitController#units'],
     ['GET', '/unit/[i:unitId]', 'UnitController#unit'],
     ['GET', '/edit-unit/[i:unitId]', 'UnitController#edit'],
-    ['GET', '/create-unit/[i:propertyId]', 'UnitController#edit'],
-    ['GET', '/create-unit', 'UnitController#edit'],
+    ['GET', '/edit-unit/[i:propertyId]', 'UnitController#edit'],
+    ['GET', '/add-unit', 'UnitController#edit'],
     ['POST', '/delete-unit/[i:unitId]', 'UnitController#delete'],
 	['POST', '/save-unit', 'UnitController#save'],
 
@@ -64,7 +64,8 @@ return [
     ['GET', '/payments/[i:propertyId]', 'PaymentController#payments'],
     ['GET', '/payment/[i:paymentIds]', 'PaymentController#payment'],
     ['GET', '/edit-payment/[i:paymentId]', 'PaymentController#edit'],
-    ['GET', '/add-payment/[i:unitId]', 'PaymentController#edit'],
+    ['GET', '/add-payment/[i:propertyId]', 'PaymentController#edit'],
+    ['GET', '/add-payment', 'PaymentController#edit'],
     ['POST', '/save-payment', 'PaymentController#save'],
     ['POST', '/delete-payment/[i:paymentId]', 'PaymentController#delete'],
 
@@ -115,12 +116,15 @@ return [
     ['GET', '/edit-lead/[i:leadId]', 'ScraperController#editLead'],
     ['POST', '/save-lead', 'ScraperController#saveLead'],
     ['POST', '/lead/save-address', 'ScraperController#saveAddress'],
-    ['GET', '/lead-street-view/[i:addressId]', 'ScraperController#leadStreetView'],
+    ['GET', '/street-view/[a:type]/[i:addressId]', 'ScraperController#streetView'],
+    ['GET', '/street-view/[a:type]/[i:addressId]', 'ScraperController#streetView'],
     ['GET', '/lead/[i:leadId]', 'ScraperController#lead'],
     ['GET', '/lead/[i:leadId]', 'ScraperController#lead'],
     ['GET', '/lead/edit-address/[i:addressId]', 'ScraperController#editAddress'],
     ['GET', '/lead/[i:leadId]/add-address', 'ScraperController#editAddress'],
     ['GET', '/lead/quarantine-address/[i:addressId]', 'ScraperController#quarantineAddress'],
+    ['GET', '/scraper/quarantined-addresses', 'ScraperController#quarantineAddresses'],
+    ['POST', '/delete-address/[a:type]/[i:addressId]', 'ScraperController#deleteAddress'],
 
 
 
@@ -138,5 +142,6 @@ return [
     ['POST', '/app-data/scraper/urls', 'AjaxDataController#scraperUrls'],
     ['POST', '/app-data/scraper/leads', 'AjaxDataController#scraperLeads'],
     ['POST', '/app-data/payments', 'AjaxDataController#payments'],
+    ['POST', '/app-data/scraper/quarantine-addresses', 'AjaxDataController#quarantineAddresses'],
 
 ];

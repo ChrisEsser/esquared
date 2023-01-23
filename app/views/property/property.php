@@ -245,8 +245,8 @@ $images = $this->getVar('images');
             else if (type == 'unit' && typeof unit == 'undefined') url = '/create-unit/<?=$property->property_id?>';
             else if (type == 'note' && typeof note != 'undefined') url += '/' + note;
             else if (type == 'note' && typeof note == 'undefined') url = '/create-note/<?=$property->property_id?>';
-            else if (type == 'payment' && typeof payment == 'undefined') url = '/property/<?=$property->property_id?>/add-payment/';
-            else if (type == 'payment' && typeof payment != 'undefined') url = '/property/edit-payment/';
+            else if (type == 'payment' && typeof payment == 'undefined') url = '/add-payment/<?=$property->property_id?>';
+            else if (type == 'payment' && typeof payment != 'undefined') url = '/edit-payment/' + payment;
             else {
                 alert('Invalid Request');
                 return;

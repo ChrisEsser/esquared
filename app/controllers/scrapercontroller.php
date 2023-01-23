@@ -330,6 +330,11 @@ class ScraperController extends BaseController
         HTTP::rewindQuick();
     }
 
+    public function quarantineAddresses()
+    {
+
+    }
+
     public function deleteLead($params)
     {
         $this->render = false;
@@ -342,18 +347,40 @@ class ScraperController extends BaseController
         HTTP::rewindQuick();
     }
 
-    public function leadStreetView($params)
+    public function streetView($params)
     {
         HTTP::removePageFromHistory();
         $this->render_header = false;
 
         $addressId = ($params['addressId']) ?? 0;
-        /** @var \ScraperLeadAddress $address */
-        $address = ScraperLeadAddress::findOne(['address_id' => $addressId]);
+        $type = ($params['type']) ?? '';
+
+        if ($type === 'lead') {
+            $address = ScraperLeadAddress::findOne(['address_id' => $addressId]);
+        } else if ($type === 'quarantine') {
+            $address = ScraperQuarantineAddress::findOne(['address_id' => $addressId]);
+        } else throw new Exception404();
+
 
         if (!$address->address_id) throw new Exception404();
 
         $this->view->setVar('address', $address);
+    }
+
+    public function deleteAddress($params)
+    {
+        $this->render = false;
+
+        $addressId = ($params['addressId']) ?? 0;
+        $type = ($params['type']) ?? '';
+
+        if ($type === 'lead') {
+            ScraperLeadAddress::findOne(['address_id' => $addressId])->delete();
+        } else if ($type === 'quarantine') {
+            ScraperQuarantineAddress::findOne(['address_id' => $addressId])->delete();
+        } else throw new Exception404();
+
+        HTTP::rewindQuick();
     }
 
     public function afterAction()

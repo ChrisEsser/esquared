@@ -9,15 +9,19 @@ $url = $this->getVar('url');
 
     <input type="hidden" name="url_id" id="url_id" value="<?=$url->url_id?>" />
 
-    <div class="mb-3">
-        <label for="name" class="form-label">Name</label>
-        <input type="text" class="form-control" id="name" name="name" aria-describedby="nameHelp" value="<?=$url->name?>" />
-<!--            <div id="nameHelp" class="form-text"></div>-->
-    </div>
+    <div class="row">
 
-    <div class="mb-3">
-        <label for="state" class="form-label">State</label>
-        <input type="text" class="form-control" id="state" name="state" aria-describedby="stateHelp" value="<?=$url->state?>" />
+        <div class="mb-3 col-md-6">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" aria-describedby="nameHelp" value="<?=$url->name?>" />
+    <!--            <div id="nameHelp" class="form-text"></div>-->
+        </div>
+
+        <div class="mb-3 col-md-6">
+            <label for="state" class="form-label">State</label>
+            <input type="text" class="form-control" id="state" name="state" aria-describedby="stateHelp" value="<?=$url->state?>" />
+        </div>
+
     </div>
 
     <div class="mb-3">
@@ -25,18 +29,22 @@ $url = $this->getVar('url');
         <input type="text" class="form-control" id="url" name="url" aria-describedby="urlHelp" value="<?=$url->url?>" />
     </div>
 
-    <div class="mb-3">
-        <label for="description" class="form-label">Doc Type</label>
-        <select class="form-control" id="doc_type" name="doc_type" aria-describedby="doc_typeHelp">
-            <option value="pdf" <?=($url->doc_type == 'pdf') ? 'selected' : ''?>>PDF</option>
-            <option value="html"<?=($url->doc_type == 'html') ? 'selected' : ''?>>HTML</option>
-        </select>
-    </div>
+    <div class="row">
 
-    <div class="mb-3">
-        <label for="depth" class="form-label">Scrape Depth</label>
-        <input type="number" min="1" step="1" class="form-control" id="depth" name="depth" aria-describedby="depthHelp" value="<?=intval($url->depth)+1?>" />
-        <div id="depthHelp" class="form-text">The depth is how many pages deep does the crawler need to go to find the correct information. each depth is associated with a filter string level below.</div>
+        <div class="mb-3 col-md-6">
+            <label for="description" class="form-label">Doc Type</label>
+            <select class="form-control" id="doc_type" name="doc_type" aria-describedby="doc_typeHelp">
+                <option value="pdf" <?=($url->doc_type == 'pdf') ? 'selected' : ''?>>PDF</option>
+                <option value="html"<?=($url->doc_type == 'html') ? 'selected' : ''?>>HTML</option>
+            </select>
+        </div>
+
+        <div class="mb-3 col-md-6">
+            <label for="depth" class="form-label">Scrape Depth</label>
+            <input type="number" min="1" step="1" class="form-control" id="depth" name="depth" aria-describedby="depthHelp" value="<?=intval($url->depth)+1?>" />
+            <div id="depthHelp" class="form-text">The depth is how many pages deep does the crawler need to go to find the correct information. each depth is associated with a filter string level below.</div>
+        </div>
+
     </div>
 
     <div id="filter_levels">

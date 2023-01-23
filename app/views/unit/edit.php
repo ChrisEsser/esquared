@@ -51,20 +51,24 @@ $properties = $this->getVar('properties');
 <!--            <div id="statusHelp" class="form-text"></div>-->
     </div>
 
-    <div class="mb-3">
-        <label for="rent" class="form-label">Rent</label>
-        <input type="number" min="0" step=".01" class="form-control" id="rent" name="rent" aria-describedby="rentHelp" value="<?=$unit->rent?>" />
-<!--            <div id="rentHelp" class="form-text"></div>-->
-    </div>
+    <div class="row">
 
-    <div class="mb-3">
-        <label for="rent_frequency" class="form-label">Rent Frequency</label>
-        <select class="form-control" id="rent_frequency" name="rent_frequency" aria-describedby="rent_frequencyHelp">
-            <?php foreach ($unit->rentFrequencyStrings() as $value => $string) { ?>
-                <option value="<?=$value?>" <?=$unit->rent_frequency == $value ? 'selected' : ''?>><?=$string?></option>
-            <?php } ?>
-        </select>
-<!--            <div id="statusHelp" class="form-text"></div>-->
+        <div class="mb-3 col-md-6">
+            <label for="rent" class="form-label">Rent</label>
+            <input type="number" min="0" step=".01" class="form-control" id="rent" name="rent" aria-describedby="rentHelp" value="<?=$unit->rent?>" />
+            <!--            <div id="rentHelp" class="form-text"></div>-->
+        </div>
+
+        <div class="mb-3 col-md-6">
+            <label for="rent_frequency" class="form-label">Rent Frequency</label>
+            <select class="form-control" id="rent_frequency" name="rent_frequency" aria-describedby="rent_frequencyHelp">
+                <?php foreach ($unit->rentFrequencyStrings() as $value => $string) { ?>
+                    <option value="<?=$value?>" <?=$unit->rent_frequency == $value ? 'selected' : ''?>><?=$string?></option>
+                <?php } ?>
+            </select>
+            <!--            <div id="statusHelp" class="form-text"></div>-->
+        </div>
+
     </div>
 
 </form>

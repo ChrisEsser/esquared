@@ -62,7 +62,7 @@
         $(document).on('click', '.edit_trigger', function () {
 
             let unit = $(this).data('unit');
-            let url = (unit) ? '/edit-unit/' + unit : '/create-unit';
+            let url = (unit) ? '/edit-unit/' + unit : '/add-unit';
             let modalTitle = (unit) ? 'Edit Unit' : 'Create Unit';
 
             $.get(url).done(function (result) {

@@ -100,7 +100,7 @@ $viewAll = $this->getVar('viewAll');
 
         $(document).on('click', '.trigger_street_view', function() {
             let address = $(this).data('address');
-            $.get('/lead-street-view/' + address).done(function(result) {
+            $.get('/street-view/lead/' + address).done(function(result) {
                 $('#viewModalLabel').text('Street View');
                 $('#viewModal .modal-body').html(result);
                 $('#viewModal').modal('show');

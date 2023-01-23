@@ -524,4 +524,51 @@ class AjaxDataController extends BaseController
 
     }
 
+    public function quarantineAddresses()
+    {
+        $where = $order = [];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT a.* FROM quarantine_addresses a ';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['street', 'city', 'state', 'zip'])) {
+                    $where[$col] = 'a.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                }
+            }
+        }
+
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['street', 'city', 'state', 'zip'])) {
+                    $order[$col] = 'a.' . $col . ' ' . $dir;
+                }
+            }
+        }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
+
+        echo json_encode([
+            'total' => $total,
+            'pages' => $totalPages,
+            'page' => $this->page,
+            'data' => $data,
+        ]);
+    }
+
 }
