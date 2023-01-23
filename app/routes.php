@@ -125,6 +125,7 @@ return [
     ['GET', '/lead/quarantine-address/[i:addressId]', 'ScraperController#quarantineAddress'],
     ['GET', '/scraper/quarantined-addresses', 'ScraperController#quarantineAddresses'],
     ['POST', '/delete-address/[a:type]/[i:addressId]', 'ScraperController#deleteAddress'],
+    ['GET', '/scraper/map-view', 'ScraperController#mapView'],
 
 
 

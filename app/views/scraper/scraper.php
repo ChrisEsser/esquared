@@ -7,6 +7,7 @@
 
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
     <button role="button" class="btn btn-round btn-primary edit_trigger" type="button">Add Url</button>
+    <button role="button" class="btn btn-round btn-info" data-bs-toggle="modal" data-bs-target="#mapViewModal" type="button">Map View</button>
     <a href="/scraper/leads" class="btn btn-round btn-info">View All Leads</a>
     <a href="/scraper/quarantined-addresses" class="btn btn-round btn-info">Quarantined Addressed</a>
 </div>
@@ -23,6 +24,18 @@
     </thead>
     <tbody></tbody>
 </table>
+
+<div class="modal fade" id="mapViewModal" tabindex="-1" aria-labelledby="mapViewModal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mapViewModal">Map View</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 0"></div>
+        </div>
+    </div>
+</div>
 
 <script>
 
@@ -69,6 +82,16 @@
                 $('#editModal .modal-body').html(result);
                 $('#editModal').modal('show');
             });
+        });
+
+        const mapViewModal = document.getElementById('mapViewModal');
+        mapViewModal.addEventListener('show.bs.modal', event => {
+            $.get('/scraper/map-view').done(function(response) {
+                $('#mapViewModal .modal-body').html(response);
+            });
+        });
+        mapViewModal.addEventListener('hide.bs.modal', event => {
+            $('#mapViewModal .modal-body').html('');
         });
 
     });

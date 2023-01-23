@@ -383,6 +383,16 @@ class ScraperController extends BaseController
         HTTP::rewindQuick();
     }
 
+    public function mapView()
+    {
+        HTTP::removePageFromHistory();
+        $this->render_header = false;
+
+        $scrapers = ScraperUrl::find([], ['name' => 'ASC']);
+
+        $this->view->setVar('scrapers', $scrapers);
+    }
+
     public function afterAction()
     {
         if (!$this->render_header) {
