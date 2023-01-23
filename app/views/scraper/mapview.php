@@ -14,6 +14,10 @@ $scrapers = $this->getVar('scrapers');
 
     #mapview_left_container {
         border-right: 5px solid #ccc;
+        height: calc(100vh - 62.8px);
+    }
+    #mapview_bottom_left {
+        overflow-y: auto;
     }
     #mapview_top_left {
         border-bottom: 5px solid #ccc;
@@ -75,7 +79,7 @@ $scrapers = $this->getVar('scrapers');
     if (typeof map == 'undefined') {
         let map;
     }
-    
+
     $(document).ready(function() {
 
         let leftWidth = Math.floor(window.innerWidth / 3);
