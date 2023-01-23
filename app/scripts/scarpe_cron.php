@@ -423,6 +423,7 @@ function pullAddressesFromString($string)
 function pullDollarAmountFromString($string)
 {
     $dollar = 0;
+    $string = str_replace(',', '', $string);
     preg_match('/\$([0-9]+[\.,0-9]*)/', $string, $m);
 
     if (!empty($m[1])) {

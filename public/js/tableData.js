@@ -39,6 +39,7 @@ class tableData
             $this.paginationNavigateTrigger($(this).data('page'));
         });
         $(document).on('change', '#' + this.id + '_perPage', function() {
+            sessionStorage.setItem($this.id + '_pageLength', $(this).val());
             $this.getData(1, function (results) {
                 $this.loadData(results);
             });
@@ -334,7 +335,11 @@ class tableData
         newHtml += '<div class="col-auto">';
         newHtml += '<select class="form-control" id="' + this.id + '_perPage" style="max-width: 50px">';
 
-        const pageLength = (typeof this.config.pageLength == 'bigint') ? this.config.pageLength : 10;
+        let pageLength = (typeof this.config.pageLength == 'bigint') ? this.config.pageLength : 10;
+
+        if (sessionStorage.getItem(this.id + '_pageLength')) {
+            pageLength = sessionStorage.getItem(this.id + '_pageLength');
+        }
 
         if (typeof this.config.pageLengths == 'object') {
             for (var i = 0; i < this.config.pageLengths.length; i++) {
