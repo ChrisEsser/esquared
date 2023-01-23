@@ -13,23 +13,43 @@ $scrapers = $this->getVar('scrapers');
     }
 
     #mapview_left_container {
-        border-right: 5px solid #ccc;
+        border-right: 1px solid #ccc;
+        width: 30%;
         height: calc(100vh - 62.8px);
     }
     #mapview_bottom_left {
         overflow-y: auto;
     }
     #mapview_top_left {
-        border-bottom: 5px solid #ccc;
+        border-bottom: 1px solid #ccc;
     }
     .mapview_lead_item:hover {
         background-color: #eeffff;
         cursor: pointer;
     }
+    #mapview_map_container {
+        height: 100%;
+        width: 100%;
+        min-height: 300px;
+    }
+
+    @media (max-width: 768px) {
+        #mapview_bottom_left {
+            overflow-y: inherit;
+        }
+        #mapview_left_container  {
+            width: 100%;
+            height: auto;
+            border-right: none;
+        }
+        #mapview_leads_container {
+            padding-bottom: 20px;
+        }
+    }
 
 </style>
 
-<div id="mapview_container" class="d-flex">
+<div id="mapview_container" class="d-flex flex-column-reverse flex-md-row">
 
     <div id="mapview_left_container" class="align-items-stretch d-flex flex-column">
 
@@ -56,7 +76,7 @@ $scrapers = $this->getVar('scrapers');
 
         </div>
 
-        <div id="mapview_bottom_left">
+        <div id="mapview_bottom_left flex-grow-1">
 
             <div id="mapview_leads_container" class="d-flex flex-column"></div>
 
@@ -64,9 +84,9 @@ $scrapers = $this->getVar('scrapers');
 
     </div>
 
-    <div id="mapview_right_container" class="align-items-stretch">
+    <div id="mapview_right_container" class="align-items-stretch flex-grow-1">
 
-        <div id="mapview_map_container" style="height: 100%; width: 100%;"></div>
+        <div id="mapview_map_container"></div>
 
     </div>
 
@@ -79,14 +99,11 @@ $scrapers = $this->getVar('scrapers');
     if (typeof map == 'undefined') {
         let map;
     }
+    if (typeof infoWindow == 'undefined') {
+        let infoWindow;
+    }
 
     $(document).ready(function() {
-
-        let leftWidth = Math.floor(window.innerWidth / 3);
-        let rightWidth = window.innerWidth - leftWidth;
-
-        $('#mapview_left_container').css({width: leftWidth});
-        $('#mapview_right_container').css({width: rightWidth});
 
         $(document).on('click', '#refresh_page_trigger', function() {
             refreshPage();
@@ -161,6 +178,10 @@ $scrapers = $this->getVar('scrapers');
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             maxZoom: 19
         });
+        // infoWindow = new google.maps.InfoWindow({
+        //     content: "",
+        //     disableAutoPan: true,
+        // });
 
         var bounds = new google.maps.LatLngBounds();
         for (i = 0; i < data.length; i++) {
@@ -172,6 +193,12 @@ $scrapers = $this->getVar('scrapers');
 
                 let location = {lat: lat, lng: lon};
                 var marker = addMarker(location, map);
+
+                // marker.addListener("click", function() {
+                //     infoWindow.setContent('');
+                //     infoWindow.open(map, marker);
+                // });
+
                 bounds.extend(marker.position);
 
             }
@@ -187,5 +214,6 @@ $scrapers = $this->getVar('scrapers');
             map: map,
         });
     }
+
 
 </script>
