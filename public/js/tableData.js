@@ -337,11 +337,10 @@ class tableData
 
         let pageLength = (typeof this.config.pageLength == 'bigint') ? this.config.pageLength : 10;
 
+        // overide the page length if the user as already set the length this session
         if (sessionStorage.getItem(this.id + '_pageLength')) {
             pageLength = sessionStorage.getItem(this.id + '_pageLength');
         }
-
-        console.log(pageLength);
 
         if (typeof this.config.pageLengths == 'object') {
             for (var i = 0; i < this.config.pageLengths.length; i++) {
