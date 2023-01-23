@@ -194,8 +194,13 @@ echo 'done';
  */
 function recursiveCrawl($url, $currentLevel, $totalLevels, $domTarget, $filters, $client): array
 {
-    $request = $client->request('GET', $url);
-    $html = (string)$request->getBody();
+    try {
+        $request = $client->request('GET', $url);
+        $html = (string)$request->getBody();
+    } catch (Exception $e) {
+        var_dump($e->getMessage());
+        return [];
+    }
 
     $dom = new DOMDocument();
     $dom->loadHTML($html);
