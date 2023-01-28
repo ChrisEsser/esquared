@@ -21,98 +21,104 @@ $action = $this->getVar('action');
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"/>
     <link rel="stylesheet" href="https://unpkg.com/filepond/dist/filepond.css"/>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"/>
-    <link rel="stylesheet" href="/css/betterButtons.css?ver=103"/>
-    <link rel="stylesheet" href="/css/style.css?ver=103"/>
+    <link rel="stylesheet" href="/css/betterButtons.css?ver=105"/>
+    <link rel="stylesheet" href="/css/style.css?ver=105"/>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
     <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
     <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
-    <script src="/js/confirm.js?ver=103"></script>
+    <script src="/js/confirm.js?ver=105"></script>
     <script src="/js/filepondHelper.js"></script>
-    <script src="/js/tableData.js?ver=103"></script>
+    <script src="/js/tableData.js?ver=105"></script>
     <?= HTML::displayHead() ?>
 </head>
 
 <body>
 <div class="container-fluid">
     <div class="row flex-nowrap">
+
         <div class="col-auto px-0">
 
-            <div id="sidebar" class="border-end vh-100 shadow-sm">
+                <div id="sidebar" class="border-end vh-100 shadow-sm">
 
-                <div id="sidebar-nav" class="list-group border-0">
+                    <div id="sidebar-nav" class="list-group border-0">
 
-                    <div class="p-3"><h4 class="mb-0" style="color: #0d6efd; white-space: nowrap">E<sup>2</sup> Admin</h4></div>
+                        <div class="p-3"><h4 class="mb-0" style="color: #0d6efd; white-space: nowrap">E<sup>2</sup> Admin</h4></div>
 
-<!--                    <form class="d-flex p-2" style="white-space: nowrap">-->
-<!--                        <input class="form-control me-2 rounded-0" type="search" placeholder="Search" aria-label="Search">-->
-<!--                    </form>-->
+    <!--                    <form class="d-flex p-2" style="white-space: nowrap">-->
+    <!--                        <input class="form-control me-2 rounded-0" type="search" placeholder="Search" aria-label="Search">-->
+    <!--                    </form>-->
 
-                    <div class="menu_heading">Menu</div>
+                        <div class="menu_heading">Menu</div>
 
-                    <ul class="list_container">
-                        <li class="<?=($action == 'dashboard') ? 'active' : ''?>">
-                            <a href="/dashboard" tabindex="0">
-                                <div><i class="fa fa-home"></i></div>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="<?=($action == 'properties') ? 'active' : ''?>">
-                            <a href="/properties" tabindex="0">
-                                <div><i class="fa fa-building"></i></div>
-                                <span>Properties</span>
-                            </a>
-                        </li>
-                        <li class="<?=($action == 'units') ? 'active' : ''?>">
-                            <a href="/units" tabindex="0">
-                                <div><i class="fa fa-building-o"></i></div>
-                                <span>Units</span>
-                            </a>
-                        </li>
-                        <li class="<?=($action == 'payments') ? 'active' : ''?>">
-                            <a href="/payments" tabindex="0">
-                                <div><i class="fa fa-dollar"></i></div>
-                                <span>Payments</span>
-                            </a>
-                        </li>
-                        <li class="<?=($action == 'documents') ? 'active' : ''?>">
-                            <a href="/documents" tabindex="0">
-                                <div><i class="fa fa-file"></i></div>
-                                <span>Documents</span>
-                            </a>
-                        </li>
-                        <li class="<?=($action == 'notes') ? 'active' : ''?>">
-                            <a href="/notes" tabindex="0">
-                                <div><i class="fa fa-sticky-note"></i></div>
-                                <span>Notes</span>
-                            </a>
-                        </li>
-                        <li class="<?=($action == 'users') ? 'active' : ''?>">
-                            <a href="/users" tabindex="0">
-                                <div><i class="fa fa-users"></i></div>
-                                <span>Users</span>
-                            </a>
-                        </li>
-                        <li class="<?=($action == 'scraper') ? 'active' : ''?>">
-                            <a href="/scraper" tabindex="0">
-                                <div><i class="fa fa-crosshairs"></i></div>
-                                <span>Scraper Urls</span>
-                            </a>
-                        </li>
-                        <li class="<?=($action == 'admin') ? 'active' : ''?>">
-                            <a href="/admin" tabindex="0">
-                                <div><i class="fa fa-cog"></i></div>
-                                <span>Settings</span>
-                            </a>
-                        </li>
-                    </ul>
+                        <ul class="list_container">
+                            <li class="<?=($action == 'dashboard') ? 'active' : ''?>">
+                                <a href="/dashboard" tabindex="0">
+                                    <div><i class="fa fa-home"></i></div>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="<?=($action == 'properties') ? 'active' : ''?>">
+                                <a href="/properties" tabindex="0">
+                                    <div><i class="fa fa-building"></i></div>
+                                    <span>Properties</span>
+                                </a>
+                            </li>
+                            <li class="<?=($action == 'units') ? 'active' : ''?>">
+                                <a href="/units" tabindex="0">
+                                    <div><i class="fa fa-building-o"></i></div>
+                                    <span>Units</span>
+                                </a>
+                            </li>
+                            <li class="<?=($action == 'payments') ? 'active' : ''?>">
+                                <a href="/payments" tabindex="0">
+                                    <div><i class="fa fa-dollar"></i></div>
+                                    <span>Payments</span>
+                                </a>
+                            </li>
+                            <li class="<?=($action == 'documents') ? 'active' : ''?>">
+                                <a href="/documents" tabindex="0">
+                                    <div><i class="fa fa-file"></i></div>
+                                    <span>Documents</span>
+                                </a>
+                            </li>
+                            <li class="<?=($action == 'notes') ? 'active' : ''?>">
+                                <a href="/notes" tabindex="0">
+                                    <div><i class="fa fa-sticky-note"></i></div>
+                                    <span>Notes</span>
+                                </a>
+                            </li>
+                            <li class="<?=($action == 'users') ? 'active' : ''?>">
+                                <a href="/users" tabindex="0">
+                                    <div><i class="fa fa-users"></i></div>
+                                    <span>Users</span>
+                                </a>
+                            </li>
+                            <li class="<?=($action == 'scraper') ? 'active' : ''?>">
+                                <a href="/scraper" tabindex="0">
+                                    <div><i class="fa fa-crosshairs"></i></div>
+                                    <span>Scraper Urls</span>
+                                </a>
+                            </li>
+                            <li class="<?=($action == 'admin') ? 'active' : ''?>">
+                                <a href="/admin" tabindex="0">
+                                    <div><i class="fa fa-cog"></i></div>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div>
+
+                    <a href="#" id="sidebar_trigger"><i class="fa fa-bars"></i></a>
+
                 </div>
 
-                <a href="#" id="sidebar_trigger"><i class="fa fa-bars"></i></a>
 
-            </div>
+
+<!--            </div>-->
 
         </div>
 

@@ -385,9 +385,6 @@ class ScraperController extends BaseController
 
     public function mapView()
     {
-        HTTP::removePageFromHistory();
-        $this->render_header = false;
-
         $scrapers = ScraperUrl::find([], ['name' => 'ASC']);
 
         $this->view->setVar('scrapers', $scrapers);
