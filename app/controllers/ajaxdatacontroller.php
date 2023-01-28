@@ -400,7 +400,7 @@ class AjaxDataController extends BaseController
         $params = [];
         foreach ($this->filters as $filter) {
             foreach ($filter as $col => $value) {
-                if (in_array($col, ['url', 'judgment_amount', 'last_seen'])) {
+                if (in_array($col, ['url', 'judgment_amount', 'last_seen', 'created'])) {
                     $where[$col] = 'l.' . $col . ' LIKE :' . $col;
                     $params[$col] = '%' . $value . '%';
                 } else if ($col == 'url_name') {
@@ -421,7 +421,7 @@ class AjaxDataController extends BaseController
 
         foreach ($this->sort as $sort) {
             foreach ($sort as $col => $dir) {
-                if (in_array($col, ['url', 'judgment_amount', 'last_seen', 'active'])) {
+                if (in_array($col, ['url', 'judgment_amount', 'last_seen', 'created', 'active'])) {
                     $order[$col] = 'l.' . $col . ' ' . $dir;
                 } else if ($col == 'url_name') {
                     $order[$col] = 'u.name ' . $dir;
