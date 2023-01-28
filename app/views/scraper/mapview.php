@@ -116,6 +116,11 @@ $scrapers = $this->getVar('scrapers');
     let markers;
     let locations;
 
+    const moneyFormatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    });
+
 
     $(document).ready(function() {
         $('#refresh_page_trigger').click(function () {
@@ -139,17 +144,24 @@ $scrapers = $this->getVar('scrapers');
                 maxZoom: 19
             });
 
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+            });
+
             markers = locations.map(function(location, i) {
                 var marker = new google.maps.Marker({
                     position: location,
                     map
                 });
                 var content = '<div>';
-                content += '<h4>' + location.url_name + '</h4>';
-                content += '<p><strong>Judgment Amount: </strong>' + location.judgment_amount + '</p>';
-                content += '<p><strong>First Seen: </strong>' + location.created + '</p>';
-                content += '<p><strong>Last Seen: </strong>' + location.last_seen + '</p>';
-                content += '<p><a href="' + location.url + '" target="_blank">Info URL</a></p>';
+                content += '<h5>' + location.url_name + '</h5>';
+                content += '<p style="font-size: 1.2em;">' + location.addresses[0].street;
+                content += '<br />' + location.addresses[0].city + ',' + location.addresses[0].zip + ', ' + location.addresses[0].state + '</p>';
+                content += '<p style="font-size: 1.2em;"><strong>' + moneyFormatter.format(location.judgment_amount) + '</strong></p>';
+                content += '<p style="font-size: 1.2em;"><strong>First Seen: </strong>' + location.created;
+                content += '<br /><strong>Last Seen: </strong>' + location.last_seen;
+                content += '<p style="font-size: 1.2em;"><a href="' + location.url + '" target="_blank">Info URL</a></p>';
                 content += '</div>';
                 // add a listener to trigger the profile modal
                 google.maps.event.addListener(marker, 'click', function() {
@@ -221,6 +233,7 @@ $scrapers = $this->getVar('scrapers');
             html += data.data[i].addresses[0].street + ', ';
             html += data.data[i].addresses[0].city + ', ';
             html += data.data[i].addresses[0].state;
+            html += '<br /><small>' + moneyFormatter.format(data.data[i].judgment_amount) + '</small>';
             html += '</div>';
             html += '</div>';
         }
