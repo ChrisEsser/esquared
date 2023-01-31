@@ -86,20 +86,22 @@ $scrapers = $this->getVar('scrapers');
                     </div>
                 </div>
 
-<!--                <div class="mb-3">-->
-<!--                    <div class="input-group">-->
-<!--                        <select class="form-control" id="sort">-->
-<!--                            <option value="city">City</option>-->
-<!--                            <option value="state">State</option>-->
-<!--                            <option value="street">Street</option>-->
-<!--                        </select>-->
-<!--                        <span class="input-group-append">-->
-<!--                            <span class="input-group-text bg-light d-block">-->
-<!--                                <i class="fa fa-list"></i>-->
-<!--                            </span>-->
-<!--                        </span>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <select class="form-control" id="sort">
+                            <option value="city">City</option>
+                            <option value="state">State</option>
+                            <option value="street">Street</option>
+                            <option value="judgment_amount">Judgement</option>
+                            <option value="created">Created Date</option>
+                        </select>
+                        <span class="input-group-append">
+                            <span class="input-group-text bg-light d-block">
+                                <i class="fa fa fa-sort-alpha-asc"></i>
+                            </span>
+                        </span>
+                    </div>
+                </div>
 
                 <div class="mb-3">
                     <div class="input-group">
@@ -141,12 +143,12 @@ $scrapers = $this->getVar('scrapers');
     let infoWindow;
     let markers;
     let locations;
+    var timeout;
 
     const moneyFormatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
     });
-
 
     $(document).ready(function() {
         $('#refresh_page_trigger').click(function () {
@@ -155,11 +157,15 @@ $scrapers = $this->getVar('scrapers');
         $('#scraper').change(function() {
             refreshPage();
         });
-
-
-        // $('#sort').change(function() {
-        //     refreshPage();
-        // });
+        $('#search').keyup(function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                refreshPage();
+            }, 400);
+        });
+        $('#sort').change(function() {
+            refreshPage();
+        });
         $(document).on('click', '.mapview_lead_item', function () {
             let markId = $(this).data('markerid');
             if (typeof markers[markId] == 'object') {
@@ -229,21 +235,25 @@ $scrapers = $this->getVar('scrapers');
     function getLeads(callback) {
 
         let scraper = $('#scraper').val();
-        // let sortVal = $('#sort').val();
-        let filter = [];
-        // let sort = [];
+        let sortVal = $('#sort').val();
+        let searchVal = $('#search').val();
+
+        let filter = (searchVal) ? [{search: searchVal}] : [];
+
+        let sort = [];
+        let obj = {};
+        obj[sortVal] = 'ASC';
+        sort.push(obj);
+
         if (scraper) {
             filter.push({url_id: scraper});
         }
-        // let obj = {};
-        // obj[sortVal] = 'ASC';
-        // sort.push(obj)
 
         var data = {
             page: 1,
             len: 100,
             filter: filter,
-            // sort: sort
+            sort: sort
         };
         data = 'tableData=' + JSON.stringify(data);
         $.post('/app-data/scraper/leads', data).done(function (response) {
@@ -280,6 +290,7 @@ $scrapers = $this->getVar('scrapers');
             html = '<div class="alert alert-info">No Leads</div>';
         }
         $('#mapview_leads_container').html(html);
+
         setLocationsArray(data.data, function () {
             initMap();
         });

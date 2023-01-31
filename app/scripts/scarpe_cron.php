@@ -99,7 +99,7 @@ try {
                 $addresses = pullAddressesFromString($plainSTring);
                 if ($addresses) {
                     $addresses = parseAddressPartsFromGoogle($addresses);
-                    removeQuarantinedAddressFromArray($addresses);
+                    $addresses = removeQuarantinedAddressFromArray($addresses);
                 }
             }
 
@@ -396,23 +396,27 @@ function getHtmlString($url, $client)
     return (string)$request->getBody();
 }
 
-function removeQuarantinedAddressFromArray(&$addresses)
+function removeQuarantinedAddressFromArray($addresses)
 {
-    foreach ($addresses as $key => $address) {
+    $returnAddresses = [];
+
+    foreach ($addresses as $address) {
 
         $db = new StandardQuery();
         $sql = 'SELECT address_id FROM quarantine_addresses WHERE street = :street AND city = :city AND state = :state ';
         $params = [
-            'street' => $address['streetNumber'] . ' ' . $address['streetNumber'],
+            'street' => $address['streetNumber'] . ' ' . $address['streetName'],
             'city' => $address['city'],
             'state' => $address['state']
         ];
 
-        if ($db->count($sql, $params)) {
-            unset($addresses[$key]);
+        if (!$db->count($sql, $params)) {
+            $returnAddresses[] = $address;
         }
 
     }
+
+    return $returnAddresses;
 }
 
 /**

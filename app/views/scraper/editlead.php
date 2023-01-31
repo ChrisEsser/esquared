@@ -13,6 +13,8 @@ $lead = $this->getVar('lead');
 
 <form id="LeadForm">
 
+    <input type="hidden" name="lead" id="lead" value="<?=$lead->lead_id?>" />
+
     <div class="mb-3">
         <label for="city" class="form-label">Judgment Amount</label>
         <input type="number" min="0" step=".01" class="form-control" id="judgment_amount" name="judgment_amount" aria-describedby="judgment_amountHelp" autocomplete="off" value="<?= $lead->judgment_amount ?>"/>

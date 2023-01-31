@@ -397,6 +397,9 @@ class AjaxDataController extends BaseController
 
         $where['deleted'] = 'l.deleted = 0';
 
+
+        $joinAddresses = false;
+
         $params = [];
         foreach ($this->filters as $filter) {
             foreach ($filter as $col => $value) {
@@ -415,6 +418,10 @@ class AjaxDataController extends BaseController
                 } else if ($col == 'url_id') {
                     $where['url_id'] = 'l.url_id = :url_id ';
                     $params['url_id'] = $value;
+                } else if ($col == 'search') {
+                    $where['search'] = '(a.street LIKE :search OR a.city LIKE :search OR a.state LIKE :search OR a.zip LIKE :search )';
+                    $params['search'] = '%' . $value . '%';
+                    $joinAddresses = true;
                 }
             }
         }
@@ -425,12 +432,21 @@ class AjaxDataController extends BaseController
                     $order[$col] = 'l.' . $col . ' ' . $dir;
                 } else if ($col == 'url_name') {
                     $order[$col] = 'u.name ' . $dir;
+                } else if (in_array($col, ['city', 'state', 'zip'])) {
+                    $order[$col] = 'a.' . $col . ' ' . $dir;
+                    $joinAddresses = true;
                 }
             }
         }
 
+        if ($joinAddresses === true) {
+            $sql .= ' INNER JOIN lead_addresses a ON a.lead_id = l.lead_id ';
+        }
+
         $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
         $sql .= ' ' . $whereString;
+
+//        print_r($sql);
 
         $total = $db->count($sql, $params);
         $totalPages = ceil($total / $this->pageLength);
