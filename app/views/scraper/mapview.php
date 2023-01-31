@@ -242,7 +242,8 @@ $scrapers = $this->getVar('scrapers');
 
         let sort = [];
         let obj = {};
-        obj[sortVal] = 'ASC';
+
+        obj[sortVal] = (sortVal === 'created') ? 'DESC' : 'ASC';
         sort.push(obj);
 
         if (scraper) {
