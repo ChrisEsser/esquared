@@ -10,9 +10,9 @@ session_start();
 
 ini_set('max_execution_time', 0);
 set_time_limit(0);
-//ini_set("xdebug.var_display_max_children", '-1');
-//ini_set("xdebug.var_display_max_data", '-1');
-//ini_set("xdebug.var_display_max_depth", '-1');
+ini_set("xdebug.var_display_max_children", '-1');
+ini_set("xdebug.var_display_max_data", '-1');
+ini_set("xdebug.var_display_max_depth", '-1');
 
 define('ROOT', dirname(dirname(dirname(__FILE__))));
 define('DS', DIRECTORY_SEPARATOR);
@@ -60,20 +60,12 @@ try {
     libxml_use_internal_errors(true);
 
     $newLeadUrls = [];
+
+    $client = new GuzzleHttp\Client();
+
     foreach ($urls as $urlRow) {
 
         $filters = unserialize(base64_decode($urlRow->search_string));
-        $client = new GuzzleHttp\Client([
-            'curl' => [
-                \CURLOPT_ENCODING => '',
-                \CURLOPT_RETURNTRANSFER => true,
-                \CURLOPT_MAXREDIRS => 3,
-                \CURLOPT_TIMEOUT => 0,
-                \CURLOPT_FOLLOWLOCATION => true,
-                \CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            ]
-        ]);
-
         $leads = recursiveCrawl($urlRow->url, 0, $urlRow->depth, $urlRow->dom_target, $filters, $client);
 
         $leadHrefs = [];
@@ -205,7 +197,12 @@ echo 'done';
 function recursiveCrawl($url, $currentLevel, $totalLevels, $domTarget, $filters, $client): array
 {
     try {
-        $request = $client->request('GET', $url);
+        $request = $client->request('GET', $url, [
+            'referer' => true,
+            'headers' => [
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.70',
+            ],
+        ]);
         $html = (string)$request->getBody();
     } catch (Exception $e) {
         var_dump($e->getMessage());
@@ -333,7 +330,12 @@ function getPdfString($url, $client)
 {
     $tmpPdfPath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmppdf' . time() . '.pdf';
 
-    $request = $client->request('GET', $url);
+    $request = $client->request('GET', $url, [
+        'referer' => true,
+        'headers' => [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.70',
+        ],
+    ]);
     $contents = (string)$request->getBody();
 
     if ($contents === false || empty($contents)) return false;
@@ -385,7 +387,12 @@ function getPdfString($url, $client)
 
 function getHtmlString($url, $client)
 {
-    $request = $client->request('GET', $url);
+    $request = $client->request('GET', $url, [
+        'referer' => true,
+        'headers' => [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.70',
+        ],
+    ]);
     return (string)$request->getBody();
 }
 
