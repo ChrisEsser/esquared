@@ -70,7 +70,7 @@ $scrapers = $this->getVar('scrapers');
             <div class="p-2">
 
                 <div class="mb-3">
-                    <label for="scraper">Scraper URL</label>
+<!--                    <label for="scraper">Scraper URL</label>-->
                     <div class="input-group">
                         <select class="form-control" id="scraper">
                             <option value="">All</option>
@@ -81,6 +81,32 @@ $scrapers = $this->getVar('scrapers');
                         <span class="input-group-append">
                             <span class="input-group-text bg-light d-block">
                                 <a href="javascript:void(0);" id="refresh_page_trigger"><i class="fa fa-refresh"></i></a>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+<!--                <div class="mb-3">-->
+<!--                    <div class="input-group">-->
+<!--                        <select class="form-control" id="sort">-->
+<!--                            <option value="city">City</option>-->
+<!--                            <option value="state">State</option>-->
+<!--                            <option value="street">Street</option>-->
+<!--                        </select>-->
+<!--                        <span class="input-group-append">-->
+<!--                            <span class="input-group-text bg-light d-block">-->
+<!--                                <i class="fa fa-list"></i>-->
+<!--                            </span>-->
+<!--                        </span>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search" placeholder="Search" />
+                        <span class="input-group-append">
+                            <span class="input-group-text bg-light d-block">
+                                <i class="fa fa-search"></i>
                             </span>
                         </span>
                     </div>
@@ -129,6 +155,11 @@ $scrapers = $this->getVar('scrapers');
         $('#scraper').change(function() {
             refreshPage();
         });
+
+
+        // $('#sort').change(function() {
+        //     refreshPage();
+        // });
         $(document).on('click', '.mapview_lead_item', function () {
             let markId = $(this).data('markerid');
             if (typeof markers[markId] == 'object') {
@@ -196,15 +227,23 @@ $scrapers = $this->getVar('scrapers');
     }
 
     function getLeads(callback) {
+
         let scraper = $('#scraper').val();
+        // let sortVal = $('#sort').val();
         let filter = [];
+        // let sort = [];
         if (scraper) {
             filter.push({url_id: scraper});
         }
+        // let obj = {};
+        // obj[sortVal] = 'ASC';
+        // sort.push(obj)
+
         var data = {
             page: 1,
             len: 100,
             filter: filter,
+            // sort: sort
         };
         data = 'tableData=' + JSON.stringify(data);
         $.post('/app-data/scraper/leads', data).done(function (response) {

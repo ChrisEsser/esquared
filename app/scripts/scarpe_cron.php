@@ -63,7 +63,17 @@ try {
     foreach ($urls as $urlRow) {
 
         $filters = unserialize(base64_decode($urlRow->search_string));
-        $client = new GuzzleHttp\Client();
+        $client = new GuzzleHttp\Client([
+            'curl' => [
+                \CURLOPT_ENCODING => '',
+                \CURLOPT_RETURNTRANSFER => true,
+                \CURLOPT_MAXREDIRS => 3,
+                \CURLOPT_TIMEOUT => 0,
+                \CURLOPT_FOLLOWLOCATION => true,
+                \CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            ]
+        ]);
+
         $leads = recursiveCrawl($urlRow->url, 0, $urlRow->depth, $urlRow->dom_target, $filters, $client);
 
         $leadHrefs = [];
