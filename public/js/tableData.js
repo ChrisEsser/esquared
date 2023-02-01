@@ -333,11 +333,11 @@ class tableData
         newHtml += '<div class="row g-3 align-items-center">';
         newHtml += '<div class="col-auto"><label for="' + this.id + '_perPage" class="col-form-label" style="font-weight: 500">Show</label></div>';
         newHtml += '<div class="col-auto">';
-        newHtml += '<select class="form-control" id="' + this.id + '_perPage" style="max-width: 50px">';
+        newHtml += '<select class="form-control" id="' + this.id + '_perPage" style="max-width: 62px">';
 
         let pageLength = (typeof this.config.pageLength == 'bigint') ? this.config.pageLength : 10;
 
-        // overide the page length if the user as already set the length this session
+        // override the page length if the user as already set the length this session
         if (sessionStorage.getItem(this.id + '_pageLength')) {
             pageLength = sessionStorage.getItem(this.id + '_pageLength');
         }
