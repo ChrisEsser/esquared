@@ -5,12 +5,6 @@ $lead = $this->getVar('lead');
 
 ?>
 
-<style>
-    .pac-container {
-        z-index: 9999 !important;
-    }
-</style>
-
 <form id="LeadForm">
 
     <input type="hidden" name="lead" id="lead" value="<?=$lead->lead_id?>" />

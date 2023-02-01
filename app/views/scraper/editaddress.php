@@ -6,6 +6,12 @@ $leadId = $this->getVar('leadId');
 
 ?>
 
+<style>
+    .pac-container {
+        z-index: 9999 !important;
+    }
+</style>
+
 <form id="addressForm">
 
     <input type="hidden" name="address" value="<?=$address->address_id?>" />
