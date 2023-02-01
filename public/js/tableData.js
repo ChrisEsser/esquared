@@ -14,6 +14,10 @@ class tableData
         }
         if (typeof this.config.sort == 'undefined') {
             this.config.sort = [];
+        } else if (sessionStorage.getItem(this.id + '_savedSort')) {
+            let obj = sessionStorage.getItem(this.id + '_savedSort');
+            obj = JSON.parse(obj);
+            this.config.sort = [obj];
         } else if (typeof this.config.sort == 'object') {
             this.config.sort = [this.config.sort];
         }
@@ -58,6 +62,7 @@ class tableData
             let tmpObj = {};
             tmpObj[col] = order;
             $this.config.sort.push(tmpObj);
+            sessionStorage.setItem($this.id + '_savedSort', JSON.stringify(tmpObj));
             $this.toggleSortIcons();
             $this.getData(1, function (results) {
                 $this.loadData(results);
