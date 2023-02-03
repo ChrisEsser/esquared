@@ -430,7 +430,16 @@ function pullAddressesFromString($string)
     $string = strip_tags($string);
     $string = preg_replace("/&nbsp;/"," ",$string);
 
+//    $tmpMatches = [];
     preg_match_all("/[0-9]{2,10}+\s+[^0-9]{0,50}(wi|ia)+\s+[0-9]{5}/is", $string, $matches);
+
+//    foreach ($tmpMatches[0] as $tmpMatch) {
+//        // find the string in the full string and make sure the address doesn't start with a letter. Example N1430 S Something Road.
+////        $matches[] = $tmpMatch;
+////        $pos = stripos($string, $tmpMatch);
+//        $sub = substr($string, stripos($string, $tmpMatch), strlen($tmpMatch));
+//
+//    }
 
     return (!empty($matches[0])) ? $matches[0] : [];
 }
