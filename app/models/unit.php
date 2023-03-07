@@ -10,10 +10,10 @@
  */
 class Unit extends BaseModel
 {
-
     public $unit_id;
     public $property_id;
     public $name;
+    public $type;
     public $description;
     public $status;
     public $rent;
@@ -31,6 +31,7 @@ class Unit extends BaseModel
     protected static $_tableFields = [
         'property_id',
         'name',
+        'type',
         'description',
         'status',
         'rent',
@@ -45,6 +46,15 @@ class Unit extends BaseModel
         self::addRelationOneToOne('property_id', 'Property', 'property_id');
         self::addRelationOneToMany('unit_id', 'User', 'unit_id', 'Renter');
         self::addRelationOneToMany('unit_id', 'PaymentHistory', 'unit_id');
+    }
+
+    public function typeStrings()
+    {
+        return [
+            0 => 'Residential',
+            1 => 'Commercial',
+            3 => 'Industrial',
+        ];
     }
 
     public function statusStrings()

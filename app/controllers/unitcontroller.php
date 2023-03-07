@@ -78,6 +78,7 @@ class UnitController extends BaseController
             if (!empty($missing)) throw new Exception('Some required fields were missing');
 
             $unit->name = $_POST['name'];
+            $unit->type = intval($_POST['type']);
             $unit->description = $_POST['description'];
             $unit->property_id = $propertyId;
             $unit->status = $_POST['status'];

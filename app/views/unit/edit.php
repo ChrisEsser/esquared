@@ -36,9 +36,17 @@ $properties = $this->getVar('properties');
     </div>
 
     <div class="mb-3">
+        <label for="type" class="form-label">Type</label>
+        <select class="form-control" id="type" name="type" aria-describedby="typeHelp">
+            <?php foreach ($unit->typeStrings() as $key => $value) { ?>
+                <option value="<?=$key?>" <?=($unit->type == $key) ? 'selected' : ''?>><?=$value?></option>
+            <?php } ?>
+        </select>
+    </div>
+
+    <div class="mb-3">
         <label for="description" class="form-label">Description</label>
         <textarea class="form-control" id="description" name="description" aria-describedby="descriptionHelp"><?=$unit->description?></textarea>
-<!--            <div id="descriptionHelp" class="form-text"></div>-->
     </div>
 
     <div class="mb-3">
@@ -48,7 +56,6 @@ $properties = $this->getVar('properties');
                 <option value="<?=$value?>" <?=$unit->status == $value ? 'selected' : ''?>><?=$string?></option>
             <?php } ?>
         </select>
-<!--            <div id="statusHelp" class="form-text"></div>-->
     </div>
 
     <div class="row">

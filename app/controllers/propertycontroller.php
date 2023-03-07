@@ -84,6 +84,7 @@ class PropertyController extends BaseController
             if (!empty($missing)) throw new Exception('Some required fields were missing');
 
             $property->name = $_POST['name'];
+            $property->type = intval($_POST['type']);
             $property->description = $_POST['description'];
             $property->purchase_price = $_POST['purchase_price'];
             $property->purchase_date = gmdate('Y-m-d', strtotime($_POST['purchase_date']));

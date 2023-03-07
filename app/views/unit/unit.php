@@ -18,6 +18,7 @@ $unit = $this->getVar('unit');
     <div style="display: flex; justify-content: left;">
 
         <div style="margin: 0 30px">
+            <strong>Type:</strong>
             <br /><strong>Description:</strong>
             <br /><strong>Status:</strong>
             <br /><strong>Rent:</strong>
@@ -25,6 +26,7 @@ $unit = $this->getVar('unit');
         </div>
 
         <div>
+            <?=$unit->typeStrings()[$unit->type]?>
             <br /><?=$unit->description?>
             <br /><?=$unit->statusStrings()[$unit->status]?>
             <br />$<?=number_format($unit->rent, 2)?>

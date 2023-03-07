@@ -13,6 +13,7 @@ class Property extends BaseModel
 
     public $property_id;
     public $name;
+    public $type;
     public $description;
     public $status;
     public $purchase_price;
@@ -29,6 +30,7 @@ class Property extends BaseModel
 
     protected static $_tableFields = [
         'name',
+        'type',
         'description',
         'status',
         'purchase_price',
@@ -43,6 +45,16 @@ class Property extends BaseModel
         self::addRelationOneToMany('property_id', 'Unit', 'property_id');
         self::addRelationOneToMany('property_id', 'Document', 'property_id');
         self::addRelationOneToMany('property_id', 'Note', 'property_id');
+    }
+
+    public function typeStrings()
+    {
+        return [
+            0 => 'Single Family',
+            1 => 'Multi - Residential',
+            2 => 'Multi - Commercial',
+            3 => 'Multi - Mixed',
+        ];
     }
 
 }

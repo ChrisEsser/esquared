@@ -48,6 +48,7 @@ $images = $this->getVar('images');
 
         <div style="margin: 0 30px">
             <strong>Name:</strong>
+            <br /><strong>Type:</strong>
             <br /><strong>Description:</strong>
             <br /><strong>Purchase Price:</strong>
             <br /><strong>Purchase Date:</strong>
@@ -55,6 +56,7 @@ $images = $this->getVar('images');
 
         <div>
             <?=$property->name?>
+            <br /><?=$property->typeStrings()[$property->type]?>
             <br /><?=$property->description?>
             <br />$<?=number_format($property->purchase_price, 2)?>
             <br /><?=date('m/d/Y', strtotime($property->purchase_date))?>

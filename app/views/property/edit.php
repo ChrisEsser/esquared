@@ -16,6 +16,15 @@ $property = $this->getVar('property');
     </div>
 
     <div class="mb-3">
+        <label for="type" class="form-label">Type</label>
+        <select class="form-control" id="type" name="type" aria-describedby="typeHelp">
+            <?php foreach ($property->typeStrings() as $key => $value) { ?>
+                <option value="<?=$key?>" <?=($property->type == $key) ? 'selected' : ''?>><?=$value?></option>
+            <?php } ?>
+        </select>
+    </div>
+
+    <div class="mb-3">
         <label for="description" class="form-label">Description</label>
         <textarea class="form-control" id="description" name="description" aria-describedby="descriptionHelp"><?=$property->description?></textarea>
     </div>
