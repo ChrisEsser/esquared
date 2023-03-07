@@ -45,6 +45,9 @@ $unit = $this->getVar('unit');
     <li class="nav-item" role="presentation">
         <button class="nav-link tabClick" id="tenant-tab" data-bs-toggle="tab" data-bs-target="#tenant" type="button" role="tab" aria-controls="tenant" aria-selected="false">Tenant History</button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link tabClick" id="expenses-tab" data-bs-toggle="tab" data-bs-target="#expenses" type="button" role="tab" aria-controls="expenses" aria-selected="true">Expenses</button>
+    </li>
 </ul>
 
 <div class="tab-content" id="tabContents">
@@ -89,6 +92,22 @@ $unit = $this->getVar('unit');
     <div class="tab-pane fade" id="tenant" role="tabpanel" aria-labelledby="tenant-tab">
     </div>
 
+    <div class="tab-pane fade" id="expenses" role="tabpanel" aria-labelledby="expenses-tab">
+
+        <table class="e2-table" id="expenseTable">
+            <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
 </div>
 
 <script>
@@ -100,6 +119,24 @@ $unit = $this->getVar('unit');
 
         $('.tabClick').click(function () {
             sessionStorage.setItem('lastUnitTab', $(this).attr('id'));
+        });
+
+        var expenseTable = new tableData('#expenseTable', {
+            url: '/app-data/expenses',
+            filter: {unit_id: '<?=$unit->unit_id?>'},
+            sort: {date: 'DESC'},
+            columns: [
+                {col: 'amount', format: 'usd'},
+                {col: 'description'},
+                {col: 'date', format: 'date'},
+                {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
+                    template: function(data) {
+                        let html = '<button role="button" class="btn btn-outline-primary btn-sm me-md-1 edit_trigger" data-expense="' + data.expense_id + '" type="button"><i class="fa fa-pencil"></i></button>';
+                        html += '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-expense="' + data.expense_id + '" data-message="Are you sure you want to delete this expense?" data-url="/delete-expnse/' + data.expense_id + '" type="button"><i class="fa fa-times"></i></button>';
+                        return html;
+                    }
+                },
+            ]
         });
 
     });

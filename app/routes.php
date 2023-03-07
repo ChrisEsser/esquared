@@ -56,6 +56,7 @@ return [
     ['GET', '/edit-unit/[i:unitId]', 'UnitController#edit'],
     ['GET', '/edit-unit/[i:propertyId]', 'UnitController#edit'],
     ['GET', '/add-unit', 'UnitController#edit'],
+    ['GET', '/add-unit/[i:propertyId]', 'UnitController#edit'],
     ['POST', '/delete-unit/[i:unitId]', 'UnitController#delete'],
 	['POST', '/save-unit', 'UnitController#save'],
 
@@ -68,6 +69,14 @@ return [
     ['GET', '/add-payment', 'PaymentController#edit'],
     ['POST', '/save-payment', 'PaymentController#save'],
     ['POST', '/delete-payment/[i:paymentId]', 'PaymentController#delete'],
+
+    ['GET', '/expenses', 'ExpenseController#expenses'],
+    ['GET', '/edit-expense/[i:expenseId]', 'ExpenseController#edit'],
+    ['GET', '/add-expense', 'ExpenseController#edit'],
+    ['GET', '/add-expense/[i:propertyId]', 'ExpenseController#edit'],
+    ['GET', '/add-expense/[i:propertyId]/[i:unitId]', 'ExpenseController#edit'],
+    ['POST', '/save-expense', 'ExpenseController#save'],
+    ['POST', '/delete-expense/[i:expenseId]', 'ExpenseController#delete'],
 
 	['GET', '/notes', 'NoteController#notes'],
 	['GET', '/note/[i:noteId]', 'NoteController#note'],
@@ -143,6 +152,8 @@ return [
     ['POST', '/app-data/scraper/urls', 'AjaxDataController#scraperUrls'],
     ['POST', '/app-data/scraper/leads', 'AjaxDataController#scraperLeads'],
     ['POST', '/app-data/payments', 'AjaxDataController#payments'],
+    ['POST', '/app-data/expenses', 'AjaxDataController#expenses'],
+    ['GET', '/app-data/expenses', 'AjaxDataController#expenses'],
     ['POST', '/app-data/scraper/quarantine-addresses', 'AjaxDataController#quarantineAddresses'],
 
 ];

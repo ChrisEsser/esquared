@@ -79,6 +79,12 @@ $action = $this->getVar('action');
                                     <span>Payments</span>
                                 </a>
                             </li>
+                            <li class="<?=($action == 'expenses') ? 'active' : ''?>">
+                                <a href="/expenses" tabindex="0">
+                                    <div><i class="fa fa-dollar"></i></div>
+                                    <span>Expenses</span>
+                                </a>
+                            </li>
                             <li class="<?=($action == 'documents') ? 'active' : ''?>">
                                 <a href="/documents" tabindex="0">
                                     <div><i class="fa fa-file"></i></div>

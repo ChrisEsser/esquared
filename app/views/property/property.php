@@ -11,6 +11,7 @@ $images = $this->getVar('images');
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
     <button role="button" class="btn btn-round btn-primary edit_trigger" data-type="property" type="button">Edit Property</button>
     <button role="button" class="btn btn-round btn-info edit_trigger" data-type="unit" type="button">Add Unit</button>
+    <button role="button" class="btn btn-round btn-info edit_trigger" data-type="expense" type="button">Add Expense</button>
     <button role="button" class="btn btn-round btn-info edit_trigger" data-type="document" type="button">Add Document</button>
     <button role="button" class="btn btn-round btn-info edit_trigger" data-type="note" type="button">Add Note</button>
     <button role="button" class="btn btn-round btn-info edit_trigger" data-type="payment" type="button">Add Rent Payment</button>
@@ -72,6 +73,9 @@ $images = $this->getVar('images');
         <button class="nav-link active tabClick" id="units-tab" data-bs-toggle="tab" data-bs-target="#units" type="button" role="tab" aria-controls="units" aria-selected="true">Units</button>
     </li>
     <li class="nav-item" role="presentation">
+        <button class="nav-link tabClick" id="expenses-tab" data-bs-toggle="tab" data-bs-target="#expenses" type="button" role="tab" aria-controls="expenses" aria-selected="false">Expenses</button>
+    </li>
+    <li class="nav-item" role="presentation">
         <button class="nav-link tabClick" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab" aria-controls="documents" aria-selected="false">Documents</button>
     </li>
     <li class="nav-item" role="presentation">
@@ -92,6 +96,23 @@ $images = $this->getVar('images');
                     <th>Rent</th>
                     <th></th>
                 </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
+    <div class="tab-pane fade" id="expenses" role="tabpanel" aria-labelledby="expenses-tab">
+
+        <table class="e2-table" id="expenseTable">
+            <thead>
+            <tr>
+                <th>Unit</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th></th>
+            </tr>
             </thead>
             <tbody></tbody>
         </table>
@@ -130,6 +151,7 @@ $images = $this->getVar('images');
         </table>
 
     </div>
+
 
 </div>
 
@@ -191,6 +213,29 @@ $images = $this->getVar('images');
             ]
         });
 
+        var expenseTable = new tableData('#expenseTable', {
+            url: '/app-data/expenses',
+            filter: {property_id: '<?=$property->property_id?>'},
+            sort: {date: 'DESC'},
+            columns: [
+                {col: 'unit_name',
+                    template: function (data) {
+                        return '<a href="/unit/' + data.unit_id + '">' + data.unit_name + '</a>';
+                    }
+                },
+                {col: 'amount', format: 'usd'},
+                {col: 'description'},
+                {col: 'date', format: 'date'},
+                {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
+                    template: function(data) {
+                        let html = '<button role="button" class="btn btn-outline-primary btn-sm me-md-1 edit_trigger" data-expense="' + data.expense_id + '" type="button"><i class="fa fa-pencil"></i></button>';
+                        html += '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-expense="' + data.expense_id + '" data-message="Are you sure you want to delete this expense?" data-url="/delete-expnse/' + data.expense_id + '" type="button"><i class="fa fa-times"></i></button>';
+                        return html;
+                    }
+                },
+            ]
+        });
+
         var docTable = new tableData('#documentTable', {
             url: '/app-data/documents',
             sort: {name: 'ASC'},
@@ -238,17 +283,20 @@ $images = $this->getVar('images');
             let unit = $(this).data('unit');
             let note = $(this).data('note');
             let payment = $(this).data('payment');
+            let expense = $(this).data('expense');
 
             let url = '/edit-' + type;
 
             if (type == 'property') url += '/<?=$property->property_id?>';
             else if (type == 'document') url = '/property/<?=$property->property_id?>/add-document';
             else if (type == 'unit' && typeof unit != 'undefined') url += '/' + unit;
-            else if (type == 'unit' && typeof unit == 'undefined') url = '/create-unit/<?=$property->property_id?>';
+            else if (type == 'unit' && typeof unit == 'undefined') url = '/add-unit/<?=$property->property_id?>';
             else if (type == 'note' && typeof note != 'undefined') url += '/' + note;
             else if (type == 'note' && typeof note == 'undefined') url = '/create-note/<?=$property->property_id?>';
             else if (type == 'payment' && typeof payment == 'undefined') url = '/add-payment/<?=$property->property_id?>';
             else if (type == 'payment' && typeof payment != 'undefined') url = '/edit-payment/' + payment;
+            else if (type == 'expense' && typeof expense == 'undefined') url = '/add-expense/<?=$property->property_id?>';
+            else if (type == 'expense' && typeof expense != 'undefined') url = '/edit-expense/' + payment;
             else {
                 alert('Invalid Request');
                 return;

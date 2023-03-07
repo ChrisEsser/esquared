@@ -540,6 +540,71 @@ class AjaxDataController extends BaseController
 
     }
 
+    public function expenses()
+    {
+        $where = $order = [];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT e.*, 
+                       IFNULL(u.name, "") AS unit_name, IFNULL(p.name, "") AS property_name
+                FROM expenses e
+                LEFT JOIN units u ON u.unit_id = e.unit_id
+                LEFT JOIN properties p ON p.property_id = e.property_id ';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['date', 'amount', 'description'])) {
+                    $where[$col] = 'e.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'unit_name') {
+                    $where[$col] = '(u.name LIKE :' . $col . ' )';
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'property_name') {
+                    $where[$col] = '(p.name LIKE :' . $col . ' )';
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'property_id' || $col == 'unit_id') {
+                    $where[$col] = 'e.' . $col . ' = :' . $col;
+                    $params[$col] = $value;
+                }
+            }
+        }
+
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['date', 'amount', 'description'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                } else if ($col == 'unit_name') {
+                    $order[$col] = 'u.name ' . $dir;
+                } else if ($col == 'property_name') {
+                    $order[$col] = 'p.name ' . $dir;
+                }
+            }
+        }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
+
+        echo json_encode([
+            'total' => $total,
+            'pages' => $totalPages,
+            'page' => $this->page,
+            'data' => $data,
+        ]);
+
+    }
+
     public function quarantineAddresses()
     {
         $where = $order = [];
