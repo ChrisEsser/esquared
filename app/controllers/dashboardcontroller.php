@@ -13,10 +13,15 @@ class DashboardController extends BaseController
 
     public function dashboard()
     {
+        HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/chart.js');
 
-//        HTML::addAlert('This is a test alert', 'danger');
-//        HTML::addAlert('This is a test notification', 'info');
+        $totals = DashboardHelper::getTotals();
+        $topProperties = DashboardHelper::topCashFlowProperties(5);
+        $monthlyBreakdown = DashboardHelper::monthBreakdown(6);
 
+        $this->view->setVar('totals', $totals);
+        $this->view->setVar('topProperties', $topProperties);
+        $this->view->setVar('monthlyBreakdown', $monthlyBreakdown);
     }
 
     public function afterAction()
