@@ -48,7 +48,7 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
 <div class="row">
 
     <div class="col-md-6 mb-3">
-        <canvas id="cashFlowMonthChart" style="width:100%;"></canvas>
+        <div id="cashFlowMonthChart" style="width:100%;"></div>
     </div>
 
     <div class="col-md-6 mb-3">
@@ -83,56 +83,102 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
         cashflows.push(monthlyBreakdown[key].cashflow);
     }
 
-    new Chart(document.getElementById('cashFlowMonthChart'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Expenses',
-                    data: expenses,
-                    borderWidth: 1,
-                    minBarLength: 1
-                },
-                {
-                    label: 'Income',
-                    data: revenues,
-                    borderWidth: 1,
-                    minBarLength: 1
-                },
-                {
-                    label: 'Cash Flow',
-                    data: cashflows,
-                    borderWidth: 1,
-                    minBarLength: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Last 6 Months'
+    var chart = new ApexCharts(
+        document.querySelector("#cashFlowMonthChart"),
+        {
+            series: [
+                {name: 'Expenses', data: expenses},
+                {name: 'Revenue', data: revenues}
+            ],
+            chart: {
+                type: 'bar',
+                // height: 400
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: true,
+                    dataLabels: {
+                        position: 'top',
+                    },
                 }
             },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        display: false
-                    }
+            dataLabels: {
+                enabled: true,
+                offsetX: -6,
+                style: {
+                    fontSize: '12px',
+                    colors: ['#fff']
                 }
+            },
+            stroke: {
+                show: true,
+                width: 1,
+                colors: ['#fff']
+            },
+            tooltip: {
+                shared: true,
+                intersect: false
+            },
+            xaxis: {
+                min: 1,
+                categories: labels,
             }
         }
-    });
+    );
+    chart.render();
+
+
+    //
+    // new Chart(document.getElementById('cashFlowMonthChart'), {
+    //     type: 'bar',
+    //     data: {
+    //         labels: labels,
+    //         datasets: [
+    //             {
+    //                 label: 'Expenses',
+    //                 data: expenses,
+    //                 borderWidth: 1,
+    //                 minBarLength: 1
+    //             },
+    //             {
+    //                 label: 'Income',
+    //                 data: revenues,
+    //                 borderWidth: 1,
+    //                 minBarLength: 1
+    //             },
+    //             {
+    //                 label: 'Cash Flow',
+    //                 data: cashflows,
+    //                 borderWidth: 1,
+    //                 minBarLength: 1
+    //             }
+    //         ]
+    //     },
+    //     options: {
+    //         responsive: true,
+    //         plugins: {
+    //             legend: {
+    //                 position: 'top',
+    //             },
+    //             title: {
+    //                 display: true,
+    //                 text: 'Last 6 Months'
+    //             }
+    //         },
+    //         scales: {
+    //             x: {
+    //                 grid: {
+    //                     display: false
+    //                 }
+    //             },
+    //             y: {
+    //                 beginAtZero: true,
+    //                 grid: {
+    //                     display: false
+    //                 }
+    //             }
+    //         }
+    //     }
+    // });
 
 </script>

@@ -14,6 +14,7 @@ class DashboardController extends BaseController
     public function dashboard()
     {
         HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/chart.js');
+        HTML::addScriptToHead('https://cdn.jsdelivr.net/npm/apexcharts');
 
         $totals = DashboardHelper::getTotals();
         $topProperties = DashboardHelper::topCashFlowProperties(5);
