@@ -212,7 +212,7 @@ function recursiveCrawl($url, $currentLevel, $totalLevels, $domTarget, $filters,
     $dom = new DOMDocument();
     $dom->loadHTML($html);
 
-    $leads = [];
+    $leads = $anchors = [];
 
     $thisFilters = explode(',', ($filters[$currentLevel]) ?? []);
 
