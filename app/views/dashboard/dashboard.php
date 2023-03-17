@@ -96,7 +96,7 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
             },
             plotOptions: {
                 bar: {
-                    horizontal: true,
+                    // horizontal: true,
                     dataLabels: {
                         position: 'top',
                     },
