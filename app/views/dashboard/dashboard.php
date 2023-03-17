@@ -6,6 +6,25 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
 
 ?>
 
+<style>
+    .dashboard_total .text-muted {
+        color: #fff !important;
+    }
+    .dashboard_total .card-title {
+        color: #fff;
+        font-weight: bold !important;
+    }
+    .dashboard_total_revenue {
+        background-color: #55e7a6;
+    }
+    .dashboard_total_expenses {
+        background-color: #ff466f;
+    }
+    .dashboard_total_cashflow {
+        background-color: #4aa0fc;
+    }
+</style>
+
 <script>
 
     var monthlyBreakdown = <?=json_encode($monthlyBreakdown)?>;
@@ -17,7 +36,7 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
 <div class="row">
 
     <div class="col-md-4 mb-3">
-        <div class="card">
+        <div class="card dashboard_total dashboard_total_revenue">
             <div class="card-body">
                 <h5 class="card-title">$<?=number_format($totals['total_revenue'], 2)?></h5>
                 <h6 class="card-subtitle mb-0 text-muted">Total Revenue</h6>
@@ -26,7 +45,7 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
     </div>
 
     <div class="col-md-4 mb-3">
-        <div class="card">
+        <div class="card dashboard_total dashboard_total_expenses">
             <div class="card-body">
                 <h5 class="card-title">$<?=number_format($totals['total_expenses'], 2)?></h5>
                 <h6 class="card-subtitle mb-0 text-muted">Total Expenses</h6>
@@ -35,7 +54,7 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
     </div>
 
     <div class="col-md-4 mb-3">
-        <div class="card">
+        <div class="card dashboard_total dashboard_total_cashflow">
             <div class="card-body">
                 <h5 class="card-title">$<?=number_format($totals['total_cashflow'], 2)?></h5>
                 <h6 class="card-subtitle mb-0 text-muted">Bottom Line</h6>
@@ -58,9 +77,9 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
                 <?php foreach ($topProperties as $propertyId => $topProperty) { ?>
                     <tr>
                         <td><?=$topProperty['property']?></td>
-                        <td class="table-success"><?=$topProperty['revenue']?></td>
-                        <td class="table-danger"><?=$topProperty['expense']?></td>
-                        <td class="table-primary"><?=$topProperty['cashflow']?></td>
+                        <td style="background-color: #55e7a6; color: #fff; font-weight: bold"><?=$topProperty['revenue']?></td>
+                        <td style="background-color: #ff466f; color: #fff; font-weight: bold"><?=$topProperty['expense']?></td>
+                        <td style="background-color: #4aa0fc; color: #fff; font-weight: bold"><?=$topProperty['cashflow']?></td>
                     </tr>
                 <?php } ?>
             </tbody>
