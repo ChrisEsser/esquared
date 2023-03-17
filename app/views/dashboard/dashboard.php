@@ -77,9 +77,9 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
                 <?php foreach ($topProperties as $propertyId => $topProperty) { ?>
                     <tr>
                         <td><?=$topProperty['property']?></td>
-                        <td style="background-color: #55e7a6; color: #fff; font-weight: bold"><?=$topProperty['revenue']?></td>
-                        <td style="background-color: #ff466f; color: #fff; font-weight: bold"><?=$topProperty['expense']?></td>
-                        <td style="background-color: #4aa0fc; color: #fff; font-weight: bold"><?=$topProperty['cashflow']?></td>
+                        <td><?=$topProperty['revenue']?></td>
+                        <td><?=$topProperty['expense']?></td>
+                        <td><?=$topProperty['cashflow']?></td>
                     </tr>
                 <?php } ?>
             </tbody>
@@ -137,6 +137,7 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
                     colors: ['#fff']
                 }
             },
+            colors: ['#ff466f', '#55e7a6'],
             tooltip: {
                 shared: true,
                 intersect: false
