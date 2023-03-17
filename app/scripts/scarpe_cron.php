@@ -205,7 +205,7 @@ function recursiveCrawl($url, $currentLevel, $totalLevels, $domTarget, $filters,
 //        ]);
 //        $html = (string)$request->getBody();
         $html = file_get_contents($url);
-        $str = $html[0].$html[1].$html[2].$html[3],$html[4].$html[5];
+        $str = $html[0].$html[1].$html[2].$html[3].$html[4].$html[5];
         var_dump($str);
         return [];
     } catch (Exception $e) {
