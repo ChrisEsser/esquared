@@ -298,57 +298,27 @@ class PropertyController extends BaseController
         ini_set("xdebug.var_display_max_data", '-1');
         ini_set("xdebug.var_display_max_depth", '-1');
 
-        $pdfUrl = 'http://nebula.wsimg.com/d9a05876408d059df98d8584dfdde1b5?AccessKeyId=B48848253604581C6DC2&disposition=0&alloworigin=1';
-
-
         $client = new GuzzleHttp\Client();
-        $tmpPdfPath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmppdf' . time() . '.pdf';
 
-        $request = $client->request('GET', $pdfUrl);
-        $contents = (string)$request->getBody();
+        $url = 'http://www.co.grant.wi.gov/section.asp?linkid=2544&locid=147';
 
-        if ($contents === false || empty($contents)) return false;
-        $result = @file_put_contents($tmpPdfPath, $contents);
-        if ($result === false) return false;
+        try {
 
-        $tmpImgFilePath = ROOT . DS . 'app' . DS . 'files' . DS . 'tmp' . DS . 'tmptxt' . time();
+            $request = $client->request('GET', $url, [
+                'referer' => true,
+                'headers' => [
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.70',
+                ],
+            ]);
+            $html = (string)$request->getBody();
 
-        $command = 'pdftoppm -jpeg ' . $tmpPdfPath . ' ' . $tmpImgFilePath;
-        exec($command);
+            echo $html;
 
-        $text = '';
-        // pdftoppm creates multiple files appended with a number on the end for multiple page pdfs
-        // filename-1, filename-2, etc
-        for($i = 1; $i <= 3; $i++) {
-
-            $tmpImagePath2 = $tmpImgFilePath . '-' . $i . '.jpg';
-            if (file_exists($tmpImagePath2)) {
-                $text .= (new thiagoalessio\TesseractOCR\TesseractOCR($tmpImagePath2))
-                    ->run();
-                unlink($tmpImagePath2);
-            }
-
+        } catch (Exception $e) {
+            var_dump($e->getMessage());
         }
 
-        unlink($tmpPdfPath);
-
-
-        $string = strip_tags($text);
-        $string = preg_replace("/&nbsp;/"," ",$string);
-
-        preg_match_all("/[0-9]{2,10}+\s+[^0-9]{0,50}(wi|ia)+\s+[0-9]{5}/is", $string, $m);
-
-        foreach ($m[0] as $address) {
-
-            var_dump($address);
-
-            $address = urlencode($address);
-            $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&key=' . $_ENV['GOOGLE_MAPS_API_KEY'];
-            $result = file_get_contents($apiUrl);
-            $result = json_decode($result, true);
-
-            var_dump($result);
-        }
+        exit;
 
     }
 

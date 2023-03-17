@@ -136,13 +136,6 @@ return [
     ['POST', '/delete-address/[a:type]/[i:addressId]', 'ScraperController#deleteAddress'],
     ['GET', '/scraper/map-view', 'ScraperController#mapView'],
 
-
-
-
-    ['GET', '/test', 'PropertyController#test'],
-
-
-
     ['POST', '/app-data/properties', 'AjaxDataController#properties'],
     ['GET', '/app-data/properties', 'AjaxDataController#properties'],
     ['POST', '/app-data/units', 'AjaxDataController#units'],

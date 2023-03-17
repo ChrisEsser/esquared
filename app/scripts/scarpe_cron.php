@@ -197,22 +197,17 @@ echo 'done';
 function recursiveCrawl($url, $currentLevel, $totalLevels, $domTarget, $filters, $client): array
 {
     try {
-//        $request = $client->request('GET', $url, [
-//            'referer' => true,
-//            'headers' => [
-//                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.70',
-//            ],
-//        ]);
-//        $html = (string)$request->getBody();
-        $html = file_get_contents($url);
-        $str = $html[0].$html[1].$html[2].$html[3].$html[4].$html[5];
-        var_dump($str);
-        return [];
+        $request = $client->request('GET', $url, [
+            'referer' => true,
+            'headers' => [
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.70',
+            ],
+        ]);
+        $html = (string)$request->getBody();
     } catch (Exception $e) {
         var_dump($e->getMessage());
         return [];
     }
-    return [];
 
     $dom = new DOMDocument();
     $dom->loadHTML($html);
