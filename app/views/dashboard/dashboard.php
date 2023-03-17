@@ -78,8 +78,16 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
     var cashflows = [];
     for (let key in monthlyBreakdown) {
         labels.push(monthlyBreakdown[key].monthShortName);
-        expenses.push(monthlyBreakdown[key].expense);
-        revenues.push(monthlyBreakdown[key].revenue);
+        if (monthlyBreakdown[key].expense == 0) {
+            expenses.push(0.01);
+        } else {
+            expenses.push(monthlyBreakdown[key].expense);
+        }
+        if (monthlyBreakdown[key].revenue == 0) {
+            revenues.push(0.01);
+        } else {
+            revenues.push(monthlyBreakdown[key].revenue);
+        }
         cashflows.push(monthlyBreakdown[key].cashflow);
     }
 
@@ -104,16 +112,11 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
             },
             dataLabels: {
                 enabled: true,
-                offsetX: -6,
+                // offsetX: -6,
                 style: {
-                    fontSize: '12px',
+                    fontSize: '7px',
                     colors: ['#fff']
                 }
-            },
-            stroke: {
-                show: true,
-                width: 1,
-                colors: ['#fff']
             },
             tooltip: {
                 shared: true,
