@@ -22,7 +22,7 @@ $unitId = $this->getVar('unitId');
 
         <div class="mb-3 col-md-6">
             <label for="name" class="form-label">Property</label>
-            <select name="property" id="property" class="form-control">
+            <select name="property_id" id="property" class="form-control">
                 <option value="">- Select -</option>
                 <?php foreach ($properties as $property) { ?>
                     <option value="<?=$property['property_id']?>" <?=($property['property_id'] == $propertyId) ? 'selected' : ''?>><?=$property['property_name']?></option>
