@@ -26,10 +26,7 @@ class UserController extends BaseController
             ? User::findOne(['user_id' => $userId])
             : new User();
 
-        $units = Unit::find();
-
         $this->view->setVar('user', $user);
-        $this->view->setVar('units', $units);
     }
 
     public function save()
@@ -69,7 +66,6 @@ class UserController extends BaseController
             $user->last_name = $_POST['last_name'];
             $user->email = $_POST['email'];
             $user->admin = $admin;
-            $user->unit_id = intval($_POST['unit_id']);
             if (!empty($_POST['password'])) {
                 $user->password = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }

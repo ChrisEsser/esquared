@@ -106,6 +106,9 @@ class RenterController extends BaseController
 
     public function rentHistory()
     {
+        HTML::downForMaintenance();
+        exit;
+
         $unit = $this->user->getUnit();
         if (!$unit) {
             HTTP::removePageFromHistory();
@@ -118,6 +121,9 @@ class RenterController extends BaseController
 
     public function payRent()
     {
+        HTML::downForMaintenance();
+        exit;
+
         HTTP::removePageFromHistory();
         $this->render_header = false;
 
@@ -145,6 +151,9 @@ class RenterController extends BaseController
 
     public function payRentProcessCard()
     {
+        HTML::downForMaintenance();
+        exit;
+
         $this->render = false;
 
         $missing = [];
@@ -222,6 +231,9 @@ class RenterController extends BaseController
 
     public function payRentProcessAch()
     {
+        HTML::downForMaintenance();
+        exit;
+
         $this->render = false;
 
         if ($this->paymentDetails['stripe_ach_verified'] != 2) {
@@ -282,6 +294,9 @@ class RenterController extends BaseController
 
     public function payRentConfirmation($params)
     {
+        HTML::downForMaintenance();
+        exit;
+
         $confNum = ($params['confirmationNumber']) ?? '';
         $payment = PaymentHistory::findOne(['confirmation_number' => $confNum]);
 
@@ -292,12 +307,18 @@ class RenterController extends BaseController
 
     public function managePayment()
     {
+        HTML::downForMaintenance();
+        exit;
+
         HTTP::removePageFromHistory();
         $this->render_header = false;
     }
 
     public function achSetupProcess()
     {
+        HTML::downForMaintenance();
+        exit;
+
         $this->render = false;
 
         $return = [

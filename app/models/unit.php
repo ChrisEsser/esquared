@@ -48,6 +48,15 @@ class Unit extends BaseModel
         self::addRelationOneToMany('unit_id', 'PaymentHistory', 'unit_id');
     }
 
+    public function getLease()
+    {
+        foreach (Lease::find(['unit_id' => $this->unit_id], ['end_date' => 'DESC'], 0, 1) as $lease) {
+            break;
+        }
+
+        return $lease;
+    }
+
     public function typeStrings()
     {
         return [

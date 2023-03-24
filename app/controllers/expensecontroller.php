@@ -23,37 +23,48 @@ class ExpenseController extends BaseController
         HTTP::removePageFromHistory();
         $this->render_header = false;
 
-        $expenseId = ($params['expenseId']) ?? '';
-        $propertyId = ($params['propertyId']) ?? '';
+        $expenseId = ($params['expenseId']) ?? 0;
+        $propertyId = ($params['propertyId']) ?? 0;
+        $unitId = ($params['propertyId']) ?? 0;
 
         $expense = ($expenseId)
             ? Expense::findOne(['expense_id' => $expenseId])
             : new Expense();
 
-        $property = ($propertyId)
-            ? Property::findOne(['property_id' => $propertyId])
-            : new Property();
+        if ($expense->expense_id) {
+            $unitId = ($expense->unit_id) ?? 0;
+            $propertyId = ($expense->property_id) ?? 0;
+        }
 
-        $properties = Property::find([], ['name' => 'ASC']);
+        if ($unitId) {
+            /** @var Unit $tmpUnit */
+            $tmpUnit = Unit::findOne(['unit_id' => $unitId]);
+            $propertyId = ($tmpUnit->property_id) ?? 0;
+        }
 
-        $tmpUnits = ($property->property_id)
-            ? $property->getUnit()
-            : Unit::find([], ['name' => 'ASC']);
+        /** @var Property[] $tmpProperties */
+        $tmpProperties = Property::find([], ['name' => 'ASC']);
 
-        // We want to group the units by property, so we can better handle the javascript on the front end
-        // for example when a property is changed I want to show a dropdown of all units for said property only
-        $units = [];
-        foreach ($tmpUnits as $tmpUnit) {
-            $units[$tmpUnit->property_id][] = [
-                'unit_id' => $tmpUnit->unit_id,
-                'name' => $tmpUnit->name,
+        $properties = [];
+        foreach ($tmpProperties as $tmpProperty) {
+            $tmp = [
+                'property_id' => $tmpProperty->property_id,
+                'property_name' => $tmpProperty->name,
+                'units' => [],
             ];
+            foreach ($tmpProperty->getUnit([], ['name' => 'ASC']) as $tmpUnit) {
+                $tmp['units'][] = [
+                    'unit_id' => $tmpUnit->unit_id,
+                    'unit_name' => $tmpUnit->name,
+                ];
+            }
+            $properties[] = $tmp;
         }
 
         $this->view->setVar('expense', $expense);
-        $this->view->setVar('units', $units);
         $this->view->setVar('properties', $properties);
-        $this->view->setVar('property', $property);
+        $this->view->setVar('propertyId', $propertyId);
+        $this->view->setVar('unitId', $unitId);
     }
 
     public function save($params)

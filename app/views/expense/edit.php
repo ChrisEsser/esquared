@@ -2,17 +2,16 @@
 
 /** @var \Expense $expense */
 $expense = $this->getVAr('expense');
-/** @var [] $units */
-$units = $this->getVAr('units');
-/** @var Property[] $properties */
-$properties = $this->getVAr('properties');
-/** @var Property $property */
-$property = $this->getVAr('property');
+$properties = $this->getVar('properties');
+$propertyId = $this->getVar('propertyId');
+$unitId = $this->getVar('unitId');
 
 ?>
 
 <script>
-    var units = <?=json_encode($units)?>;
+    var properties = <?=json_encode($properties)?>;
+    var propertyId = <?=json_encode($propertyId)?>;
+    var unitId = <?=json_encode($unitId)?>;
 </script>
 
 <form id="expenseForm">
@@ -22,18 +21,19 @@ $property = $this->getVAr('property');
     <div class="row">
 
         <div class="mb-3 col-md-6">
-            <label for="property_id" class="form-label">Property</label>
-            <select name="property_id" id="property_id" class="form-control" aria-describedby="property_idHelp">
-                <option value="0" <?=(empty($expense->property_id)) ? 'selected' : ''?>>- Select Property -</option>
-                <?php foreach ($properties as $prop) { ?>
-                    <option value="<?=$prop->property_id?>" <?=($expense->property_id === $prop->property_id || $property->property_id === $prop->property_id) ? 'selected' : ''?>><?=$prop->name?></option>
+            <label for="name" class="form-label">Property</label>
+            <select name="property" id="property" class="form-control">
+                <option value="">- Select -</option>
+                <?php foreach ($properties as $property) { ?>
+                    <option value="<?=$property['property_id']?>" <?=($property['property_id'] == $propertyId) ? 'selected' : ''?>><?=$property['property_name']?></option>
                 <?php } ?>
             </select>
         </div>
 
-        <div class="mb-3 col-md-6" id="unit_row" style="display: none">
-            <label for="unit_id" class="form-label">Unit</label>
-            <select name="unit_id" id="unit_id" class="form-control" aria-describedby="unit_idHelp"></select>
+        <div class="mb-3 col-md-6">
+            <label for="name" class="form-label">Unit</label>
+            <select name="unit_id" id="unit_id" class="form-control">
+            </select>
         </div>
 
     </div>
@@ -73,34 +73,15 @@ $property = $this->getVAr('property');
 
 <script>
 
-    function updateUnit() {
-        const property = $('#property_id').val();
-        if (drawUnitDropdown(property)) $('#unit_row').show();
-        else $('#unit_row').hide();
-    }
-    function drawUnitDropdown(property) {
-        if (!property || typeof units[property] == 'undefined') return false;
-        $('#unit_id').append($('<option>', {
-            value: 0,
-            text: ' - No Unit - '
-        }));
-        for (i = 0; i < units[property].length; i++) {
-            $('#unit_id').append($('<option>', {
-                value: units[property][i].unit_id,
-                text: units[property][i].name
-            }));
-        }
-        return true;
-    }
-
     $(document).ready(function () {
 
         $("#date").datepicker();
 
-        updateUnit();
-        $('#property_id').change(function() {
-            updateUnit();
+        $('#property').change(function() {
+            updateUnitDropdown();
         });
+
+        updateUnitDropdown();
 
         $('#button_save').click(function() {
             $.post('/save-expense', $('#expenseForm').serialize()).done(function(result) {
@@ -123,4 +104,22 @@ $property = $this->getVAr('property');
         });
 
     });
+
+    function updateUnitDropdown()
+    {
+        const property = $('#property').val();
+        let units = [];
+        for (i = 0; i < properties.length; i++) {
+            if (property == properties[i].property_id) {
+                units = properties[i].units;
+                break;
+            }
+        }
+        let html = '<option value="">- Select -</option>';
+        for (i = 0; i < units.length; i++) {
+            html += '<option value="' + units[i].unit_id + '" ' + ((unitId == units[i].unit_id) ? 'selected' : '') + '>';
+            html += units[i].unit_name + '</option>';
+        }
+        $('#unit_id').html(html);
+    }
 </script>

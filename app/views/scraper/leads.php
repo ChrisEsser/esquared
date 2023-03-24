@@ -16,7 +16,6 @@ $viewAll = $this->getVar('viewAll');
             <th>Address</th>
             <th>Judgment</th>
             <th>First Seen</th>
-            <th>Last Seen</th>
             <?=($viewAll) ? '<th>Scraper</th>' : ''?>
             <th></th>
         </tr>
@@ -86,7 +85,6 @@ $viewAll = $this->getVar('viewAll');
                 },
                 {col: 'judgment_amount', format: 'usd'},
                 {col: 'created', format: 'datetime'},
-                {col: 'last_seen', format: 'datetime'},
                 <?php if ($viewAll) { ?>
                     {col: 'url_name'},
                 <?php } ?>

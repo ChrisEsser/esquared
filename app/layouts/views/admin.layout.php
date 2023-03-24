@@ -73,6 +73,12 @@ $action = $this->getVar('action');
                                     <span>Units</span>
                                 </a>
                             </li>
+                            <li class="<?=($action == 'leases') ? 'active' : ''?>">
+                                <a href="/leases" tabindex="0">
+                                    <div><i class="fa fa-file-text-o"></i></div>
+                                    <span>leases</span>
+                                </a>
+                            </li>
                             <li class="<?=($action == 'payments') ? 'active' : ''?>">
                                 <a href="/payments" tabindex="0">
                                     <div><i class="fa fa-dollar"></i></div>

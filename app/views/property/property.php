@@ -11,6 +11,7 @@ $images = $this->getVar('images');
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
     <button role="button" class="btn btn-round btn-primary edit_trigger" data-type="property" type="button">Edit Property</button>
     <button role="button" class="btn btn-round btn-info edit_trigger" data-type="unit" type="button">Add Unit</button>
+    <button role="button" class="btn btn-round btn-info edit_trigger" data-type="lease" type="button">Add Lease</button>
     <button role="button" class="btn btn-round btn-info edit_trigger" data-type="expense" type="button">Add Expense</button>
     <button role="button" class="btn btn-round btn-info edit_trigger" data-type="document" type="button">Add Document</button>
     <button role="button" class="btn btn-round btn-info edit_trigger" data-type="note" type="button">Add Note</button>
@@ -73,6 +74,9 @@ $images = $this->getVar('images');
         <button class="nav-link active tabClick" id="units-tab" data-bs-toggle="tab" data-bs-target="#units" type="button" role="tab" aria-controls="units" aria-selected="true">Units</button>
     </li>
     <li class="nav-item" role="presentation">
+        <button class="nav-link tabClick" id="leases-tab" data-bs-toggle="tab" data-bs-target="#leases" type="button" role="tab" aria-controls="leases" aria-selected="true">Leases</button>
+    </li>
+    <li class="nav-item" role="presentation">
         <button class="nav-link tabClick" id="expenses-tab" data-bs-toggle="tab" data-bs-target="#expenses" type="button" role="tab" aria-controls="expenses" aria-selected="false">Expenses</button>
     </li>
     <li class="nav-item" role="presentation">
@@ -96,6 +100,25 @@ $images = $this->getVar('images');
                     <th>Rent</th>
                     <th></th>
                 </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
+    <div class="tab-pane fade" id="leases" role="tabpanel" aria-labelledby="leasees-tab">
+
+        <table class="e2-table" id="leaseTable">
+            <thead>
+            <tr>
+                <th>Lease</th>
+                <th>Unit</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Rent</th>
+                <th>Rent Freq</th>
+                <th></th>
+            </tr>
             </thead>
             <tbody></tbody>
         </table>
@@ -213,6 +236,34 @@ $images = $this->getVar('images');
             ]
         });
 
+        var leaseTable = new tableData('#leaseTable', {
+            url: '/app-data/leases',
+            sort: {end_date: 'DESC'},
+            columns: [
+                {col: '',
+                    template: function (data) {
+                        return '<a href="/lease/' + data.lease_id + '">view</a>';
+                    }
+                },
+                {col: 'unit_name',
+                    template: function (data) {
+                        return '<a href="/unit/' + data.unit_id + '">' + data.unit_name + '</a>';
+                    }
+                },
+                {col: 'start_date', format: 'date'},
+                {col: 'end_date', format: 'date'},
+                {col: 'rent', format: 'usd'},
+                {col: 'rent_frequency'},
+                {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
+                    template: function (data) {
+                        let html = '<button role="button" class="btn btn-outline-primary btn-sm me-md-1 edit_trigger" data-type="lease" data-lease="' + data.lease_id + '" type="button"><i class="fa fa-pencil"></i></button>';
+                        html += '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-message="Are you sure you want to delete this lease?" data-url="/delete-lease/' + data.lease_id + '" type="button"><i class="fa fa-times"></i></button>';
+                        return html;
+                    }
+                },
+            ]
+        });
+
         var expenseTable = new tableData('#expenseTable', {
             url: '/app-data/expenses',
             filter: {property_id: '<?=$property->property_id?>'},
@@ -228,7 +279,7 @@ $images = $this->getVar('images');
                 {col: 'date', format: 'date'},
                 {col: '', cellStyle: 'text-align:right;', search: false, sort: false,
                     template: function(data) {
-                        let html = '<button role="button" class="btn btn-outline-primary btn-sm me-md-1 edit_trigger" data-expense="' + data.expense_id + '" type="button"><i class="fa fa-pencil"></i></button>';
+                        let html = '<button role="button" class="btn btn-outline-primary btn-sm me-md-1 edit_trigger" data-type="expense" data-expense="' + data.expense_id + '" type="button"><i class="fa fa-pencil"></i></button>';
                         html += '<button role="button" class="btn btn-outline-danger btn-sm me-md-1 confirm_trigger" data-expense="' + data.expense_id + '" data-message="Are you sure you want to delete this expense?" data-url="/delete-expnse/' + data.expense_id + '" type="button"><i class="fa fa-times"></i></button>';
                         return html;
                     }
@@ -281,6 +332,7 @@ $images = $this->getVar('images');
 
             let type = $(this).data('type');
             let unit = $(this).data('unit');
+            let lease = $(this).data('lease');
             let note = $(this).data('note');
             let payment = $(this).data('payment');
             let expense = $(this).data('expense');
@@ -291,12 +343,14 @@ $images = $this->getVar('images');
             else if (type == 'document') url = '/property/<?=$property->property_id?>/add-document';
             else if (type == 'unit' && typeof unit != 'undefined') url += '/' + unit;
             else if (type == 'unit' && typeof unit == 'undefined') url = '/add-unit/<?=$property->property_id?>';
+            else if (type == 'lease' && typeof lease != 'undefined') url += '/' + lease;
+            else if (type == 'lease' && typeof lease == 'undefined') url = '/add-lease/<?=$property->property_id?>';
             else if (type == 'note' && typeof note != 'undefined') url += '/' + note;
             else if (type == 'note' && typeof note == 'undefined') url = '/create-note/<?=$property->property_id?>';
             else if (type == 'payment' && typeof payment == 'undefined') url = '/add-payment/<?=$property->property_id?>';
-            else if (type == 'payment' && typeof payment != 'undefined') url = '/edit-payment/' + payment;
+            else if (type == 'payment' && typeof payment != 'undefined') url = '/' + payment;
             else if (type == 'expense' && typeof expense == 'undefined') url = '/add-expense/<?=$property->property_id?>';
-            else if (type == 'expense' && typeof expense != 'undefined') url = '/edit-expense/' + payment;
+            else if (type == 'expense' && typeof expense != 'undefined') url += '/' + expense;
             else {
                 alert('Invalid Request');
                 return;

@@ -60,6 +60,17 @@ return [
     ['POST', '/delete-unit/[i:unitId]', 'UnitController#delete'],
 	['POST', '/save-unit', 'UnitController#save'],
 
+    ['GET', '/leases', 'LeaseController#leases'],
+    ['GET', '/leases/[i:propertyId]', 'LeaseController#leases'],
+    ['GET', '/leases/[i:propertyId]/[i:unitId]', 'LeaseController#leases'],
+    ['GET', '/lease/[i:leaseId]', 'LeaseController#lease'],
+    ['GET', '/edit-lease/[i:leaseId]', 'LeaseController#edit'],
+    ['GET', '/add-lease', 'LeaseController#edit'],
+    ['GET', '/add-lease/[i:propertyId]/[i:unitId]', 'LeaseController#edit'],
+    ['GET', '/add-lease/[i:propertyId]', 'LeaseController#edit'],
+    ['POST', '/save-lease', 'LeaseController#save'],
+    ['POST', '/delete-lease/[i:leaseId]', 'LeaseController#delete'],
+
     ['GET', '/payments', 'PaymentController#payments'],
     ['GET', '/payments/[i:propertyId]/[i:unitId]', 'PaymentController#payments'],
     ['GET', '/payments/[i:propertyId]', 'PaymentController#payments'],
@@ -137,8 +148,8 @@ return [
     ['GET', '/scraper/map-view', 'ScraperController#mapView'],
 
     ['POST', '/app-data/properties', 'AjaxDataController#properties'],
-    ['GET', '/app-data/properties', 'AjaxDataController#properties'],
     ['POST', '/app-data/units', 'AjaxDataController#units'],
+    ['POST', '/app-data/leases', 'AjaxDataController#leases'],
     ['POST', '/app-data/documents', 'AjaxDataController#documents'],
     ['POST', '/app-data/notes', 'AjaxDataController#notes'],
     ['POST', '/app-data/users', 'AjaxDataController#users'],
@@ -146,7 +157,6 @@ return [
     ['POST', '/app-data/scraper/leads', 'AjaxDataController#scraperLeads'],
     ['POST', '/app-data/payments', 'AjaxDataController#payments'],
     ['POST', '/app-data/expenses', 'AjaxDataController#expenses'],
-    ['GET', '/app-data/expenses', 'AjaxDataController#expenses'],
     ['POST', '/app-data/scraper/quarantine-addresses', 'AjaxDataController#quarantineAddresses'],
 
 ];

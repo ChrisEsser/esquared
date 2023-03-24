@@ -2,8 +2,6 @@
 
 /** @var \User $user */
 $user = $this->getVar('user');
-/** @var \Unit[] $units */
-$units = $this->getVar('units');
 
 ?>
 
@@ -57,20 +55,6 @@ $units = $this->getVar('units');
         </div>
 
     </div>
-
-    <?php if (count($units)) { ?>
-
-        <div class="mb-3">
-            <label for="unit_id" class="form-label">Rental Unit</label>
-            <select name="unit_id" id="unit_id" class="form-control" aria-describedby="unit_idHelp">
-                <option value="0">- No Unit -</option>
-                <?php foreach ($units as $unit) { ?>
-                    <option value="<?=$unit->unit_id?>" <?=($user->unit_id == $unit->unit_id) ? 'selected' : ''?>><?=$unit->name?></option>
-                <?php } ?>
-            </select>
-        </div>
-
-    <?php } ?>
 
     <div class="mb-3">
         <input type="checkbox" name="admin" id="admin" value="1" <?=($user->admin) ? ' checked' : ''?> />&nbsp;

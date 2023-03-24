@@ -5,7 +5,6 @@
  *
  * MAGIC METHODS
  * @method \Document[] getDocument()
- * @method \Unit getUnit()
  * @method \PaymentHistory[] getPayment()
  */
 class User extends BaseModel
@@ -16,7 +15,6 @@ class User extends BaseModel
     public $first_name;
     public $last_name;
     public $admin;
-    public $unit_id;
     public $payment_details;
     public $created;
     public $updated;
@@ -34,7 +32,6 @@ class User extends BaseModel
         'first_name',
         'last_name',
         'admin',
-        'unit_id',
         'payment_details',
         'created',
         'updated',
@@ -44,7 +41,6 @@ class User extends BaseModel
     protected static function defineRelations()
     {
         self::addRelationOneToMany('user_id', 'Document', 'user_id');
-        self::addRelationOneToOne('unit_id', 'Unit', 'unit_id');
         self::addRelationOneToMany('user_id', 'PaymentHistory', 'user_id', 'Payment');
     }
 

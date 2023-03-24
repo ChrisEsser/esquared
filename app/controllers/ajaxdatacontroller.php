@@ -143,6 +143,90 @@ class AjaxDataController extends BaseController
         ]);
     }
 
+    public function leases()
+    {
+        $where = $order = [];
+
+        $db = new StandardQuery();
+
+        $sql = 'SELECT l.*, u.name AS unit_name, u.property_id, p.name AS property_name
+                FROM leases l
+                INNER JOIN units u ON u.unit_id = l.unit_id
+                INNER JOIN properties p ON p.property_id = u.property_id';
+
+//        $where['deleted'] = 'l.deleted = 0';
+
+        $params = [];
+        foreach ($this->filters as $filter) {
+            foreach ($filter as $col => $value) {
+                if (in_array($col, ['rent'])) {
+                    $where[$col] = 'l.' . $col . ' LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'rent_frequency') {
+                    $in = [];
+                    foreach ((new Unit())->statusStrings() as $code => $statusString) {
+                        if (stripos($statusString, $value) !== false) $in[] = $code;
+                    }
+                    $where[$col] = 'u.status IN (' . implode(', ', $in) . ') ';
+                } else if ($col == 'property_name') {
+                    $where[$col] = 'p.name LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'property_id') {
+                    $where[$col] = 'u.' . $col . ' = :' . $col;
+                    $params[$col] = $value;
+                } else if ($col == 'unit_name') {
+                    $where[$col] = 'u.name LIKE :' . $col;
+                    $params[$col] = '%' . $value . '%';
+                } else if ($col == 'unit_id') {
+                    $where[$col] = 'l.' . $col . ' = :' . $col;
+                    $params[$col] = $value;
+                }
+            }
+        }
+
+        foreach ($this->sort as $sort) {
+            foreach ($sort as $col => $dir) {
+                if (in_array($col, ['rent', 'rent_frequency'])) {
+                    $order[$col] = $col . ' ' . $dir;
+                } else if ($col == 'property_name') {
+                    $order[$col] = 'p.name ' . $dir;
+                } else if ($col == 'unit_name') {
+                    $order[$col] = 'u.name ' . $dir;
+                }
+            }
+        }
+
+        $whereString = (!empty($where)) ? ' WHERE ' . implode(' AND ', $where) : '';
+        $sql .= ' ' . $whereString;
+
+        $total = $db->count($sql, $params);
+        $totalPages = ceil($total / $this->pageLength);
+
+        $orderString = (!empty($order)) ? ' ORDER BY ' . implode(', ', $order) : '';
+        $sql .= ' ' . $orderString;
+
+        $sql .= ' LIMIT ' . $this->offset . ', ' . $this->pageLength;
+
+        $data = $db->rows($sql, $params);
+
+        $baseFilePath = ROOT . DS . 'app' . DS . 'files' . DS . 'leases';
+        foreach ($data as $key => $row) {
+            $doc = '';
+            foreach (glob($baseFilePath . DS . $row->lease_id . DS . '*.*') as $file) {
+                $doc = basename($file);
+                break;
+            }
+            $data[$key]->document = $doc;
+        }
+
+        echo json_encode([
+            'total' => $total,
+            'pages' => $totalPages,
+            'page' => $this->page,
+            'data' => $data,
+        ]);
+    }
+
     public function documents()
     {
         $where = $order = [];
@@ -285,7 +369,9 @@ class AjaxDataController extends BaseController
                           WHEN ISNULL(un.name) = 0 THEN CONCAT(p.name, \' | \', un.name) 
                           ELSE \'\' END AS unit
                 FROM users u
-                LEFT JOIN units un ON un.unit_id = u.unit_id
+                LEFT JOIN user_leases ul ON ul.user_id = u.user_id
+                LEFT JOIN leases l ON l.lease_id = ul.lease_id
+                LEFT JOIN units un ON un.unit_id = l.unit_id
                 LEFT JOIN properties p ON p.property_id = un.property_id';
 
         $where['deleted'] = 'u.deleted = 0';
@@ -296,11 +382,17 @@ class AjaxDataController extends BaseController
                 if (in_array($col, ['first_name', 'last_name', 'email', 'admin'])) {
                     $where[$col] = 'u.' . $col . ' LIKE :' . $col;
                     $params[$col] = '%' . $value . '%';
+                } else if ($col == 'full_name') {
+                    $where[$col] = '(u.first_name LIKE :' . $col . ' OR u.last_name LIKE :' . $col . ' OR CONCAT(u.first_name, \' \', u.last_name) LIKE :' . $col . ')';
+                    $params[$col] = '%' . $value . '%';
                 } else if ($col == 'unit') {
                     $where[$col] = 'un.name LIKE :' . $col;
                     $params[$col] = '%' . $value . '%';
                 } else if ($col == 'unit_id') {
-                    $where[$col] = 'un.' . $col . ' = :' . $col;
+                    $where[$col] = 'un.unit_id = :' . $col;
+                    $params[$col] = $value;
+                } else if ($col == 'lease_id') {
+                    $where[$col] = 'l.lease_id = :' . $col;
                     $params[$col] = $value;
                 }
             }
@@ -487,7 +579,8 @@ class AjaxDataController extends BaseController
                        IFNULL(un.unit_id, 0) AS unit_id
                 FROM payment_history p
                 INNER JOIN users u ON u.user_id = p.user_id
-                LEFT JOIN units un ON un.unit_id = p.unit_id
+                LEFT JOIN leases l ON l.lease_id = p.lease_id
+                LEFT JOIN units un ON un.unit_id = l.unit_id
                 LEFT JOIN properties pr ON pr.property_id = un.property_id ';
 
         $params = [];
@@ -502,6 +595,12 @@ class AjaxDataController extends BaseController
                 } else if ($col == 'unit_name') {
                     $where[$col] = '(un.name LIKE :' . $col . ' OR pr.name LIKE :' . $col . ' )';
                     $params[$col] = '%' . $value . '%';
+                } else if ($col == 'lease_id') {
+                    $where[$col] = 'p.lease_id = :' . $col;
+                    $params[$col] = $value;
+                } else if ($col == 'unit_id') {
+                    $where[$col] = 'l.unit_id = :' . $col;
+                    $params[$col] = $value;
                 }
             }
         }

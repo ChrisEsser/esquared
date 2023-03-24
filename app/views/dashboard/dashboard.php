@@ -23,6 +23,13 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
     .dashboard_total_cashflow {
         background-color: #4aa0fc;
     }
+    a.card-body {
+        text-decoration: none;
+    }
+    a.card-body:hover {
+        text-decoration: none;
+        opacity: 0.7;
+    }
 </style>
 
 <script>
@@ -37,19 +44,19 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
 
     <div class="col-md-4 mb-3">
         <div class="card dashboard_total dashboard_total_revenue">
-            <div class="card-body">
+            <a href="/payments" class="card-body">
                 <h5 class="card-title">$<?=number_format($totals['total_revenue'], 2)?></h5>
                 <h6 class="card-subtitle mb-0 text-muted">Total Revenue</h6>
-            </div>
+            </a>
         </div>
     </div>
 
     <div class="col-md-4 mb-3">
         <div class="card dashboard_total dashboard_total_expenses">
-            <div class="card-body">
+            <a href="/expenses" class="card-body">
                 <h5 class="card-title">$<?=number_format($totals['total_expenses'], 2)?></h5>
                 <h6 class="card-subtitle mb-0 text-muted">Total Expenses</h6>
-            </div>
+            </a>
         </div>
     </div>
 
@@ -149,59 +156,5 @@ $monthlyBreakdown = $this->getVar('monthlyBreakdown');
         }
     );
     chart.render();
-
-
-    //
-    // new Chart(document.getElementById('cashFlowMonthChart'), {
-    //     type: 'bar',
-    //     data: {
-    //         labels: labels,
-    //         datasets: [
-    //             {
-    //                 label: 'Expenses',
-    //                 data: expenses,
-    //                 borderWidth: 1,
-    //                 minBarLength: 1
-    //             },
-    //             {
-    //                 label: 'Income',
-    //                 data: revenues,
-    //                 borderWidth: 1,
-    //                 minBarLength: 1
-    //             },
-    //             {
-    //                 label: 'Cash Flow',
-    //                 data: cashflows,
-    //                 borderWidth: 1,
-    //                 minBarLength: 1
-    //             }
-    //         ]
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         plugins: {
-    //             legend: {
-    //                 position: 'top',
-    //             },
-    //             title: {
-    //                 display: true,
-    //                 text: 'Last 6 Months'
-    //             }
-    //         },
-    //         scales: {
-    //             x: {
-    //                 grid: {
-    //                     display: false
-    //                 }
-    //             },
-    //             y: {
-    //                 beginAtZero: true,
-    //                 grid: {
-    //                     display: false
-    //                 }
-    //             }
-    //         }
-    //     }
-    // });
 
 </script>

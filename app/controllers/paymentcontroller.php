@@ -23,23 +23,47 @@ class PaymentController extends BaseController
         HTTP::removePageFromHistory();
         $this->render_header = false;
 
-        $paymentId = ($params['paymentId']) ?? '';
-        $propertyId = ($params['propertyId']) ?? '';
+        $paymentId = ($params['paymentId']) ?? 0;
+        $propertyId = ($params['propertyId']) ?? 0;
 
         $payment = ($paymentId)
             ? PaymentHistory::findOne(['payment_id' => $paymentId])
             : new PaymentHistory();
 
-        $property = ($propertyId)
-            ? Property::findOne(['property_id' => $propertyId])
-            : new Property();
+        $unitId = 0;
+        if ($payment->payment_id) {
+            $unitId = ($payment->unit_id) ?? 0;
+        }
 
-        $units = ($property->property_id)
-            ? $property->getUnit()
-            : Unit::find([], ['name' => 'ASC']);
+        if ($unitId) {
+            /** @var Unit $tmpUnit */
+            $tmpUnit = Unit::findOne(['unit_id' => $unitId]);
+            $propertyId = ($tmpUnit->property_id) ?? 0;
+        }
+
+        /** @var Property[] $tmpProperties */
+        $tmpProperties = Property::find([], ['name' => 'ASC']);
+
+        $properties = [];
+        foreach ($tmpProperties as $tmpProperty) {
+            $tmp = [
+                'property_id' => $tmpProperty->property_id,
+                'property_name' => $tmpProperty->name,
+                'units' => [],
+            ];
+            foreach ($tmpProperty->getUnit([], ['name' => 'ASC']) as $tmpUnit) {
+                $tmp['units'][] = [
+                    'unit_id' => $tmpUnit->unit_id,
+                    'unit_name' => $tmpUnit->name,
+                ];
+            }
+            $properties[] = $tmp;
+        }
 
         $this->view->setVar('payment', $payment);
-        $this->view->setVar('units', $units);
+        $this->view->setVar('properties', $properties);
+        $this->view->setVar('propertyId', $propertyId);
+        $this->view->setVar('unitId', $unitId);
     }
 
     public function save($params)
@@ -68,8 +92,19 @@ class PaymentController extends BaseController
                 throw new Exception('Required fields were missing');
             }
 
+            if (!$payment->unit_id) {
 
-            if (!$payment->unit_id) $payment->unit_id = intval($_POST['unit_id']);
+                $unitId = intval($_POST['unit_id']);
+
+                // need to get the most current lease for this unit
+                $unit = Unit::findOne(['unit_id' => $unitId]);
+                $lease = $unit->getLease();
+                $leaseId = ($lease->lease_id) ?? 0;
+
+                $payment->unit_id = $unitId;
+                $payment->lease_id = $leaseId;
+            }
+
             $payment->method = $_POST['method'];
             $payment->type = $_POST['type'];
             $payment->payment_date = gmdate('Y-m-d H:i:s', strtotime($_POST['payment_date']));
