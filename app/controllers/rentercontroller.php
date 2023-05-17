@@ -8,6 +8,8 @@ class RenterController extends BaseController
     /** @var \User */
     private $user;
     private $paymentDetails;
+    /** @var Lease $lease */
+    protected $lease;
 
     public function beforeAction()
     {
@@ -15,6 +17,7 @@ class RenterController extends BaseController
 
         /** @var User $user */
         $user = User::findOne(['user_id' => Auth::loggedInUser()]);
+//        $user = User::findOne(['user_id' => 10]);
         if (!$user) {
             HTML::addAlert('Invalid User', 'danger');
             HTTP::redirect('/login');
@@ -27,8 +30,15 @@ class RenterController extends BaseController
 
         $this->paymentDetails = $paymentDetails;
 
+        $tmps = $this->user->getLease([], ['end_date' => 'desc']);
+        foreach ($tmps as $tmp) {
+           $this->lease = $tmp;
+        }
+        if (empty($this->lease)) $this->lease = new Lease();
+
         $this->view->setVar('user', $user);
         $this->view->setVar('paymentDetails', $paymentDetails);
+        $this->view->setVar('lease', $this->lease);
     }
 
     public function account()
@@ -106,10 +116,8 @@ class RenterController extends BaseController
 
     public function rentHistory()
     {
-        HTML::downForMaintenance();
-        exit;
+        $unit = $this->lease->getUnit();
 
-        $unit = $this->user->getUnit();
         if (!$unit) {
             HTTP::removePageFromHistory();
             HTML::addAlert('There are no rental units associated with your account.');
@@ -121,13 +129,10 @@ class RenterController extends BaseController
 
     public function payRent()
     {
-        HTML::downForMaintenance();
-        exit;
-
         HTTP::removePageFromHistory();
         $this->render_header = false;
 
-        $rent = $this->user->getUnit()->rent;
+        $rent = $this->lease->rent;
         $rent = number_format($rent, 2) * 100;
 
         $achFee = round(min($rent * 0.008, 500));
@@ -136,7 +141,7 @@ class RenterController extends BaseController
         $cardTotal = round($rent / (1 - 0.029));
         $cardFee = $cardTotal - $rent;
 
-        $rent =  $this->user->getUnit()->rent;
+        $rent =  $this->lease->rent;
         $achTotal = $achTotal/100;
         $cardTotal = $cardTotal/100;
         $cardFee = $cardFee/100;
@@ -151,9 +156,6 @@ class RenterController extends BaseController
 
     public function payRentProcessCard()
     {
-        HTML::downForMaintenance();
-        exit;
-
         $this->render = false;
 
         $missing = [];
@@ -167,7 +169,7 @@ class RenterController extends BaseController
         }
 
         // rent amount
-        $rent = $this->user->getUnit()->rent;
+        $rent = $this->lease->rent;
         $rent = number_format($rent, 2) * 100;
 
         $total = round($rent / (1 - 0.029));
@@ -196,8 +198,9 @@ class RenterController extends BaseController
 
         $payment = new PaymentHistory();
         $payment->user_id = $this->user->user_id;
-        $payment->unit_id = $this->user->getUnit()->unit_id;
-        $payment->amount = $this->user->getUnit()->rent;
+        $payment->unit_id = $this->lease->unit_id;
+        $payment->lease_id = $this->lease->lease_id;
+        $payment->amount = $this->lease->rent;
         $payment->fee = $fee / 100;
         $payment->method = 'Credit Card';
         $payment->type = 'Rent';
@@ -231,9 +234,6 @@ class RenterController extends BaseController
 
     public function payRentProcessAch()
     {
-        HTML::downForMaintenance();
-        exit;
-
         $this->render = false;
 
         if ($this->paymentDetails['stripe_ach_verified'] != 2) {
@@ -241,9 +241,7 @@ class RenterController extends BaseController
             HTTP::rewindQuick();
         }
 
-        $stripe = new \Stripe\StripeClient($_ENV['STRIPE_SECRET']);
-
-        $rent = $this->user->getUnit()->rent;
+        $rent = $this->lease->rent;
         $rent = number_format($rent, 2) * 100;
 
         $fee = round(min($rent * 0.008, 500));
@@ -271,8 +269,9 @@ class RenterController extends BaseController
 
         $payment = new PaymentHistory();
         $payment->user_id = $this->user->user_id;
-        $payment->unit_id = $this->user->getUnit()->unit_id;
-        $payment->amount = $this->user->getUnit()->rent;
+        $payment->unit_id = $this->lease->unit_id;
+        $payment->lease_id = $this->lease->lease_id;
+        $payment->amount = $this->lease->rent;
         $payment->fee = $fee / 100;
         $payment->method = 'ACH Transfer';
         $payment->type = 'Rent';
@@ -294,9 +293,6 @@ class RenterController extends BaseController
 
     public function payRentConfirmation($params)
     {
-        HTML::downForMaintenance();
-        exit;
-
         $confNum = ($params['confirmationNumber']) ?? '';
         $payment = PaymentHistory::findOne(['confirmation_number' => $confNum]);
 
@@ -307,18 +303,12 @@ class RenterController extends BaseController
 
     public function managePayment()
     {
-        HTML::downForMaintenance();
-        exit;
-
         HTTP::removePageFromHistory();
         $this->render_header = false;
     }
 
     public function achSetupProcess()
     {
-        HTML::downForMaintenance();
-        exit;
-
         $this->render = false;
 
         $return = [
@@ -451,7 +441,7 @@ class RenterController extends BaseController
 
         $html = '<h2 style="' . $hStyle . '">Payment Notification</h2>';
         $html .= '<p style="' . $pStyle . '">A payment was received from ' . $this->user->first_name . ' ' . $this->user->last_name . ' via ' . $type . '</p>';
-        $html .= '<p style="' . $pStyle . '"><strong>$' . number_format($total/100, 2) . '</strong> - <a href="' . $_ENV['BASE_PATH'] . '/property/' . $this->user->getUnit()->getProperty()->property_id . '">' . $this->user->getUnit()->getProperty()->name . ' | ' . $this->user->getUnit()->name . '</a></p>';
+        $html .= '<p style="' . $pStyle . '"><strong>$' . number_format($total/100, 2) . '</strong> - <a href="' . $_ENV['BASE_PATH'] . '/property/' . $this->lease->getUnit()->getProperty()->property_id . '">' . $this->lease->getUnit()->getProperty()->name . ' | ' . $this->lease->getUnit()->name . '</a></p>';
         $mailer->html = $html;
         return $mailer->send();
     }

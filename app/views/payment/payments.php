@@ -31,12 +31,12 @@
             url: '/app-data/payments',
             sort: {payment_date: 'DESC'},
             columns: [
-                {col: 'unit_name',
+                {col: '',
                     template: function (data) {
                         return '<a href="/unit/' + data.unit_id + '">' + data.unit_name + ' | ' + data.property_name + '</a>';
                     }
                 },
-                {col: 'payment_date', format: 'datetime'},
+                {col: 'payment_date', format: 'date'},
                 {col: 'payment_by'},
                 {col: 'amount', format: 'usd'},
                 {col: 'method'},

@@ -43,7 +43,7 @@ $leadId = $this->getVar('leadId');
 
 </form>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=<?=$_ENV['GOOGLE_MAPS_API_KEY']?>&callback=initAutocomplete&libraries=places&v=weekly" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?=$_ENV['GOOGLE_MAPS_CLIENT_KEY']?>&callback=initAutocomplete&libraries=places&v=weekly" defer></script>
 
 <script>
 

@@ -122,8 +122,8 @@ $unit = $this->getVar('unit');
             filter: {unit_id: '<?=$unit->unit_id?>'},
             sort: {end_date: 'DESC'},
             columns: [
-                {col: 'payment_date', format: 'datetime'},
                 {col: 'payment_by'},
+                {col: 'payment_date', format: 'date'},
                 {col: 'amount', format: 'usd'},
                 {col: 'method'},
                 {col: 'type'},

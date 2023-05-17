@@ -575,8 +575,7 @@ class AjaxDataController extends BaseController
         $db = new StandardQuery();
 
         $sql = 'SELECT p.*, CONCAT(u.first_name, " ", u.last_name) AS payment_by, 
-                       IFNULL(un.name, "") AS unit_name, IFNULL(pr.name, "") AS property_name,
-                       IFNULL(un.unit_id, 0) AS unit_id
+                       IFNULL(un.name, "") AS unit_name, IFNULL(pr.name, "") AS property_name
                 FROM payment_history p
                 INNER JOIN users u ON u.user_id = p.user_id
                 LEFT JOIN leases l ON l.lease_id = p.lease_id

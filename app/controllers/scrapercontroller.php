@@ -276,7 +276,7 @@ class ScraperController extends BaseController
 
             $addressString = $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['state'];
             $addressString = urlencode($addressString);
-            $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $addressString . '&key=' . $_ENV['GOOGLE_MAPS_API_KEY'];
+            $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $addressString . '&key=' . $_ENV['GOOGLE_MAPS_SERVER_KEY'];
             $resp_json = @file_get_contents($url);
             $resp = json_decode($resp_json, true);
 

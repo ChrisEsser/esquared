@@ -6,12 +6,14 @@
  * MAGIC METHODS
  * @method User getUser()
  * @method Unit getUnit()
+ * @method Lease getLease()
  */
 class PaymentHistory extends BaseModel
 {
     public $payment_id;
     public $user_id;
     public $unit_id;
+    public $lease_id;
     public $amount;
     public $payment_date;
     public $method;
@@ -30,6 +32,7 @@ class PaymentHistory extends BaseModel
     protected static $_tableFields = [
         'user_id',
         'unit_id',
+        'lease_id',
         'amount',
         'payment_date',
         'method',
@@ -44,6 +47,7 @@ class PaymentHistory extends BaseModel
     {
         self::addRelationOneToOne('user_id', 'User', 'user_id');
         self::addRelationOneToOne('unit_id', 'Unit', 'unit_id');
+        self::addRelationOneToOne('lease_id', 'Lease', 'lease_id');
     }
 
 }

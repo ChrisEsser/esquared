@@ -97,12 +97,12 @@ class PaymentController extends BaseController
                 $unitId = intval($_POST['unit_id']);
 
                 // need to get the most current lease for this unit
+                /** @var Unit $unit */
                 $unit = Unit::findOne(['unit_id' => $unitId]);
-                $lease = $unit->getLease();
-                $leaseId = ($lease->lease_id) ?? 0;
+                $lease = $unit->getActiveLease();
 
                 $payment->unit_id = $unitId;
-                $payment->lease_id = $leaseId;
+                $payment->lease_id = ($lease->lease_id) ?? 0;
             }
 
             $payment->method = $_POST['method'];
@@ -126,7 +126,8 @@ class PaymentController extends BaseController
         echo json_encode($return);
     }
 
-    public function delete($params) {
+    public function delete($params)
+    {
 
         $this->render = false;
 

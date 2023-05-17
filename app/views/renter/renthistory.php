@@ -4,11 +4,13 @@
 $user = $this->getVar('user');
 /** @var Unit $unit */
 $unit = $this->getVar('unit');
+/** @var Lease $lease */
+$lease = $this->getVar('lease');
 $paymentDetails = $this->getVar('paymentDetails');
 
 ?>
 
-<h1 class="page_header">My Rent <small>- <?=$user->getUnit()->name?></small></h1>
+<h1 class="page_header">My Rent <small>- <?=$unit->name?></small></h1>
 
 <div class="alert alert-info" role="alert">
     <h4 class="alert-heading">Hey There<?=($user->first_name) ? ', ' . ucwords($user->first_name) : ''?>!</h4>
@@ -34,7 +36,7 @@ $paymentDetails = $this->getVar('paymentDetails');
 <h5>Your payment history</h5>
 <p>Please note, when paying by check it might take a few days for this section to update.</p>
 
-<?php if (count($unit->getPaymentHistory())) { ?>
+<?php if (count($lease->getPaymentHistory())) { ?>
 
     <table class="e2-table">
         <thead>
@@ -48,7 +50,7 @@ $paymentDetails = $this->getVar('paymentDetails');
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($unit->getPaymentHistory() as $payment) { ?>
+            <?php foreach ($lease->getPaymentHistory() as $payment) { ?>
                 <tr>
                     <td>
                         <?php if ($payment->confirmation_number) { ?>

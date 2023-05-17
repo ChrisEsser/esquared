@@ -6,6 +6,7 @@
  * MAGIC METHODS
  * @method \Document[] getDocument()
  * @method \PaymentHistory[] getPayment()
+ * @method \Lease[] getLease()
  */
 class User extends BaseModel
 {
@@ -42,6 +43,7 @@ class User extends BaseModel
     {
         self::addRelationOneToMany('user_id', 'Document', 'user_id');
         self::addRelationOneToMany('user_id', 'PaymentHistory', 'user_id', 'Payment');
+        self::addRelationManyToMany('user_id', 'Lease', 'lease_id', 'user_leases');
     }
 
 }

@@ -7,11 +7,13 @@
  * @method \Property getProperty()
  * @method \User[] getRenter()
  * @method \PaymentHistory[] getPaymentHistory()
+ * @method \Lease getActiveLease()
  */
 class Unit extends BaseModel
 {
     public $unit_id;
     public $property_id;
+    public $active_lease_id;
     public $name;
     public $type;
     public $description;
@@ -30,6 +32,7 @@ class Unit extends BaseModel
 
     protected static $_tableFields = [
         'property_id',
+        'active_lease_id',
         'name',
         'type',
         'description',
@@ -46,15 +49,7 @@ class Unit extends BaseModel
         self::addRelationOneToOne('property_id', 'Property', 'property_id');
         self::addRelationOneToMany('unit_id', 'User', 'unit_id', 'Renter');
         self::addRelationOneToMany('unit_id', 'PaymentHistory', 'unit_id');
-    }
-
-    public function getLease()
-    {
-        foreach (Lease::find(['unit_id' => $this->unit_id], ['end_date' => 'DESC'], 0, 1) as $lease) {
-            break;
-        }
-
-        return $lease;
+        self::addRelationOneToOne('active_lease_id', 'Lease', 'lease_id', [], 'ActiveLease');
     }
 
     public function typeStrings()

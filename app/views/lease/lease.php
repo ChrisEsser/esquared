@@ -127,7 +127,7 @@ $lease = $this->getVar('lease');
             filter: {lease_id: '<?=$lease->lease_id?>'},
             sort: {end_date: 'DESC'},
             columns: [
-                {col: 'payment_date', format: 'datetime'},
+                {col: 'payment_date', format: 'date'},
                 {col: 'payment_by'},
                 {col: 'amount', format: 'usd'},
                 {col: 'method'},

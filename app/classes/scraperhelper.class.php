@@ -44,7 +44,7 @@ class ScraperHelper
 
                 // call google maps to get the address information
                 $address = urlencode($address);
-                $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&key=' . $_ENV['GOOGLE_MAPS_API_KEY'];
+                $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&key=' . $_ENV['GOOGLE_MAPS_SERVER_KEY'];
                 $result = file_get_contents($apiUrl);
                 $result = json_decode($result, true);
 

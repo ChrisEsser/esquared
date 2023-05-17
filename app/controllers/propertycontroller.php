@@ -294,29 +294,57 @@ class PropertyController extends BaseController
     {
         $this->render = false;
 
-        ini_set("xdebug.var_display_max_children", '-1');
-        ini_set("xdebug.var_display_max_data", '-1');
-        ini_set("xdebug.var_display_max_depth", '-1');
+        $string = '13 S main Street, Lancaster, Wi';
 
-        $client = new GuzzleHttp\Client();
+        $pattern = '/(?<street>[A-Z]?\d+[\w\s,.-]+?) # street number and name
+               [\s,.-]+
+               (?<city>[a-z][\w\s]+?) # city
+               [\s,.-]+
+               (?<state>[A-Z]{2}) # state abbreviation
+               [\s,.-]*\b
+               (?<zip>\d{5}(?:-\d{4})?)?/x';
 
-        $url = 'http://www.co.grant.wi.gov/section.asp?linkid=2544&locid=147';
+        preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
 
-        try {
+        $fullAddresses = [];
 
-            $request = $client->request('GET', $url, [
-                'referer' => true,
-                'headers' => [
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.70',
-                ],
-            ]);
-            $html = (string)$request->getBody();
+        foreach ($matches as $match) {
 
-            echo $html;
+            $fullAddress = '241 N. McKinley st, Lancaster, WI';
 
-        } catch (Exception $e) {
-            var_dump($e->getMessage());
+            if (!empty($match['street'])) {
+                $fullAddress .= $match['street'];
+            }
+
+            if (!empty($match['city'])) {
+                if (!empty($fullAddress)) {
+                    $fullAddress .= ', ';
+                }
+                $fullAddress .= $match['city'];
+            }
+
+            if (!empty($match['state'])) {
+                if (!empty($fullAddress)) {
+                    $fullAddress .= ' ';
+                }
+                $fullAddress .= $match['state'];
+            }
+
+            if (!empty($match['zip'])) {
+                if (!empty($fullAddress)) {
+                    $fullAddress .= ' ';
+                }
+                $fullAddress .= $match['zip'];
+            }
+
+            $fullAddresses[] = $fullAddress;
         }
+
+        echo '<pre>';
+        var_dump($matches);
+        var_dump($fullAddresses);
+
+
 
         exit;
 

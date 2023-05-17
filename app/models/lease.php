@@ -5,6 +5,7 @@
  *
  * MAGIC METHODS
  * @method \Unit getUnit()
+ * @method \PaymentHistory getPaymentHistory()
  */
 class Lease extends BaseModel
 {
@@ -32,6 +33,7 @@ class Lease extends BaseModel
     protected static function defineRelations()
     {
         self::addRelationOneToOne('unit_id', 'Unit', 'unit_id');
+        self::addRelationOneToMany('lease_id', 'PaymentHistory', 'lease_id');
     }
 
     public function rentFrequencyStrings()

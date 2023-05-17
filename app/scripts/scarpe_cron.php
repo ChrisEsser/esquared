@@ -430,7 +430,6 @@ function pullAddressesFromString($string)
     $string = strip_tags($string);
     $string = preg_replace("/&nbsp;/"," ",$string);
 
-//    $tmpMatches = [];
     preg_match_all("/[0-9]{2,10}+\s+[^0-9]{0,50}(wi|ia)+\s+[0-9]{5}/is", $string, $matches);
 
 //    foreach ($tmpMatches[0] as $tmpMatch) {
@@ -442,6 +441,7 @@ function pullAddressesFromString($string)
 //    }
 
     return (!empty($matches[0])) ? $matches[0] : [];
+
 }
 
 /**
@@ -511,7 +511,7 @@ function googleGeoAndParse($address)
 
     // call google maps to get the address information
     $address = urlencode($address);
-    $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&key=' . $_ENV['GOOGLE_MAPS_API_KEY'];
+    $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $address . '&key=' . $_ENV['GOOGLE_MAPS_SERVER_KEY'];
     $result = file_get_contents($apiUrl);
     $result = json_decode($result, true);
 
