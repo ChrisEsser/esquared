@@ -88,6 +88,7 @@ class AjaxDataController extends BaseController
                 FROM units u
                 INNER JOIN properties p ON p.property_id = u.property_id';
 
+        $where['p_deleted'] = 'p.deleted = 0';
         $where['deleted'] = 'u.deleted = 0';
 
         $params = [];

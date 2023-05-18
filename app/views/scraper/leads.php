@@ -8,6 +8,10 @@ $viewAll = $this->getVar('viewAll');
 
 <h1 class="page_header">Leads<?=($url->name) ? ' <small>- <a href="' . $url->url . '" target="_blank">' . $url->name . '</a></small>' : ''?></h1>
 
+<div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
+    <a href="/scraper/map-view" role="button" class="btn btn-round btn-info" type="button">Map View</a>
+</div>
+
 <table class="e2-table" id="leadTable">
     <thead>
         <tr>

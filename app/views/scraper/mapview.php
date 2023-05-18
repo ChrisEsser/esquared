@@ -114,9 +114,11 @@ $scrapers = $this->getVar('scrapers');
                     </div>
                 </div>
 
+                <div class="d-grid gap-2 d-md-flex my-2 justify-content-md-end">
+                    <a href="/scraper/leads" class="btn btn-round btn-info flex-grow-1">list View</a>
+                </div>
+
             </div>
-
-
         </div>
 
         <div id="mapview_bottom_left">

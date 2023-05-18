@@ -7,7 +7,6 @@
 
 <div class="d-grid gap-2 d-md-flex my-3 justify-content-md-end">
     <button role="button" class="btn btn-round btn-primary edit_trigger" type="button">Add Url</button>
-    <a href="/scraper/map-view" role="button" class="btn btn-round btn-info" type="button">Map View</a>
     <a href="/scraper/leads" class="btn btn-round btn-info">View All Leads</a>
     <a href="/scraper/quarantined-addresses" class="btn btn-round btn-info">Quarantined Addressed</a>
 </div>
