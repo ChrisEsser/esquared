@@ -308,7 +308,7 @@ class PropertyController extends BaseController
 
         foreach ($leads as $lead) {
 
-            $plainSTring = ScraperHelper::getPdfString($lead);
+            $plainSTring = ScraperHelper::getPdfString($lead->url);
             if (!empty($plainSTring)) {
 
                 $addresses = ScraperHelper::pullAddressesFromString($plainSTring);
