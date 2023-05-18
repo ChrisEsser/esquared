@@ -294,57 +294,32 @@ class PropertyController extends BaseController
     {
         $this->render = false;
 
-        $string = '13 S main Street, Lancaster, Wi';
+        /** @var ScraperLeadAddress[] $addresses */
+        $addresses = ScraperLeadAddress::find();
+        foreach ($addresses as $address) {
+            if (empty($address->lat) || empty($address->lon)) {
 
-        $pattern = '/(?<street>[A-Z]?\d+[\w\s,.-]+?) # street number and name
-               [\s,.-]+
-               (?<city>[a-z][\w\s]+?) # city
-               [\s,.-]+
-               (?<state>[A-Z]{2}) # state abbreviation
-               [\s,.-]*\b
-               (?<zip>\d{5}(?:-\d{4})?)?/x';
+                $addressString = $address->street . ' ' . $address->city . ' ' . $address->state . ' ' . $address->zip;
+                $addressString = urlencode($addressString);
 
-        preg_match_all($pattern, $string, $matches, PREG_SET_ORDER);
+                $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $addressString . '&key=' . $_ENV['GOOGLE_MAPS_SERVER_KEY'];
+                $result = file_get_contents($apiUrl);
+                $result = json_decode($result, true);
 
-        $fullAddresses = [];
+                if (isset($result['status']) && $result['status'] = 'OK') {
 
-        foreach ($matches as $match) {
+                    $geo = $result['results'][0]['geometry']['location'];
 
-            $fullAddress = '241 N. McKinley st, Lancaster, WI';
+                    if ($geo) {
+                        $address->lat = $geo['lat'];
+                        $address->lon = $geo['lng'];
+                        $address->save();
+                    }
 
-            if (!empty($match['street'])) {
-                $fullAddress .= $match['street'];
-            }
-
-            if (!empty($match['city'])) {
-                if (!empty($fullAddress)) {
-                    $fullAddress .= ', ';
                 }
-                $fullAddress .= $match['city'];
-            }
 
-            if (!empty($match['state'])) {
-                if (!empty($fullAddress)) {
-                    $fullAddress .= ' ';
-                }
-                $fullAddress .= $match['state'];
             }
-
-            if (!empty($match['zip'])) {
-                if (!empty($fullAddress)) {
-                    $fullAddress .= ' ';
-                }
-                $fullAddress .= $match['zip'];
-            }
-
-            $fullAddresses[] = $fullAddress;
         }
-
-        echo '<pre>';
-        var_dump($matches);
-        var_dump($fullAddresses);
-
-
 
         exit;
 
