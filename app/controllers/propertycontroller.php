@@ -294,49 +294,6 @@ class PropertyController extends BaseController
     {
         $this->render = false;
 
-        $client = new GuzzleHttp\Client();
-
-        $db = new StandardQuery();
-
-        $sql = 'SELECT l.lead_id, l.url
-                FROM scraper_leads l
-                LEFT JOIN lead_addresses a ON a.lead_id = l.lead_id            
-                GROUP BY l.lead_id
-                HAVING COUNT(a.address_id) = 0';
-
-        $leads = $db->rows($sql);
-
-        foreach ($leads as $lead) {
-
-            $plainSTring = ScraperHelper::getPdfString($lead->url);
-            if (!empty($plainSTring)) {
-
-                $addresses = ScraperHelper::pullAddressesFromString($plainSTring);
-
-                var_dump($addresses);
-                continue;
-
-                if ($addresses) {
-                    $addresses = ScraperHelper::parseAddressPartsFromGoogle($addresses);
-                    $addresses = ScraperHelper::removeQuarantinedAddressFromArray($addresses);
-                }
-            }
-
-            foreach($addresses as $address) {
-                $addr = new ScraperLeadAddress();
-                $addr->lead_id = $lead->lead_id;
-                $addr->street = $address['streetNumber'] . ' ' . $address['streetName'];
-                $addr->city = $address['city'];
-                $addr->state = $address['state'];
-                $addr->zip = $address['zip'];
-                $addr->lat = $address['lat'];
-                $addr->lon = $address['lon'];
-                $addr->type = 0;
-                $addr->save();
-            }
-
-        }
-
         exit;
 
     }

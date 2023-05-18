@@ -231,7 +231,6 @@ class tableData
         if (format === 'usd') {
             value = new Intl.NumberFormat('en-US', { style: 'currency', 'currency':'USD' }).format(value);
         } else if (format === 'date' || format === 'datetime') {
-            value += 'Z';
             const d = new Date(value);
             const month = d.getMonth()+1;
             value = + month + '/' + d.getDate() + '/' + d.getFullYear();
