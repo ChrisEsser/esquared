@@ -312,14 +312,15 @@ class PropertyController extends BaseController
             if (!empty($plainSTring)) {
 
                 $addresses = ScraperHelper::pullAddressesFromString($plainSTring);
+
+                var_dump($addresses);
+                continue;
+
                 if ($addresses) {
                     $addresses = ScraperHelper::parseAddressPartsFromGoogle($addresses);
                     $addresses = ScraperHelper::removeQuarantinedAddressFromArray($addresses);
                 }
             }
-
-            var_dump($addresses);
-            continue;
 
             foreach($addresses as $address) {
                 $addr = new ScraperLeadAddress();
