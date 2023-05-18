@@ -297,7 +297,11 @@ class PropertyController extends BaseController
         /** @var ScraperLeadAddress[] $addresses */
         $addresses = ScraperLeadAddress::find();
         foreach ($addresses as $address) {
+
             if (empty($address->lat) || empty($address->lon)) {
+
+                var_dump($address);
+                continue;
 
                 $addressString = $address->street . ' ' . $address->city . ' ' . $address->state . ' ' . $address->zip;
                 $addressString = urlencode($addressString);
