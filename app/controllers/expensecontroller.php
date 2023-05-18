@@ -86,7 +86,7 @@ class ExpenseController extends BaseController
             $missing = [];
             if (empty($_POST['amount'])) $missing[] = 'amount';
             if (empty($_POST['date'])) $missing[] = 'date';
-            if (empty($_POST['property_id'])) $missing[] = 'property_id';
+//            if (empty($_POST['property_id'])) $missing[] = 'property_id';
 
             if (!empty($missing)) {
                 throw new Exception('Required fields were missing');

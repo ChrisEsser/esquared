@@ -14,7 +14,7 @@ $unitId = $this->getVar('unitId');
     var unitId = <?=json_encode($unitId)?>;
 </script>
 
-<form id="expenseForm">
+<form id="expenseForm" autocomplete="off">
 
     <input type="hidden" id="expense" name="expense" value="<?=$expense->expense_id?>" />
 
@@ -32,8 +32,7 @@ $unitId = $this->getVar('unitId');
 
         <div class="mb-3 col-md-6">
             <label for="name" class="form-label">Unit</label>
-            <select name="unit_id" id="unit_id" class="form-control">
-            </select>
+            <select name="unit_id" id="unit_id" class="form-control"></select>
         </div>
 
     </div>
@@ -53,7 +52,7 @@ $unitId = $this->getVar('unitId');
         <div class="mb-3 col-md-6">
             <label for="date" class="form-label">Date</label>
             <div class="input-group">
-                <input type="text" class="form-control" name="date" id="date" value="<?=($expense->date) ? date('m/d/Y', strtotime($expense->date)) : ''?>" />
+                <input type="text" class="form-control" name="date" id="date" value="<?=($expense->date) ? date('m/d/Y', strtotime($expense->date)) : ''?>" autocomplete="off" />
                 <span class="input-group-append">
                     <span class="input-group-text bg-light d-block">
                         <i class="fa fa-calendar"></i>
