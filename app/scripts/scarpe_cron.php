@@ -347,9 +347,6 @@ function getPdfString($url, $client)
     $command = 'pdftoppm -jpeg ' . $tmpPdfPath . ' ' . $tmpImgFilePath;
     exec($command);
 
-
-
-
     if (file_exists($tmpImgFilePath . '.jpg')) {
 
         $tmpImgFilePath .= '.jpg';

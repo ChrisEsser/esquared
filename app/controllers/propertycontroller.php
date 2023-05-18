@@ -294,35 +294,43 @@ class PropertyController extends BaseController
     {
         $this->render = false;
 
-        /** @var ScraperLeadAddress[] $addresses */
-        $addresses = ScraperLeadAddress::find();
-        foreach ($addresses as $address) {
+        $client = new GuzzleHttp\Client();
 
-            if (empty($address->lat) || empty($address->lon)) {
+        $db = new StandardQuery();
 
-                var_dump($address);
-                continue;
+        $sql = 'SELECT l.lead_id, l.url
+                FROM scraper_leads l
+                LEFT JOIN lead_addresses a ON a.lead_id = l.lead_id            
+                GROUP BY l.lead_id
+                HAVING COUNT(a.address_id) = 0';
 
-                $addressString = $address->street . ' ' . $address->city . ' ' . $address->state . ' ' . $address->zip;
-                $addressString = urlencode($addressString);
+        $leads = $db->rows($sql);
 
-                $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . $addressString . '&key=' . $_ENV['GOOGLE_MAPS_SERVER_KEY'];
-                $result = file_get_contents($apiUrl);
-                $result = json_decode($result, true);
+        foreach ($leads as $lead) {
 
-                if (isset($result['status']) && $result['status'] = 'OK') {
+            $plainSTring = ScraperHelper::getPdfString($lead);
+            if (!empty($plainSTring)) {
 
-                    $geo = $result['results'][0]['geometry']['location'];
-
-                    if ($geo) {
-                        $address->lat = $geo['lat'];
-                        $address->lon = $geo['lng'];
-                        $address->save();
-                    }
-
+                $addresses = ScraperHelper::pullAddressesFromString($plainSTring);
+                if ($addresses) {
+                    $addresses = ScraperHelper::parseAddressPartsFromGoogle($addresses);
+                    $addresses = ScraperHelper::removeQuarantinedAddressFromArray($addresses);
                 }
-
             }
+
+            foreach($addresses as $address) {
+                $addr = new ScraperLeadAddress();
+                $addr->lead_id = $lead->lead_id;
+                $addr->street = $address['streetNumber'] . ' ' . $address['streetName'];
+                $addr->city = $address['city'];
+                $addr->state = $address['state'];
+                $addr->zip = $address['zip'];
+                $addr->lat = $address['lat'];
+                $addr->lon = $address['lon'];
+                $addr->type = 0;
+                $addr->save();
+            }
+
         }
 
         exit;
