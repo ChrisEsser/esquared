@@ -233,6 +233,27 @@ ul.pagination {
     margin-bottom: 0;
 }
 
+.mobile_sort_trigger {
+    display: none;
+    cursor: pointer;
+}
+
+@media screen and (min-width: 991px) {
+    .tableData_search_input::-webkit-input-placeholder {
+        color: rgba(0, 0, 0, 0);
+    }
+    .tableData_search_input::-moz-placeholder {
+        color: rgba(0, 0, 0, 0);
+    }
+    .tableData_search_input:-ms-input-placeholder {
+        color: rgba(0, 0, 0, 0);
+    }
+    .tableData_search_input::placeholder {
+        color: rgba(0, 0, 0, 0);
+    }
+}
+
+
 
 @media screen and (max-width: 1200px) {
     .property_image {
@@ -297,5 +318,9 @@ ul.pagination {
 
     .e2-table td:last-child {
         border-bottom: 0;
+    }
+
+    .e2-table .mobile_sort_trigger {
+        display: block;
     }
 }

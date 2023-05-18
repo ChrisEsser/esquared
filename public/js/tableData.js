@@ -299,13 +299,13 @@ class tableData
             } else {
                 // try to grab the col header to display in the label
                 const label = (typeof $(headers[i]).text() == 'string') ? $(headers[i]).text() : '';
-                html += '<td style="padding: 8px 8px">';
-                html += '<div class="mobile_header_label" style="display: none;">';
+                const order = (typeof this.config.columns[i].order == 'undefined' || this.config.columns[i].order === 'ASC') ? 'ASC' : '';
+
+                html += '<td style="padding: 5px 5px">';
                 html += '<div  style="display: flex; align-items: center; justify-content: space-between;">';
-                html += '<lable for="' + this.id + '_headerSearch_' + i + '">' + label + '</lable>';
+                html += '<input class="tableData_search_input flex-grow-1" type="text" placeholder="' + label + '" id="' + this.id + '_headerSearch_' + i + '" data-col="' + this.config.columns[i].col + '" />';
+                html += '<div class="p-2 ' + this.id + '_tableData_sort_trigger mobile_sort_trigger" data-col="' + this.config.columns[i].col + '" data-order="' + order + '"><i class="fa fa-sort"></i></div>';
                 html += '</div>';
-                html += '</div>';
-                html += '<input class="tableData_search_input" type="text" id="' + this.id + '_headerSearch_' + i + '" data-col="' + this.config.columns[i].col + '" />';
                 html += '</td>';
                 hasOneSearchColumn = true;
             }
