@@ -318,6 +318,9 @@ class PropertyController extends BaseController
                 }
             }
 
+            var_dump($addresses);
+            continue;
+
             foreach($addresses as $address) {
                 $addr = new ScraperLeadAddress();
                 $addr->lead_id = $lead->lead_id;
